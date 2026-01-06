@@ -6,7 +6,7 @@ import { theme } from '@/styles/theme'
 import { WorldMap } from '@/components/WorldMap'
 import { Header, Footer } from '@/components/layout'
 import { LiveTransactions } from '@/components/dashboard'
-import { HowItWorks, CoveragePlans, FAQ, ActivePools } from '@/components/sections'
+import { HowItWorks, CoveragePlans, FAQ, ActivePools, ActiveEvents } from '@/components/sections'
 import { Button, GlassCard, StatCard } from '@/components/common'
 
 const PageContainer = styled.div`
@@ -366,6 +366,7 @@ export const Home = () => {
         </FeaturesSection>
 
         <ActivePools />
+        <ActiveEvents />
         <LiveTransactions />
         <HowItWorks />
         <CoveragePlans />

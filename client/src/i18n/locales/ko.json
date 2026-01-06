@@ -254,6 +254,66 @@
     "terms": "이용약관",
     "cookies": "쿠키 정책"
   },
+  "activeEvents": {
+    "badge": "EPISODE EXPLORER",
+    "title": "Active Events",
+    "subtitle": "각 이벤트의 규칙을 확인한 후 참여하세요. 모든 조건은 사전에 확정됩니다.",
+    "status": {
+      "recruiting": "모집중",
+      "inForce": "IN FORCE"
+    },
+    "categories": {
+      "flightDelay": "항공 지연",
+      "weather": "날씨 위험"
+    },
+    "labels": {
+      "viewRules": "View rules →",
+      "backToEvents": "← Back to events",
+      "backToRules": "← Back to rules",
+      "trigger": "Trigger",
+      "premium": "Premium",
+      "maxPayout": "Max payout",
+      "maxLoss": "Max Loss",
+      "event": "이벤트",
+      "eventWindow": "이벤트 기간",
+      "triggerCondition": "트리거 조건",
+      "dataSource": "데이터 소스",
+      "resolutionTime": "결정 시간",
+      "additionalContributions": "추가 기여",
+      "poolLogic": "풀 로직",
+      "poolLogicDesc": "동질적 위험 풀. 잉여금은 조합원에게 비례하여 반환됩니다.",
+      "none": "없음",
+      "checkboxLabel": "본인은 이 규칙을 이해합니다. 결과는 협상이나 이의 제기 없이 오라클에 의해 자동으로 결정됨을 인정합니다.",
+      "joinPool": "Join Pool",
+      "confirmAndJoin": "Confirm & Join",
+      "poolClosesIn": "Pool closes in",
+      "eventEndsIn": "Event ends in",
+      "warning": "참여하면 이 에피소드의 리스크 풀 멤버가 됩니다. 참여 후에는 환불이 불가능합니다.",
+      "yourEpisode": "Your Episode",
+      "currentData": "실시간 데이터",
+      "live": "Live",
+      "flightStatus": "비행 상태",
+      "currentDelay": "현재 지연",
+      "progressToTrigger": "트리거까지 진행률",
+      "referenceOnly": "실시간 데이터는 참고용일 뿐입니다. 최종 결과는 지정된 시간에 오라클 결의에 의해서만 결정됩니다.",
+      "viewResolution": "View Resolution"
+    },
+    "events": {
+      "ke902": {
+        "title": "Flight KE902 Delay",
+        "subtitle": "인천-나리타 KE902편 도착 지연 보험",
+        "trigger": "도착 지연 ≥ 3시간",
+        "time": "2025-01-15 09:00 - 2025-01-15 18:00",
+        "oracle": "FlightAware API",
+        "resolution": "2025-01-15 18:30 UTC"
+      },
+      "jejuTyphoon": {
+        "title": "Jeju Typhoon Cancellation",
+        "trigger": "태풍 경보로 인한 결항",
+        "time": "2025-08-01 00:00 - 2025-08-31 23:59"
+      }
+    }
+  },
   "common": {
     "currency": "원",
     "memberUnit": "명"
