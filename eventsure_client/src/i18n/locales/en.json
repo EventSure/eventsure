@@ -1,0 +1,261 @@
+{
+  "header": {
+    "howItWorks": "How it Works",
+    "coverage": "Coverage",
+    "claims": "Claims",
+    "about": "About"
+  },
+  "hero": {
+    "badge": "Powered by Mantle Network",
+    "title1": "Flight Delay",
+    "title2": "Insurance",
+    "title3": "On-Chain Protection",
+    "subtitle": "Get instant compensation for flight delays with our decentralized mutual insurance protocol. Transparent, automated, and trustless coverage for travelers worldwide.",
+    "getCoverage": "Get Coverage",
+    "learnMore": "Learn More"
+  },
+  "stats": {
+    "tvl": "Total Value Locked",
+    "policies": "Policies Issued",
+    "claimRate": "Claim Success Rate",
+    "payoutTime": "Average Payout Time"
+  },
+  "features": {
+    "security": {
+      "title": "Smart Contract Security",
+      "description": "Your funds are protected by audited smart contracts on Mantle Network, ensuring transparent and tamper-proof insurance coverage."
+    },
+    "claims": {
+      "title": "Instant Claims",
+      "description": "Flight delay data is automatically verified through oracles, triggering instant payouts without manual claim processing."
+    },
+    "mutual": {
+      "title": "Mutual Coverage",
+      "description": "Join a decentralized pool of travelers sharing risk together. Lower premiums, higher coverage, community-driven protection."
+    }
+  },
+  "activePools": {
+    "badge": "ACTIVE POOLS",
+    "title": "Active Insurance Pools",
+    "description": "Join mutual insurance pools operated with transparent rules and automatic settlement.",
+    "subtext": "All conditions are predetermined.",
+    "filters": {
+      "all": "All",
+      "recruiting": "Recruiting",
+      "active": "Active",
+      "settling": "Settling"
+    },
+    "status": {
+      "recruiting": "Recruiting",
+      "active": "Active",
+      "settling": "Settling"
+    },
+    "labels": {
+      "coverageCondition": "Coverage Condition",
+      "premium": "Premium",
+      "maxPayout": "Max Payout",
+      "members": "Members",
+      "endDate": "End Date",
+      "poolSize": "Pool Size",
+      "join": "Join Now"
+    },
+    "categories": {
+      "flightDelay": "Flight Delay",
+      "weather": "Weather Risk",
+      "tripCancel": "Trip Cancellation"
+    },
+    "pools": {
+      "incheonTokyo": {
+        "title": "Incheon-Tokyo Flight Delay Insurance",
+        "description": "Compensation for delays over 2 hours on Incheon-Narita departures on Jan 15, 2025",
+        "condition": "Automatic payout for departure delays over 2 hours"
+      },
+      "jejuTyphoon": {
+        "title": "Jeju Typhoon Cancellation Insurance",
+        "description": "Compensation for flight cancellations due to typhoons during summer 2025 Jeju travel",
+        "condition": "Automatic payout for cancellations due to typhoon warnings"
+      },
+      "gimpoJeju": {
+        "title": "Gimpo-Jeju Flight Delay Insurance",
+        "description": "Compensation for delays over 2 hours on domestic Gimpo-Jeju routes in Jan 2025",
+        "condition": "Automatic payout for departure delays over 2 hours"
+      },
+      "tokyoCherry": {
+        "title": "Tokyo Cherry Blossom Season Travel Insurance",
+        "description": "Settlement in progress for April 2024 Tokyo cherry blossom season trip cancellation coverage",
+        "condition": "Automatic payout for flight cancellations or accommodation cancellations"
+      }
+    }
+  },
+  "liveTransactions": {
+    "badge": "Live on Mantle",
+    "title": "Real-Time",
+    "titleHighlight": "Transparency",
+    "description": "Every transaction is recorded on-chain. Watch the protocol in action with complete transparency.",
+    "feedTitle": "Live Transaction Feed",
+    "txTypes": {
+      "purchase": "Policy Purchased",
+      "claim": "Claim Submitted",
+      "payout": "Payout Sent",
+      "stake": "Pool Staked"
+    },
+    "stats": {
+      "volume": "Total Volume (24h)",
+      "activePolicies": "Active Policies",
+      "networkStatus": "Network Status",
+      "acrossAll": "Across all transactions",
+      "protected": "Protected travelers"
+    }
+  },
+  "howItWorks": {
+    "badge": "Simple Process",
+    "title": "How It",
+    "titleHighlight": "Works",
+    "description": "Get protected in minutes with our streamlined on-chain insurance process.",
+    "steps": {
+      "connect": {
+        "title": "Connect Wallet",
+        "description": "Connect your Web3 wallet to the Mantle network. We support MetaMask, WalletConnect, and other popular wallets."
+      },
+      "flight": {
+        "title": "Enter Flight Details",
+        "description": "Input your flight number and travel date. Our system automatically verifies flight data through trusted oracles."
+      },
+      "purchase": {
+        "title": "Purchase Coverage",
+        "description": "Pay a small premium in MNT tokens to activate your coverage. Smart contracts instantly secure your policy on-chain."
+      },
+      "monitor": {
+        "title": "Automatic Monitoring",
+        "description": "Our oracle network monitors your flight in real-time. No action needed from you - just travel as planned."
+      },
+      "payout": {
+        "title": "Instant Payout",
+        "description": "If your flight is delayed beyond the threshold, compensation is automatically sent to your wallet. No claims, no waiting."
+      }
+    }
+  },
+  "coveragePlans": {
+    "badge": "Flexible Plans",
+    "title": "Choose Your",
+    "titleHighlight": "Coverage",
+    "description": "Select the protection level that matches your travel needs. All plans include instant on-chain payouts.",
+    "mostPopular": "Most Popular",
+    "perFlight": "per flight",
+    "getButton": "Get {{plan}}",
+    "plans": {
+      "basic": {
+        "name": "Basic",
+        "description": "Essential coverage for budget travelers"
+      },
+      "standard": {
+        "name": "Standard",
+        "description": "Most popular choice for frequent flyers"
+      },
+      "premium": {
+        "name": "Premium",
+        "description": "Maximum protection for business travelers"
+      }
+    },
+    "features": {
+      "delay3h": "Coverage for delays over 3 hours",
+      "delay2h": "Coverage for delays over 2 hours",
+      "delay1h": "Coverage for delays over 1 hour",
+      "payout01": "Up to 0.1 MNT payout",
+      "payout03": "Up to 0.3 MNT payout",
+      "payout05": "Up to 0.5 MNT payout",
+      "single": "Single flight coverage",
+      "multi": "Multi-flight bundle discount",
+      "unlimited": "Unlimited flights for 30 days",
+      "standard": "Standard oracle verification",
+      "priority": "Priority oracle verification",
+      "instant": "Instant oracle verification",
+      "email": "Email notifications",
+      "push": "Real-time push notifications",
+      "support": "Priority customer support",
+      "cancel": "Cancellation coverage included",
+      "cancelDelay": "Cancellation + delay coverage",
+      "rebook": "Rebooking cost coverage"
+    },
+    "coverage": {
+      "threshold": "Delay Threshold",
+      "maxPayout": "Max Payout",
+      "validity": "Validity",
+      "3hours": "3+ hours",
+      "2hours": "2+ hours",
+      "1hour": "1+ hour",
+      "singleFlight": "Single flight",
+      "30days": "30 days",
+      "30daysUnlimited": "30 days unlimited"
+    }
+  },
+  "faq": {
+    "badge": "Got Questions?",
+    "title": "Frequently Asked",
+    "titleHighlight": "Questions",
+    "description": "Everything you need to know about decentralized flight insurance.",
+    "questions": {
+      "q1": {
+        "question": "How does the flight delay insurance work?",
+        "answer": "When you purchase a policy, your coverage details are recorded on the Mantle blockchain. Our oracle network monitors real-time flight data from multiple trusted sources. If your flight is delayed beyond your coverage threshold, the smart contract automatically triggers a payout to your wallet - no claims process required."
+      },
+      "q2": {
+        "question": "What qualifies as a covered delay?",
+        "answer": "Coverage depends on your plan tier. Basic plans cover delays of 3+ hours, Standard covers 2+ hours, and Premium covers delays of just 1+ hour. Delays are measured from the original scheduled departure time. Cancellations are covered under Standard and Premium plans."
+      },
+      "q3": {
+        "question": "How fast do I receive my payout?",
+        "answer": "Payouts are automatic and typically processed within minutes of the delay being confirmed by our oracle network. Since everything runs on smart contracts, there's no manual review process. The average payout time is under 5 minutes."
+      },
+      "q4": {
+        "question": "What is a mutual insurance pool?",
+        "answer": "Instead of a traditional insurance company, EventSure operates as a decentralized mutual pool. All premium payments go into a shared pool that covers everyone's claims. This removes the profit motive of traditional insurers, resulting in lower premiums and higher payouts for travelers."
+      },
+      "q5": {
+        "question": "Which airlines and flights are covered?",
+        "answer": "We cover flights from over 500 airlines worldwide, including all major carriers. Our oracle network integrates with official aviation data sources to track flights globally. Before purchasing, you can verify your specific flight is trackable in our system."
+      },
+      "q6": {
+        "question": "What tokens can I use to pay and receive payouts?",
+        "answer": "All transactions are conducted in MNT (Mantle native token). Premiums are paid in MNT, and payouts are automatically sent in MNT to your connected wallet. The low gas fees on Mantle Network make micro-transactions economically viable."
+      },
+      "q7": {
+        "question": "Is my coverage valid if I miss my flight?",
+        "answer": "No, coverage only applies to airline-caused delays and cancellations. If you miss your flight or arrive late to the airport, the coverage does not apply. The policy specifically covers delays on the airline's side as verified by official flight data."
+      },
+      "q8": {
+        "question": "How do I know my funds are safe?",
+        "answer": "Our smart contracts have been audited by leading security firms. All code is open-source and verifiable on-chain. The mutual pool is managed by audited smart contracts with no single point of control. You can view all transactions and the pool balance in real-time on the blockchain."
+      }
+    }
+  },
+  "footer": {
+    "description": "Decentralized flight delay insurance powered by smart contracts on Mantle Network. Instant, transparent, and trustless coverage for travelers worldwide.",
+    "product": "Product",
+    "resources": "Resources",
+    "company": "Company",
+    "links": {
+      "howItWorks": "How it Works",
+      "coveragePlans": "Coverage Plans",
+      "pricing": "Pricing",
+      "faq": "FAQ",
+      "documentation": "Documentation",
+      "smartContracts": "Smart Contracts",
+      "auditReports": "Audit Reports",
+      "api": "API",
+      "aboutUs": "About Us",
+      "blog": "Blog",
+      "careers": "Careers",
+      "contact": "Contact"
+    },
+    "copyright": "© 2025 EventSure. All rights reserved.",
+    "builtOn": "Built on Mantle",
+    "privacy": "Privacy Policy",
+    "terms": "Terms of Service",
+    "cookies": "Cookie Policy"
+  },
+  "common": {
+    "currency": "KRW",
+    "memberUnit": "members"
+  }
+}
