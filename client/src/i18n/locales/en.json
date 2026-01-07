@@ -1,7 +1,7 @@
 {
   "header": {
-    "howItWorks": "How it Works",
-    "coverage": "Coverage",
+    "home": "Home",
+    "explorer": "Explorer",
     "claims": "Claims",
     "about": "About"
   },
@@ -253,6 +253,91 @@
     "privacy": "Privacy Policy",
     "terms": "Terms of Service",
     "cookies": "Cookie Policy"
+  },
+  "activeEvents": {
+    "badge": "EPISODE EXPLORER",
+    "title": "Active Events",
+    "subtitle": "Check the rules for each event before participating. All conditions are fixed in advance.",
+    "status": {
+      "recruiting": "Recruiting",
+      "inForce": "IN FORCE"
+    },
+    "categories": {
+      "flightDelay": "Flight Delay",
+      "weather": "Weather Risk"
+    },
+    "labels": {
+      "viewRules": "View rules →",
+      "viewRulesShort": "View Rules",
+      "backToEvents": "← Back to events",
+      "backToRules": "← Back to rules",
+      "trigger": "Trigger",
+      "premium": "Premium",
+      "maxPayout": "Max payout",
+      "maxLoss": "Max Loss",
+      "event": "Event",
+      "eventWindow": "Event window",
+      "triggerCondition": "Trigger condition",
+      "dataSource": "Data source",
+      "resolutionTime": "Resolution time",
+      "additionalContributions": "Additional contributions",
+      "poolLogic": "Pool Logic",
+      "poolLogicDesc": "Homogeneous risk pool. Surplus returned pro-rata to members.",
+      "none": "None",
+      "checkboxLabel": "I understand these rules. I acknowledge that outcomes are determined automatically by the oracle with no negotiation or appeal.",
+      "joinPool": "Join Pool",
+      "confirmAndJoin": "Confirm & Join",
+      "poolClosesIn": "Pool closes in",
+      "eventEndsIn": "Event ends in",
+      "warning": "By joining, you become a member of this episode's risk pool. No refunds after joining.",
+      "yourEpisode": "Your Episode",
+      "currentData": "Current data",
+      "live": "Live",
+      "flightStatus": "Flight status",
+      "currentDelay": "Current delay",
+      "progressToTrigger": "Progress to trigger",
+      "referenceOnly": "Real-time data is for reference only. Final outcome is determined solely by oracle resolution at the specified time.",
+      "viewResolution": "View Resolution",
+      "episodeRules": "Episode Rules",
+      "readOnly": "Read-only",
+      "coveredEvent": "Covered Event",
+      "oracle": "Oracle",
+      "financialTerms": "Financial Terms",
+      "enRoute": "En route",
+      "triggerThreshold": "3h (trigger)"
+    },
+    "events": {
+      "ke902": {
+        "title": "Flight KE902 Delay",
+        "subtitle": "Incheon-Narita KE902 Arrival Delay Insurance",
+        "trigger": "Arrival delay ≥ 3 hours",
+        "time": "2025-01-15 09:00 - 2025-01-15 18:00",
+        "oracle": "FlightAware API",
+        "resolution": "2025-01-15 18:30 UTC"
+      },
+      "jejuTyphoon": {
+        "title": "Jeju Typhoon Cancellation",
+        "subtitle": "Jeju Typhoon Flight Cancellation Insurance",
+        "trigger": "Flight cancellation due to typhoon warning",
+        "time": "2025-08-01 00:00 - 2025-08-31 23:59",
+        "oracle": "KMA Weather API",
+        "resolution": "2025-08-31 23:59 UTC"
+      }
+    },
+    "steps": {
+      "rules": {
+        "title": "Review Rules",
+        "subtitle": "Check conditions"
+      },
+      "join": {
+        "title": "Join Pool",
+        "subtitle": "Confirm & pay"
+      },
+      "dashboard": {
+        "title": "Monitor",
+        "subtitle": "Track status"
+      }
+    }
   },
   "common": {
     "currency": "KRW",

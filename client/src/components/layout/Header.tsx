@@ -2,6 +2,7 @@ import styled from '@emotion/styled'
 import { motion } from 'framer-motion'
 import { ConnectButton } from '@rainbow-me/rainbowkit'
 import { useTranslation } from 'react-i18next'
+import { Link, useLocation } from 'react-router-dom'
 import { theme } from '@/styles/theme'
 
 const HeaderContainer = styled(motion.header)`
@@ -24,10 +25,11 @@ const HeaderContent = styled.div`
   justify-content: space-between;
 `
 
-const Logo = styled.div`
+const Logo = styled(Link)`
   display: flex;
   align-items: center;
   gap: ${theme.spacing.sm};
+  text-decoration: none;
 `
 
 const LogoIcon = styled.div`
@@ -65,15 +67,30 @@ const Nav = styled.nav`
   }
 `
 
-const NavLink = styled.a`
-  color: ${theme.colors.textSecondary};
+const NavLink = styled(Link)<{ $isActive?: boolean }>`
+  color: ${({ $isActive }) => $isActive ? theme.colors.secondary : theme.colors.textSecondary};
   font-weight: ${theme.fontWeight.medium};
   transition: color ${theme.transitions.fast};
   cursor: pointer;
+  text-decoration: none;
+  position: relative;
 
   &:hover {
-    color: ${theme.colors.text};
+    color: ${({ $isActive }) => $isActive ? theme.colors.secondary : theme.colors.text};
   }
+
+  ${({ $isActive }) => $isActive && `
+    &::after {
+      content: '';
+      position: absolute;
+      bottom: -8px;
+      left: 0;
+      right: 0;
+      height: 2px;
+      background: ${theme.colors.secondary};
+      border-radius: ${theme.borderRadius.full};
+    }
+  `}
 `
 
 const Actions = styled.div`
@@ -109,10 +126,18 @@ const LanguageGroup = styled.div`
 
 export const Header = () => {
   const { t, i18n } = useTranslation()
+  const location = useLocation()
 
   const changeLanguage = (lng: string) => {
     i18n.changeLanguage(lng)
     localStorage.setItem('language', lng)
+  }
+
+  const isActive = (path: string) => {
+    if (path === '/') {
+      return location.pathname === '/'
+    }
+    return location.pathname.startsWith(path)
   }
 
   return (
@@ -122,7 +147,7 @@ export const Header = () => {
       transition={{ duration: 0.6, ease: 'easeOut' }}
     >
       <HeaderContent>
-        <Logo>
+        <Logo to="/">
           <LogoIcon>
             <svg viewBox="0 0 24 24">
               <path d="M21 16v-2l-8-5V3.5c0-.83-.67-1.5-1.5-1.5S10 2.67 10 3.5V9l-8 5v2l8-2.5V19l-2 1.5V22l3.5-1 3.5 1v-1.5L13 19v-5.5l8 2.5z" />
@@ -132,10 +157,10 @@ export const Header = () => {
         </Logo>
 
         <Nav>
-          <NavLink>{t('header.howItWorks')}</NavLink>
-          <NavLink>{t('header.coverage')}</NavLink>
-          <NavLink>{t('header.claims')}</NavLink>
-          <NavLink>{t('header.about')}</NavLink>
+          <NavLink to="/" $isActive={isActive('/')}>{t('header.home')}</NavLink>
+          <NavLink to="/explorer" $isActive={isActive('/explorer')}>{t('header.explorer')}</NavLink>
+          <NavLink to="/claims" $isActive={isActive('/claims')}>{t('header.claims')}</NavLink>
+          <NavLink to="/about" $isActive={isActive('/about')}>{t('header.about')}</NavLink>
         </Nav>
 
         <Actions>
