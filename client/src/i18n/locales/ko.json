@@ -1,7 +1,7 @@
 {
   "header": {
-    "howItWorks": "이용 방법",
-    "coverage": "보장 내용",
+    "home": "홈",
+    "explorer": "탐색기",
     "claims": "보상 청구",
     "about": "소개"
   },
@@ -256,7 +256,7 @@
   },
   "activeEvents": {
     "badge": "EPISODE EXPLORER",
-    "title": "Active Events",
+    "title": "진행중인 보험",
     "subtitle": "각 이벤트의 규칙을 확인한 후 참여하세요. 모든 조건은 사전에 확정됩니다.",
     "status": {
       "recruiting": "모집중",
@@ -268,6 +268,7 @@
     },
     "labels": {
       "viewRules": "View rules →",
+      "viewRulesShort": "View Rules",
       "backToEvents": "← Back to events",
       "backToRules": "← Back to rules",
       "trigger": "Trigger",
@@ -296,7 +297,14 @@
       "currentDelay": "현재 지연",
       "progressToTrigger": "트리거까지 진행률",
       "referenceOnly": "실시간 데이터는 참고용일 뿐입니다. 최종 결과는 지정된 시간에 오라클 결의에 의해서만 결정됩니다.",
-      "viewResolution": "View Resolution"
+      "viewResolution": "View Resolution",
+      "episodeRules": "Episode Rules",
+      "readOnly": "Read-only",
+      "coveredEvent": "보장 이벤트",
+      "oracle": "오라클",
+      "financialTerms": "재무 조건",
+      "enRoute": "비행 중",
+      "triggerThreshold": "3h (trigger)"
     },
     "events": {
       "ke902": {
@@ -309,8 +317,25 @@
       },
       "jejuTyphoon": {
         "title": "Jeju Typhoon Cancellation",
+        "subtitle": "제주 태풍 결항 보험",
         "trigger": "태풍 경보로 인한 결항",
-        "time": "2025-08-01 00:00 - 2025-08-31 23:59"
+        "time": "2025-08-01 00:00 - 2025-08-31 23:59",
+        "oracle": "기상청 API",
+        "resolution": "2025-08-31 23:59 UTC"
+      }
+    },
+    "steps": {
+      "rules": {
+        "title": "규칙 확인",
+        "subtitle": "조건 검토"
+      },
+      "join": {
+        "title": "풀 가입",
+        "subtitle": "확인 & 결제"
+      },
+      "dashboard": {
+        "title": "모니터링",
+        "subtitle": "상태 추적"
       }
     }
   },

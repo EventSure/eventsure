@@ -1,26 +1,31 @@
-import styled from '@emotion/styled'
-import { motion } from 'framer-motion'
-import { useAccount } from 'wagmi'
-import { useTranslation } from 'react-i18next'
-import { theme } from '@/styles/theme'
-import { WorldMap } from '@/components/WorldMap'
-import { Header, Footer } from '@/components/layout'
-import { LiveTransactions } from '@/components/dashboard'
-import { HowItWorks, CoveragePlans, FAQ, ActivePools, ActiveEvents } from '@/components/sections'
-import { Button, GlassCard, StatCard } from '@/components/common'
+import styled from "@emotion/styled";
+import { motion } from "framer-motion";
+import { useAccount } from "wagmi";
+import { useTranslation } from "react-i18next";
+import { theme } from "@/styles/theme";
+import { WorldMap } from "@/components/WorldMap";
+import { Header, Footer } from "@/components/layout";
+import { LiveTransactions } from "@/components/dashboard";
+import {
+  HowItWorks,
+  FAQ,
+  ActivePools,
+  ActiveEvents,
+} from "@/components/sections";
+import { Button, GlassCard, StatCard } from "@/components/common";
 
 const PageContainer = styled.div`
   min-height: 100vh;
   position: relative;
   overflow: hidden;
-`
+`;
 
 const Content = styled.div`
   position: relative;
   z-index: 10;
   min-height: 100vh;
   padding-top: 80px;
-`
+`;
 
 const HeroSection = styled.section`
   min-height: calc(100vh - 80px);
@@ -30,11 +35,11 @@ const HeroSection = styled.section`
   justify-content: center;
   padding: ${theme.spacing.xl};
   text-align: center;
-`
+`;
 
 const HeroContent = styled(motion.div)`
   max-width: 900px;
-`
+`;
 
 const Badge = styled(motion.div)`
   display: inline-flex;
@@ -48,7 +53,7 @@ const Badge = styled(motion.div)`
   font-size: ${theme.fontSize.sm};
   font-weight: ${theme.fontWeight.medium};
   margin-bottom: ${theme.spacing.lg};
-`
+`;
 
 const Title = styled(motion.h1)`
   font-size: clamp(40px, 8vw, ${theme.fontSize.display});
@@ -67,7 +72,7 @@ const Title = styled(motion.h1)`
     -webkit-text-fill-color: transparent;
     background-clip: text;
   }
-`
+`;
 
 const Subtitle = styled(motion.p)`
   font-size: ${theme.fontSize.xl};
@@ -77,20 +82,20 @@ const Subtitle = styled(motion.p)`
   max-width: 600px;
   margin-left: auto;
   margin-right: auto;
-`
+`;
 
 const ButtonGroup = styled(motion.div)`
   display: flex;
   gap: ${theme.spacing.md};
   justify-content: center;
   flex-wrap: wrap;
-`
+`;
 
 const StatsSection = styled(motion.section)`
   padding: ${theme.spacing.xxl} ${theme.spacing.xl};
   display: flex;
   justify-content: center;
-`
+`;
 
 const StatsGrid = styled.div`
   display: grid;
@@ -106,28 +111,32 @@ const StatsGrid = styled.div`
   @media (max-width: ${theme.breakpoints.sm}) {
     grid-template-columns: 1fr;
   }
-`
+`;
 
 const StatValue = styled.div`
   font-size: ${theme.fontSize.xxxl};
   font-weight: ${theme.fontWeight.bold};
-  background: linear-gradient(135deg, ${theme.colors.primary}, ${theme.colors.secondary});
+  background: linear-gradient(
+    135deg,
+    ${theme.colors.primary},
+    ${theme.colors.secondary}
+  );
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
   margin-bottom: ${theme.spacing.xs};
-`
+`;
 
 const StatLabel = styled.div`
   font-size: ${theme.fontSize.sm};
   color: ${theme.colors.textSecondary};
-`
+`;
 
 const FeaturesSection = styled.section`
   padding: ${theme.spacing.xxxl} ${theme.spacing.xl};
   display: flex;
   justify-content: center;
-`
+`;
 
 const FeaturesGrid = styled.div`
   display: grid;
@@ -139,17 +148,21 @@ const FeaturesGrid = styled.div`
   @media (max-width: ${theme.breakpoints.lg}) {
     grid-template-columns: 1fr;
   }
-`
+`;
 
 const FeatureCard = styled(GlassCard)`
   text-align: center;
-`
+`;
 
 const FeatureIcon = styled.div`
   width: 64px;
   height: 64px;
   margin: 0 auto ${theme.spacing.lg};
-  background: linear-gradient(135deg, ${theme.colors.primary}30, ${theme.colors.secondary}30);
+  background: linear-gradient(
+    135deg,
+    ${theme.colors.primary}30,
+    ${theme.colors.secondary}30
+  );
   border-radius: ${theme.borderRadius.lg};
   display: flex;
   align-items: center;
@@ -160,20 +173,20 @@ const FeatureIcon = styled.div`
     height: 32px;
     fill: ${theme.colors.primary};
   }
-`
+`;
 
 const FeatureTitle = styled.h3`
   font-size: ${theme.fontSize.xl};
   font-weight: ${theme.fontWeight.semibold};
   margin-bottom: ${theme.spacing.sm};
   color: ${theme.colors.text};
-`
+`;
 
 const FeatureDescription = styled.p`
   font-size: ${theme.fontSize.md};
   color: ${theme.colors.textSecondary};
   line-height: 1.6;
-`
+`;
 
 const ConnectedBadge = styled(motion.div)`
   display: inline-flex;
@@ -188,7 +201,7 @@ const ConnectedBadge = styled(motion.div)`
   margin-top: ${theme.spacing.lg};
 
   &::before {
-    content: '';
+    content: "";
     width: 8px;
     height: 8px;
     background: ${theme.colors.success};
@@ -197,10 +210,15 @@ const ConnectedBadge = styled(motion.div)`
   }
 
   @keyframes pulse {
-    0%, 100% { opacity: 1; }
-    50% { opacity: 0.5; }
+    0%,
+    100% {
+      opacity: 1;
+    }
+    50% {
+      opacity: 0.5;
+    }
   }
-`
+`;
 
 const containerVariants = {
   hidden: { opacity: 0 },
@@ -211,20 +229,20 @@ const containerVariants = {
       delayChildren: 0.3,
     },
   },
-}
+};
 
 const itemVariants = {
   hidden: { opacity: 0, y: 30 },
   visible: {
     opacity: 1,
     y: 0,
-    transition: { duration: 0.6, ease: 'easeOut' as const },
+    transition: { duration: 0.6, ease: "easeOut" as const },
   },
-}
+};
 
 export const Home = () => {
-  const { address, isConnected } = useAccount()
-  const { t } = useTranslation()
+  const { address, isConnected } = useAccount();
+  const { t } = useTranslation();
 
   return (
     <PageContainer>
@@ -239,20 +257,24 @@ export const Home = () => {
             animate="visible"
           >
             <Badge variants={itemVariants}>
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+              <svg
+                width="16"
+                height="16"
+                viewBox="0 0 24 24"
+                fill="currentColor"
+              >
                 <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5" />
               </svg>
-              {t('hero.badge')}
+              {t("hero.badge")}
             </Badge>
 
             <Title variants={itemVariants}>
-              {t('hero.title1')} <span>{t('hero.title2')}</span><br />
-              {t('hero.title3')}
+              {t("hero.title1")} <span>{t("hero.title2")}</span>
+              <br />
+              {t("hero.title3")}
             </Title>
 
-            <Subtitle variants={itemVariants}>
-              {t('hero.subtitle')}
-            </Subtitle>
+            <Subtitle variants={itemVariants}>{t("hero.subtitle")}</Subtitle>
 
             <ButtonGroup variants={itemVariants}>
               <Button
@@ -260,7 +282,7 @@ export const Home = () => {
                 whileHover={{ scale: 1.02 }}
                 whileTap={{ scale: 0.98 }}
               >
-                {t('hero.getCoverage')}
+                {t("hero.getCoverage")}
               </Button>
               <Button
                 variant="outline"
@@ -268,7 +290,7 @@ export const Home = () => {
                 whileHover={{ scale: 1.02 }}
                 whileTap={{ scale: 0.98 }}
               >
-                {t('hero.learnMore')}
+                {t("hero.learnMore")}
               </Button>
             </ButtonGroup>
 
@@ -293,22 +315,24 @@ export const Home = () => {
           <StatsGrid>
             <StatCard whileHover={{ scale: 1.02 }}>
               <StatValue>$2.5M</StatValue>
-              <StatLabel>{t('stats.tvl')}</StatLabel>
+              <StatLabel>{t("stats.tvl")}</StatLabel>
             </StatCard>
             <StatCard whileHover={{ scale: 1.02 }}>
               <StatValue>15K+</StatValue>
-              <StatLabel>{t('stats.policies')}</StatLabel>
+              <StatLabel>{t("stats.policies")}</StatLabel>
             </StatCard>
             <StatCard whileHover={{ scale: 1.02 }}>
               <StatValue>98%</StatValue>
-              <StatLabel>{t('stats.claimRate')}</StatLabel>
+              <StatLabel>{t("stats.claimRate")}</StatLabel>
             </StatCard>
             <StatCard whileHover={{ scale: 1.02 }}>
               <StatValue>5 min</StatValue>
-              <StatLabel>{t('stats.payoutTime')}</StatLabel>
+              <StatLabel>{t("stats.payoutTime")}</StatLabel>
             </StatCard>
           </StatsGrid>
         </StatsSection>
+
+        <HowItWorks />
 
         <FeaturesSection>
           <FeaturesGrid>
@@ -323,9 +347,9 @@ export const Home = () => {
                   <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
                 </svg>
               </FeatureIcon>
-              <FeatureTitle>{t('features.security.title')}</FeatureTitle>
+              <FeatureTitle>{t("features.security.title")}</FeatureTitle>
               <FeatureDescription>
-                {t('features.security.description')}
+                {t("features.security.description")}
               </FeatureDescription>
             </FeatureCard>
 
@@ -340,9 +364,9 @@ export const Home = () => {
                   <path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z" />
                 </svg>
               </FeatureIcon>
-              <FeatureTitle>{t('features.claims.title')}</FeatureTitle>
+              <FeatureTitle>{t("features.claims.title")}</FeatureTitle>
               <FeatureDescription>
-                {t('features.claims.description')}
+                {t("features.claims.description")}
               </FeatureDescription>
             </FeatureCard>
 
@@ -357,9 +381,9 @@ export const Home = () => {
                   <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2M9 11a4 4 0 1 0 0-8 4 4 0 0 0 0 8zM23 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75" />
                 </svg>
               </FeatureIcon>
-              <FeatureTitle>{t('features.mutual.title')}</FeatureTitle>
+              <FeatureTitle>{t("features.mutual.title")}</FeatureTitle>
               <FeatureDescription>
-                {t('features.mutual.description')}
+                {t("features.mutual.description")}
               </FeatureDescription>
             </FeatureCard>
           </FeaturesGrid>
@@ -368,12 +392,10 @@ export const Home = () => {
         <ActivePools />
         <ActiveEvents />
         <LiveTransactions />
-        <HowItWorks />
-        <CoveragePlans />
         <FAQ />
       </Content>
 
       <Footer />
     </PageContainer>
-  )
-}
+  );
+};
