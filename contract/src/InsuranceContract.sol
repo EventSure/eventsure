@@ -38,7 +38,7 @@ contract InsuranceContract is FunctionsClient {
     
     // Chainlink configuration
     LinkTokenInterface public immutable linkToken;
-    uint64 public immutable subscriptionId;
+    uint64 public subscriptionId;
     uint32 public constant GAS_LIMIT = 300000;
     bytes32 public donId;
     
