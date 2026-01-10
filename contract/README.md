@@ -27,24 +27,6 @@ $ forge build
 $ forge test
 ```
 
-### Format
-
-```shell
-$ forge fmt
-```
-
-### Gas Snapshots
-
-```shell
-$ forge snapshot
-```
-
-### Anvil
-
-```shell
-$ anvil
-```
-
 ### Deploy
 
 ```shell
@@ -57,10 +39,26 @@ $ forge script script/Counter.s.sol:CounterScript --rpc-url <your_rpc_url> --pri
 $ cast <subcommand>
 ```
 
-### Help
+## Project Structure
 
 ```shell
-$ forge --help
-$ anvil --help
-$ cast --help
+contract/
+├── src/
+│   ├── core/
+│   │   ├── Episode.sol
+│   │   └── EpisodeFactory.sol
+│   ├── interfaces/
+│   │   ├── IEpisode.sol
+│   │   ├── IEpisodeFactory.sol
+│   │   └── IOracle.sol
+│   ├── libraries/
+│   │   └── Errors.sol
+│   └── mocks/
+│       └── MockOracle.sol
+├── test/
+│   ├── Episode.t.sol
+│   └── EpisodeFactory.t.sol
+├── script/
+│   └── Deploy.s.sol
+└── foundry.toml
 ```
