@@ -50,11 +50,8 @@ contract/
 │   ├── interfaces/
 │   │   ├── IEpisode.sol
 │   │   ├── IEpisodeFactory.sol
-│   │   └── IOracle.sol
 │   ├── libraries/
 │   │   └── Errors.sol
-│   └── mocks/
-│       └── MockOracle.sol
 ├── test/
 │   ├── Episode.t.sol
 │   └── EpisodeFactory.t.sol
