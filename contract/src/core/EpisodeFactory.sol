@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.20;
 
-import "./Episode.sol";
+import {Episode} from "./Episode.sol";
 
 contract EpisodeFactory {
     address public owner;
@@ -18,8 +18,12 @@ contract EpisodeFactory {
     mapping(address => bool) public isEpisode;
 
     modifier onlyOwner() {
-        require(msg.sender == owner, "Not owner");
+        _onlyOwner();
         _;
+    }
+
+    function _onlyOwner() internal view {
+        require(msg.sender == owner, "Not owner");
     }
 
     constructor(address _oracle) {

@@ -2,17 +2,19 @@
 pragma solidity ^0.8.20;
 
 import {Script} from "forge-std/Script.sol";
-import {Episode} from "../src/core/Episode.sol";
+import {EpisodeFactory} from "../src/core/EpisodeFactory.sol";
 
-contract DeployScript is Script {
-    Episode public episode;
+contract Deploy is Script {
+    EpisodeFactory public factory;
 
-    function setUp() public {}
+    // A placeholder for the oracle address.
+    // Replace this with the actual oracle address for the target network.
+    address constant ORACLE_ADDRESS = 0x5FbDB2315678afecb367f032d93F642f64180aa3;
 
     function run() public {
         vm.startBroadcast();
 
-        counter = new Episode();
+        factory = new EpisodeFactory(ORACLE_ADDRESS);
 
         vm.stopBroadcast();
     }

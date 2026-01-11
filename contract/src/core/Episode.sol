@@ -1,9 +1,9 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.20;
 
-import "../interfaces/IEpisode.sol";
+import {IEpisode} from "../interfaces/IEpisode.sol";
 
-abstract contract Episode is IEpisode {
+contract Episode is IEpisode {
     EpisodeState public override state;
 
     uint256 public override totalPremium;
@@ -16,8 +16,8 @@ abstract contract Episode is IEpisode {
 
     bool public eventOccurred;
 
-    address public immutable oracle;
-    address public immutable factory;
+    address public immutable ORACLE;
+    address public immutable FACTORY;
 
     // ============ Member State ===============
     struct Member {
@@ -31,25 +31,37 @@ abstract contract Episode is IEpisode {
     address[] public memberList;
 
     modifier onlyFactory() {
-        require(msg.sender == factory, "Not factory");
+        _onlyFactory();
         _;
+    }
+
+    function _onlyFactory() internal view {
+        require(msg.sender == FACTORY, "Not factory");
     }
 
     modifier onlyOracle() {
-        require(msg.sender == oracle, "Not oracle");
+        _onlyOracle();
         _;
+    }
+
+    function _onlyOracle() internal view {
+        require(msg.sender == ORACLE, "Not oracle");
     }
 
     modifier inState(EpisodeState s) {
-        require(state == s, "Invalid state");
+        _inState(s);
         _;
     }
 
+    function _inState(EpisodeState s) internal view {
+        require(state == s, "Invalid state");
+    }
+
     constructor(address _oracle) {
-        factory = msg.sender;
-        oracle = _oracle;
+        FACTORY = msg.sender;
+        ORACLE = _oracle;
         state = EpisodeState.Created;
-        emit EpisodeCreated(oracle, factory);
+        emit EpisodeCreated(ORACLE, FACTORY);
     }
 
     /* ========== State Transitions ========== */
