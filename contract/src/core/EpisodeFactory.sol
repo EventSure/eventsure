@@ -2,8 +2,9 @@
 pragma solidity ^0.8.20;
 
 import "./Episode.sol";
+import "../interfaces/IEpisodeFactory.sol";
 
-contract EpisodeFactory {
+contract EpisodeFactory is IEpisodeFactory {
     address public owner;
     address public oracle;
 
@@ -81,6 +82,16 @@ contract EpisodeFactory {
     {
         require(isEpisode[ep], "Unknown episode");
         Episode(ep).close();
+    }
+
+    /* ========== User Actions ========== */
+
+    function joinEpisode(address ep, uint256 premium)
+        external
+    {
+        require(isEpisode[ep], "Unknown episode");
+        Episode(ep).join(premium);
+        emit UserJoined(msg.sender, ep, premium);
     }
 
     /* ========== Views ========== */
