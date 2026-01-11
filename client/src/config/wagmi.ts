@@ -1,19 +1,4 @@
-import { http } from 'wagmi'
-import { mantleSepoliaTestnet, mantle } from 'wagmi/chains'
-import { getDefaultConfig } from '@rainbow-me/rainbowkit'
+// NOTE: This file is deprecated. Use appkit.ts instead.
+// Kept for reference during migration.
 
-// Get WalletConnect project ID from https://cloud.walletconnect.com
-const projectId = import.meta.env.VITE_WALLETCONNECT_PROJECT_ID || ''
-
-export const config = getDefaultConfig({
-  appName: 'EventSure',
-  projectId,
-  chains: [mantle, mantleSepoliaTestnet],
-  transports: {
-    [mantle.id]: http(),
-    [mantleSepoliaTestnet.id]: http(),
-  },
-  ssr: false,
-})
-
-export { mantle, mantleSepoliaTestnet }
+export { config, mantle, mantleSepoliaTestnet } from './appkit'

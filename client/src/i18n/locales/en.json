@@ -342,5 +342,38 @@
   "common": {
     "currency": "KRW",
     "memberUnit": "members"
+  },
+  "episode": {
+    "state": {
+      "created": "Created",
+      "open": "Open",
+      "locked": "Locked",
+      "resolved": "Resolved",
+      "settled": "Settled",
+      "closed": "Closed"
+    },
+    "totalPremium": "Total Premium",
+    "totalPayout": "Total Payout",
+    "surplus": "Surplus",
+    "yourPremium": "Your Premium",
+    "enterAmount": "Enter amount (ETH)",
+    "join": "Join Episode",
+    "joining": "Joining...",
+    "claim": "Claim Payout",
+    "claiming": "Claiming...",
+    "withdrawSurplus": "Withdraw Surplus",
+    "withdrawing": "Withdrawing...",
+    "alreadyClaimed": "Already claimed",
+    "alreadyWithdrawn": "Already withdrawn",
+    "joinSuccess": "Successfully joined episode!",
+    "claimSuccess": "Successfully claimed payout!",
+    "withdrawSuccess": "Successfully withdrawn surplus!",
+    "transactionFailed": "Transaction failed",
+    "connectWallet": "Connect your wallet to participate",
+    "allEpisodes": "All Episodes",
+    "episodesAvailable": "episodes available",
+    "errorLoading": "Failed to load episodes",
+    "noEpisodes": "No Episodes Found",
+    "noEpisodesDesc": "There are no insurance episodes available at the moment. Check back soon!"
   }
 }

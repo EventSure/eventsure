@@ -1,6 +1,6 @@
 import styled from '@emotion/styled'
 import { motion } from 'framer-motion'
-import { ConnectButton } from '@rainbow-me/rainbowkit'
+import { useAppKit, useAppKitAccount } from '@reown/appkit/react'
 import { useTranslation } from 'react-i18next'
 import { Link, useLocation } from 'react-router-dom'
 import { theme } from '@/styles/theme'
@@ -67,7 +67,9 @@ const Nav = styled.nav`
   }
 `
 
-const NavLink = styled(Link)<{ $isActive?: boolean }>`
+const NavLink = styled(Link, {
+  shouldForwardProp: (prop) => prop !== '$isActive'
+})<{ $isActive?: boolean }>`
   color: ${({ $isActive }) => $isActive ? theme.colors.secondary : theme.colors.textSecondary};
   font-weight: ${theme.fontWeight.medium};
   transition: color ${theme.transitions.fast};
@@ -88,7 +90,6 @@ const NavLink = styled(Link)<{ $isActive?: boolean }>`
       right: 0;
       height: 2px;
       background: ${theme.colors.secondary};
-      border-radius: ${theme.borderRadius.full};
     }
   `}
 `
@@ -123,6 +124,42 @@ const LanguageGroup = styled.div`
   border-radius: ${theme.borderRadius.md};
   padding: 2px;
 `
+
+const ConnectWalletButton = styled.button`
+  padding: ${theme.spacing.sm} ${theme.spacing.lg};
+  border-radius: ${theme.borderRadius.md};
+  font-size: ${theme.fontSize.md};
+  font-weight: ${theme.fontWeight.semibold};
+  cursor: pointer;
+  transition: all ${theme.transitions.fast};
+  border: 1px solid ${theme.colors.primary};
+  background: linear-gradient(135deg, ${theme.colors.primary} 0%, ${theme.colors.primaryDark} 100%);
+  color: ${theme.colors.text};
+
+  &:hover {
+    box-shadow: ${theme.shadows.glowStrong};
+    transform: translateY(-1px);
+  }
+
+  &:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+`
+
+const WalletButton = () => {
+  const { open } = useAppKit()
+  const { address, isConnected } = useAppKitAccount()
+
+  return (
+    <ConnectWalletButton onClick={() => open()}>
+      {isConnected && address 
+        ? `${address.slice(0, 6)}...${address.slice(-4)}`
+        : 'Connect Wallet'
+      }
+    </ConnectWalletButton>
+  )
+}
 
 export const Header = () => {
   const { t, i18n } = useTranslation()
@@ -178,10 +215,7 @@ export const Header = () => {
               KO
             </LanguageSwitcher>
           </LanguageGroup>
-          <ConnectButton
-            chainStatus="icon"
-            showBalance={false}
-          />
+          <WalletButton />
         </Actions>
       </HeaderContent>
     </HeaderContainer>
