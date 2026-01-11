@@ -1,13 +1,18 @@
 package main
 
 import (
-	"encoding/json"
 	"log"
 	"net/http"
 	"os"
-	"strconv"
-	"strings"
-	"time"
+
+	eventusecase "eventsure-server/application/event"
+	poolusecase "eventsure-server/application/pool"
+	statsusecase "eventsure-server/application/stats"
+	transactionusecase "eventsure-server/application/transaction"
+	httprouter "eventsure-server/interface/http"
+	"eventsure-server/interface/http/controller"
+	"eventsure-server/infrastructure/mock"
+	"eventsure-server/infrastructure/repository"
 
 	"github.com/gorilla/mux"
 	"github.com/rs/cors"
@@ -19,26 +24,49 @@ func main() {
 		port = "3000"
 	}
 
+	// Initialize repositories
+	eventRepo := repository.NewEventRepository()
+	poolRepo := repository.NewPoolRepository()
+	txRepo := repository.NewTransactionRepository()
+
+	// Initialize mock data
+	events := mock.CreateMockEvents()
+	pools := mock.CreateMockPools()
+	transactions := mock.CreateMockTransactions()
+
+	eventRepo.InitializeMockData(events)
+	poolRepo.InitializeMockData(pools)
+	txRepo.InitializeMockData(transactions)
+
+	// Initialize use cases
+	eventUseCase := eventusecase.NewUseCase(eventRepo)
+	poolUseCase := poolusecase.NewUseCase(poolRepo)
+	txUseCase := transactionusecase.NewUseCase(txRepo)
+	statsUseCase := statsusecase.NewUseCase()
+
+	// Initialize controllers
+	eventController := controller.NewEventController(eventUseCase)
+	poolController := controller.NewPoolController(poolUseCase)
+	txController := controller.NewTransactionController(txUseCase)
+	statsController := controller.NewStatsController(statsUseCase)
+
+	// Initialize router
+	router := httprouter.NewRouter(
+		eventController,
+		poolController,
+		txController,
+		statsController,
+	)
+
+	// Setup mux
 	r := mux.NewRouter()
-	api := r.PathPrefix("/api").Subrouter()
+	router.SetupRoutes(r)
 
-	// Phase 1: 필수 엔드포인트
-	api.HandleFunc("/events", getEvents).Methods("GET")
-	api.HandleFunc("/events/{eventId}", getEventDetail).Methods("GET")
-	api.HandleFunc("/pools", getPools).Methods("GET")
-	api.HandleFunc("/stats/home", getHomeStats).Methods("GET")
-
-	// Phase 2: 중요 엔드포인트
-	api.HandleFunc("/transactions", getTransactions).Methods("GET")
-	api.HandleFunc("/transactions/stats", getTransactionStats).Methods("GET")
-	api.HandleFunc("/users/me/events", getMyEvents).Methods("GET")
-	api.HandleFunc("/users/me/events/{eventId}/dashboard", getEventDashboard).Methods("GET")
-
-	// CORS 설정
+	// CORS configuration
 	c := cors.New(cors.Options{
-		AllowedOrigins: []string{"*"},
-		AllowedMethods: []string{"GET", "POST", "PUT", "DELETE", "OPTIONS"},
-		AllowedHeaders: []string{"*"},
+		AllowedOrigins:   []string{"*"},
+		AllowedMethods:   []string{"GET", "POST", "PUT", "DELETE", "OPTIONS"},
+		AllowedHeaders:   []string{"*"},
 		AllowCredentials: true,
 	})
 
