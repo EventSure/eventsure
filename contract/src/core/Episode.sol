@@ -112,13 +112,15 @@ contract Episode is IEpisode {
 
     /* ========== User Actions ========== */
 
-    function join(uint256 premium)
+    function join()
         external
+        payable
         inState(EpisodeState.Open)
     {
-        premiumOf[msg.sender] += premium;
-        totalPremium += premium;
-        emit MemberJoined(msg.sender, premium);
+        require(msg.value > 0, "Premium must be greater than zero");
+        premiumOf[msg.sender] += msg.value;
+        totalPremium += msg.value;
+        emit MemberJoined(msg.sender, msg.value);
     }
 
     function claim()

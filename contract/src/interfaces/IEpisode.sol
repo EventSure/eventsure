@@ -36,7 +36,7 @@ interface IEpisode {
 
     /* ========== User Actions ========== */
 
-    function join(uint256 premium) external;
+    function join() external payable;
 
     function claim() external;
     function withdrawSurplus() external;
