@@ -5,14 +5,14 @@ import (
 	"net/http"
 	"os"
 
-	eventusecase "eventsure-server/application/event"
+	episodeusecase "eventsure-server/application/episode"
 	poolusecase "eventsure-server/application/pool"
 	statsusecase "eventsure-server/application/stats"
 	transactionusecase "eventsure-server/application/transaction"
-	httprouter "eventsure-server/interface/http"
-	"eventsure-server/interface/http/controller"
 	"eventsure-server/infrastructure/mock"
 	"eventsure-server/infrastructure/repository"
+	httprouter "eventsure-server/interface/http"
+	"eventsure-server/interface/http/controller"
 
 	"github.com/gorilla/mux"
 	"github.com/rs/cors"
@@ -25,34 +25,34 @@ func main() {
 	}
 
 	// Initialize repositories
-	eventRepo := repository.NewEventRepository()
+	episodeRepo := repository.NewEpisodeRepository()
 	poolRepo := repository.NewPoolRepository()
 	txRepo := repository.NewTransactionRepository()
 
 	// Initialize mock data
-	events := mock.CreateMockEvents()
+	episodes := mock.CreateMockEpisodes()
 	pools := mock.CreateMockPools()
 	transactions := mock.CreateMockTransactions()
 
-	eventRepo.InitializeMockData(events)
+	episodeRepo.InitializeMockData(episodes)
 	poolRepo.InitializeMockData(pools)
 	txRepo.InitializeMockData(transactions)
 
 	// Initialize use cases
-	eventUseCase := eventusecase.NewUseCase(eventRepo)
+	episodeUseCase := episodeusecase.NewUseCase(episodeRepo)
 	poolUseCase := poolusecase.NewUseCase(poolRepo)
 	txUseCase := transactionusecase.NewUseCase(txRepo)
 	statsUseCase := statsusecase.NewUseCase()
 
 	// Initialize controllers
-	eventController := controller.NewEventController(eventUseCase)
+	episodeController := controller.NewEpisodeController(episodeUseCase)
 	poolController := controller.NewPoolController(poolUseCase)
 	txController := controller.NewTransactionController(txUseCase)
 	statsController := controller.NewStatsController(statsUseCase)
 
 	// Initialize router
 	router := httprouter.NewRouter(
-		eventController,
+		episodeController,
 		poolController,
 		txController,
 		statsController,

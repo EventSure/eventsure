@@ -8,7 +8,7 @@ import (
 
 // Router sets up HTTP routes
 type Router struct {
-	eventController       *controller.EventController
+	episodeController     *controller.EpisodeController
 	poolController        *controller.PoolController
 	transactionController *controller.TransactionController
 	statsController       *controller.StatsController
@@ -16,13 +16,13 @@ type Router struct {
 
 // NewRouter creates a new Router
 func NewRouter(
-	eventController *controller.EventController,
+	episodeController *controller.EpisodeController,
 	poolController *controller.PoolController,
 	transactionController *controller.TransactionController,
 	statsController *controller.StatsController,
 ) *Router {
 	return &Router{
-		eventController:       eventController,
+		episodeController:     episodeController,
 		poolController:        poolController,
 		transactionController: transactionController,
 		statsController:       statsController,
@@ -34,8 +34,8 @@ func (r *Router) SetupRoutes(mux *mux.Router) {
 	api := mux.PathPrefix("/api").Subrouter()
 
 	// Phase 1: 필수 엔드포인트
-	api.HandleFunc("/events", r.eventController.GetEvents).Methods("GET")
-	api.HandleFunc("/events/{eventId}", r.eventController.GetEventDetail).Methods("GET")
+	api.HandleFunc("/episodes", r.episodeController.GetEpisodes).Methods("GET")
+	api.HandleFunc("/episodes/{episodeId}", r.episodeController.GetEpisodeDetail).Methods("GET")
 	api.HandleFunc("/pools", r.poolController.GetPools).Methods("GET")
 	api.HandleFunc("/stats/home", r.statsController.GetHomeStats).Methods("GET")
 

@@ -2,13 +2,13 @@ package mock
 
 import (
 	"time"
-	eventsureevent "eventsure-server/domain/event"
+	eventsureepisode "eventsure-server/domain/episode"
 	eventsurepool "eventsure-server/domain/pool"
 	eventsuretransaction "eventsure-server/domain/transaction"
 )
 
-// CreateMockEvents creates mock events
-func CreateMockEvents() []*eventsureevent.Event {
+// CreateMockEpisodes creates mock episodes
+func CreateMockEpisodes() []*eventsureepisode.Episode {
 	poolClosesAt1 := time.Date(2025, 1, 15, 12, 0, 0, 0, time.UTC)
 	eventEndsAt1 := time.Date(2025, 1, 15, 18, 0, 0, 0, time.UTC)
 	poolClosesAt2 := time.Date(2025, 8, 31, 12, 0, 0, 0, time.UTC)
@@ -19,10 +19,10 @@ func CreateMockEvents() []*eventsureevent.Event {
 	additionalContributions := "none"
 	poolLogic := "Homogeneous risk pool. Surplus returned pro-rata to members."
 
-	event1 := eventsureevent.NewEvent(
+	episode1 := eventsureepisode.NewEpisode(
 		"ke902",
-		eventsureevent.CategoryFlightDelay,
-		eventsureevent.StatusRecruiting,
+		eventsureepisode.CategoryFlightDelay,
+		eventsureepisode.StatusRecruiting,
 		"KE902 항공편 지연 보험",
 		"2025.01.15 14:00 - 2025.01.15 18:00",
 		"출발 지연 2시간 이상",
@@ -30,19 +30,19 @@ func CreateMockEvents() []*eventsureevent.Event {
 		"USDC",
 		300,
 		"USDC",
-		eventsureevent.IconPlane,
+		eventsureepisode.IconPlane,
 	)
-	event1.SetSubtitle(subtitle1)
-	event1.SetAdditionalContributions(additionalContributions)
-	event1.SetPoolLogic(poolLogic)
-	event1.SetOracle(eventsureevent.NewOracle("FlightStats API", "이벤트 종료 후 24시간"))
-	event1.SetPoolClosesAt(poolClosesAt1)
-	event1.SetEventEndsAt(eventEndsAt1)
+	episode1.SetSubtitle(subtitle1)
+	episode1.SetAdditionalContributions(additionalContributions)
+	episode1.SetPoolLogic(poolLogic)
+	episode1.SetOracle(eventsureepisode.NewOracle("FlightStats API", "이벤트 종료 후 24시간"))
+	episode1.SetPoolClosesAt(poolClosesAt1)
+	episode1.SetEventEndsAt(eventEndsAt1)
 
-	event2 := eventsureevent.NewEvent(
+	episode2 := eventsureepisode.NewEpisode(
 		"jejuTyphoon",
-		eventsureevent.CategoryWeather,
-		eventsureevent.StatusRecruiting,
+		eventsureepisode.CategoryWeather,
+		eventsureepisode.StatusRecruiting,
 		"제주도 태풍 취소 보험",
 		"2025.08.01 - 2025.08.31",
 		"태풍 경보로 인한 결항 시 자동 지급",
@@ -50,16 +50,16 @@ func CreateMockEvents() []*eventsureevent.Event {
 		"USDC",
 		500,
 		"USDC",
-		eventsureevent.IconCloud,
+		eventsureepisode.IconCloud,
 	)
-	event2.SetSubtitle(subtitle2)
-	event2.SetAdditionalContributions(additionalContributions)
-	event2.SetPoolLogic(poolLogic)
-	event2.SetOracle(eventsureevent.NewOracle("기상청 API", "이벤트 종료 후 48시간"))
-	event2.SetPoolClosesAt(poolClosesAt2)
-	event2.SetEventEndsAt(eventEndsAt2)
+	episode2.SetSubtitle(subtitle2)
+	episode2.SetAdditionalContributions(additionalContributions)
+	episode2.SetPoolLogic(poolLogic)
+	episode2.SetOracle(eventsureepisode.NewOracle("기상청 API", "이벤트 종료 후 48시간"))
+	episode2.SetPoolClosesAt(poolClosesAt2)
+	episode2.SetEventEndsAt(eventEndsAt2)
 
-	return []*eventsureevent.Event{event1, event2}
+	return []*eventsureepisode.Episode{episode1, episode2}
 }
 
 // CreateMockPools creates mock pools
@@ -154,8 +154,8 @@ func CreateMockTransactions() []*eventsuretransaction.Transaction {
 	flight1 := "KE123"
 	flight2 := "BA321"
 	flight3 := "EK111"
-	eventID1 := "ke902"
-	eventID2 := "jejuTyphoon"
+	episodeID1 := "ke902"
+	episodeID2 := "jejuTyphoon"
 	poolID1 := "1"
 	poolID2 := "2"
 
@@ -171,7 +171,7 @@ func CreateMockTransactions() []*eventsuretransaction.Transaction {
 		eventsuretransaction.StatusConfirmed,
 	)
 	tx1.SetFlight(flight1)
-	tx1.SetEventID(eventID1)
+	tx1.SetEventID(episodeID1)
 	tx1.SetPoolID(poolID1)
 
 	tx2 := eventsuretransaction.NewTransaction(
@@ -186,7 +186,7 @@ func CreateMockTransactions() []*eventsuretransaction.Transaction {
 		eventsuretransaction.StatusConfirmed,
 	)
 	tx2.SetFlight(flight2)
-	tx2.SetEventID(eventID2)
+	tx2.SetEventID(episodeID2)
 	tx2.SetPoolID(poolID2)
 
 	tx3 := eventsuretransaction.NewTransaction(
@@ -201,7 +201,7 @@ func CreateMockTransactions() []*eventsuretransaction.Transaction {
 		eventsuretransaction.StatusConfirmed,
 	)
 	tx3.SetFlight(flight3)
-	tx3.SetEventID(eventID1)
+	tx3.SetEventID(episodeID1)
 	tx3.SetPoolID(poolID1)
 
 	tx4 := eventsuretransaction.NewTransaction(
@@ -215,7 +215,7 @@ func CreateMockTransactions() []*eventsuretransaction.Transaction {
 		12345675,
 		eventsuretransaction.StatusConfirmed,
 	)
-	tx4.SetEventID(eventID1)
+	tx4.SetEventID(episodeID1)
 	tx4.SetPoolID(poolID1)
 
 	return []*eventsuretransaction.Transaction{tx1, tx2, tx3, tx4}

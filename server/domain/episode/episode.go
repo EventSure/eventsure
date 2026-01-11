@@ -1,33 +1,33 @@
-package event
+package episode
 
 import (
 	"time"
 )
 
-// Event is the Aggregate Root for the Event domain
-type Event struct {
-	id                     string
-	category               Category
-	status                 Status
-	title                  string
-	subtitle               *string
-	eventWindow            string
-	triggerCondition       string
-	premium                float64
-	premiumCurrency        string
-	maxPayout              float64
-	payoutCurrency         string
+// Episode is the Aggregate Root for the Episode domain
+type Episode struct {
+	id                      string
+	category                Category
+	status                  Status
+	title                   string
+	subtitle                *string
+	eventWindow             string
+	triggerCondition        string
+	premium                 float64
+	premiumCurrency         string
+	maxPayout               float64
+	payoutCurrency          string
 	additionalContributions *string
-	poolLogic              *string
-	oracle                 *Oracle
-	poolClosesAt           *time.Time
-	eventEndsAt            *time.Time
-	icon                   Icon
-	createdAt              time.Time
-	updatedAt              time.Time
+	poolLogic               *string
+	oracle                  *Oracle
+	poolClosesAt            *time.Time
+	eventEndsAt             *time.Time
+	icon                    Icon
+	createdAt               time.Time
+	updatedAt               time.Time
 }
 
-// Category represents event category
+// Category represents episode category
 type Category string
 
 const (
@@ -36,7 +36,7 @@ const (
 	CategoryTripCancel  Category = "tripCancel"
 )
 
-// Status represents event status
+// Status represents episode status
 type Status string
 
 const (
@@ -46,7 +46,7 @@ const (
 	StatusCompleted  Status = "completed"
 )
 
-// Icon represents event icon type
+// Icon represents episode icon type
 type Icon string
 
 const (
@@ -57,14 +57,14 @@ const (
 
 // Oracle represents oracle information
 type Oracle struct {
-	dataSource    string
+	dataSource     string
 	resolutionTime string
 }
 
 // NewOracle creates a new Oracle
 func NewOracle(dataSource, resolutionTime string) *Oracle {
 	return &Oracle{
-		dataSource:    dataSource,
+		dataSource:     dataSource,
 		resolutionTime: resolutionTime,
 	}
 }
@@ -85,8 +85,8 @@ func (o *Oracle) ResolutionTime() string {
 	return o.resolutionTime
 }
 
-// NewEvent creates a new Event aggregate root
-func NewEvent(
+// NewEpisode creates a new Episode aggregate root
+func NewEpisode(
 	id string,
 	category Category,
 	status Status,
@@ -98,152 +98,152 @@ func NewEvent(
 	maxPayout float64,
 	payoutCurrency string,
 	icon Icon,
-) *Event {
+) *Episode {
 	now := time.Now()
-	return &Event{
-		id:              id,
-		category:        category,
-		status:          status,
-		title:           title,
-		eventWindow:     eventWindow,
+	return &Episode{
+		id:               id,
+		category:         category,
+		status:           status,
+		title:            title,
+		eventWindow:      eventWindow,
 		triggerCondition: triggerCondition,
-		premium:         premium,
-		premiumCurrency: premiumCurrency,
-		maxPayout:       maxPayout,
-		payoutCurrency:  payoutCurrency,
-		icon:            icon,
-		createdAt:       now,
-		updatedAt:       now,
+		premium:          premium,
+		premiumCurrency:  premiumCurrency,
+		maxPayout:        maxPayout,
+		payoutCurrency:   payoutCurrency,
+		icon:             icon,
+		createdAt:        now,
+		updatedAt:        now,
 	}
 }
 
-// ID returns event ID
-func (e *Event) ID() string {
+// ID returns episode ID
+func (e *Episode) ID() string {
 	return e.id
 }
 
-// Category returns event category
-func (e *Event) Category() Category {
+// Category returns episode category
+func (e *Episode) Category() Category {
 	return e.category
 }
 
-// Status returns event status
-func (e *Event) Status() Status {
+// Status returns episode status
+func (e *Episode) Status() Status {
 	return e.status
 }
 
-// Title returns event title
-func (e *Event) Title() string {
+// Title returns episode title
+func (e *Episode) Title() string {
 	return e.title
 }
 
-// Subtitle returns event subtitle
-func (e *Event) Subtitle() *string {
+// Subtitle returns episode subtitle
+func (e *Episode) Subtitle() *string {
 	return e.subtitle
 }
 
-// SetSubtitle sets event subtitle
-func (e *Event) SetSubtitle(subtitle string) {
+// SetSubtitle sets episode subtitle
+func (e *Episode) SetSubtitle(subtitle string) {
 	e.subtitle = &subtitle
 }
 
 // EventWindow returns event window
-func (e *Event) EventWindow() string {
+func (e *Episode) EventWindow() string {
 	return e.eventWindow
 }
 
 // TriggerCondition returns trigger condition
-func (e *Event) TriggerCondition() string {
+func (e *Episode) TriggerCondition() string {
 	return e.triggerCondition
 }
 
 // Premium returns premium amount
-func (e *Event) Premium() float64 {
+func (e *Episode) Premium() float64 {
 	return e.premium
 }
 
 // PremiumCurrency returns premium currency
-func (e *Event) PremiumCurrency() string {
+func (e *Episode) PremiumCurrency() string {
 	return e.premiumCurrency
 }
 
 // MaxPayout returns max payout amount
-func (e *Event) MaxPayout() float64 {
+func (e *Episode) MaxPayout() float64 {
 	return e.maxPayout
 }
 
 // PayoutCurrency returns payout currency
-func (e *Event) PayoutCurrency() string {
+func (e *Episode) PayoutCurrency() string {
 	return e.payoutCurrency
 }
 
 // AdditionalContributions returns additional contributions
-func (e *Event) AdditionalContributions() *string {
+func (e *Episode) AdditionalContributions() *string {
 	return e.additionalContributions
 }
 
 // SetAdditionalContributions sets additional contributions
-func (e *Event) SetAdditionalContributions(contributions string) {
+func (e *Episode) SetAdditionalContributions(contributions string) {
 	e.additionalContributions = &contributions
 }
 
 // PoolLogic returns pool logic description
-func (e *Event) PoolLogic() *string {
+func (e *Episode) PoolLogic() *string {
 	return e.poolLogic
 }
 
 // SetPoolLogic sets pool logic description
-func (e *Event) SetPoolLogic(logic string) {
+func (e *Episode) SetPoolLogic(logic string) {
 	e.poolLogic = &logic
 }
 
 // Oracle returns oracle information
-func (e *Event) Oracle() *Oracle {
+func (e *Episode) Oracle() *Oracle {
 	return e.oracle
 }
 
 // SetOracle sets oracle information
-func (e *Event) SetOracle(oracle *Oracle) {
+func (e *Episode) SetOracle(oracle *Oracle) {
 	e.oracle = oracle
 }
 
 // PoolClosesAt returns pool closes time
-func (e *Event) PoolClosesAt() *time.Time {
+func (e *Episode) PoolClosesAt() *time.Time {
 	return e.poolClosesAt
 }
 
 // SetPoolClosesAt sets pool closes time
-func (e *Event) SetPoolClosesAt(t time.Time) {
+func (e *Episode) SetPoolClosesAt(t time.Time) {
 	e.poolClosesAt = &t
 }
 
 // EventEndsAt returns event ends time
-func (e *Event) EventEndsAt() *time.Time {
+func (e *Episode) EventEndsAt() *time.Time {
 	return e.eventEndsAt
 }
 
 // SetEventEndsAt sets event ends time
-func (e *Event) SetEventEndsAt(t time.Time) {
+func (e *Episode) SetEventEndsAt(t time.Time) {
 	e.eventEndsAt = &t
 }
 
-// Icon returns event icon
-func (e *Event) Icon() Icon {
+// Icon returns episode icon
+func (e *Episode) Icon() Icon {
 	return e.icon
 }
 
 // CreatedAt returns created at time
-func (e *Event) CreatedAt() time.Time {
+func (e *Episode) CreatedAt() time.Time {
 	return e.createdAt
 }
 
 // UpdatedAt returns updated at time
-func (e *Event) UpdatedAt() time.Time {
+func (e *Episode) UpdatedAt() time.Time {
 	return e.updatedAt
 }
 
-// UpdateStatus updates event status
-func (e *Event) UpdateStatus(status Status) {
+// UpdateStatus updates episode status
+func (e *Episode) UpdateStatus(status Status) {
 	e.status = status
 	e.updatedAt = time.Now()
 }

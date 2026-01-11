@@ -1,12 +1,12 @@
-package event
+package episode
 
 import (
 	"time"
-	eventsureevent "eventsure-server/domain/event"
+	eventsureepisode "eventsure-server/domain/episode"
 )
 
-// EventDTO represents Event data transfer object
-type EventDTO struct {
+// EpisodeDTO represents Episode data transfer object
+type EpisodeDTO struct {
 	ID                     string     `json:"id"`
 	Category               string     `json:"category"`
 	Status                 string     `json:"status"`
@@ -34,14 +34,14 @@ type OracleDTO struct {
 	ResolutionTime string `json:"resolutionTime"`
 }
 
-// EventDetailDTO extends EventDTO with rules
-type EventDetailDTO struct {
-	EventDTO
-	Rules *EventRulesDTO `json:"rules,omitempty"`
+// EpisodeDetailDTO extends EpisodeDTO with rules
+type EpisodeDetailDTO struct {
+	EpisodeDTO
+	Rules *EpisodeRulesDTO `json:"rules,omitempty"`
 }
 
-// EventRulesDTO represents event rules data transfer object
-type EventRulesDTO struct {
+// EpisodeRulesDTO represents episode rules data transfer object
+type EpisodeRulesDTO struct {
 	CoveredEvent   CoveredEventDTO   `json:"coveredEvent"`
 	Oracle         OracleDTO         `json:"oracle"`
 	FinancialTerms FinancialTermsDTO `json:"financialTerms"`
@@ -62,61 +62,61 @@ type FinancialTermsDTO struct {
 	AdditionalContributions string  `json:"additionalContributions"`
 }
 
-// EventsResponseDTO represents events list response
-type EventsResponseDTO struct {
-	Events []EventDTO `json:"events"`
-	Total  int        `json:"total"`
-	Page   int        `json:"page"`
-	Limit  int        `json:"limit"`
+// EpisodesResponseDTO represents episodes list response
+type EpisodesResponseDTO struct {
+	Episodes []EpisodeDTO `json:"episodes"`
+	Total    int          `json:"total"`
+	Page     int          `json:"page"`
+	Limit    int          `json:"limit"`
 }
 
-// ToDTO converts domain Event to DTO
-func ToDTO(event *eventsureevent.Event) EventDTO {
+// ToDTO converts domain Episode to DTO
+func ToDTO(ep *eventsureepisode.Episode) EpisodeDTO {
 	var oracle *OracleDTO
-	if event.Oracle() != nil {
+	if ep.Oracle() != nil {
 		oracle = &OracleDTO{
-			DataSource:    event.Oracle().DataSource(),
-			ResolutionTime: event.Oracle().ResolutionTime(),
+			DataSource:    ep.Oracle().DataSource(),
+			ResolutionTime: ep.Oracle().ResolutionTime(),
 		}
 	}
 
 	var subtitle *string
-	if event.Subtitle() != nil {
-		subtitle = event.Subtitle()
+	if ep.Subtitle() != nil {
+		subtitle = ep.Subtitle()
 	}
 
-	return EventDTO{
-		ID:                     event.ID(),
-		Category:               string(event.Category()),
-		Status:                 string(event.Status()),
-		Title:                  event.Title(),
+	return EpisodeDTO{
+		ID:                     ep.ID(),
+		Category:               string(ep.Category()),
+		Status:                 string(ep.Status()),
+		Title:                  ep.Title(),
 		Subtitle:               subtitle,
-		EventWindow:            event.EventWindow(),
-		TriggerCondition:       event.TriggerCondition(),
-		Premium:                event.Premium(),
-		PremiumCurrency:        event.PremiumCurrency(),
-		MaxPayout:              event.MaxPayout(),
-		PayoutCurrency:         event.PayoutCurrency(),
-		AdditionalContributions: event.AdditionalContributions(),
-		PoolLogic:              event.PoolLogic(),
+		EventWindow:            ep.EventWindow(),
+		TriggerCondition:       ep.TriggerCondition(),
+		Premium:                ep.Premium(),
+		PremiumCurrency:        ep.PremiumCurrency(),
+		MaxPayout:              ep.MaxPayout(),
+		PayoutCurrency:         ep.PayoutCurrency(),
+		AdditionalContributions: ep.AdditionalContributions(),
+		PoolLogic:              ep.PoolLogic(),
 		Oracle:                 oracle,
-		PoolClosesAt:           event.PoolClosesAt(),
-		EventEndsAt:            event.EventEndsAt(),
-		Icon:                   string(event.Icon()),
-		CreatedAt:              event.CreatedAt(),
-		UpdatedAt:              event.UpdatedAt(),
+		PoolClosesAt:           ep.PoolClosesAt(),
+		EventEndsAt:            ep.EventEndsAt(),
+		Icon:                   string(ep.Icon()),
+		CreatedAt:              ep.CreatedAt(),
+		UpdatedAt:              ep.UpdatedAt(),
 	}
 }
 
-// ToDetailDTO converts domain Event to EventDetailDTO
-func ToDetailDTO(event *eventsureevent.Event) EventDetailDTO {
-	eventDTO := ToDTO(event)
+// ToDetailDTO converts domain Episode to EpisodeDetailDTO
+func ToDetailDTO(ep *eventsureepisode.Episode) EpisodeDetailDTO {
+	episodeDTO := ToDTO(ep)
 
 	var oracle OracleDTO
-	if event.Oracle() != nil {
+	if ep.Oracle() != nil {
 		oracle = OracleDTO{
-			DataSource:    event.Oracle().DataSource(),
-			ResolutionTime: event.Oracle().ResolutionTime(),
+			DataSource:    ep.Oracle().DataSource(),
+			ResolutionTime: ep.Oracle().ResolutionTime(),
 		}
 	} else {
 		oracle = OracleDTO{
@@ -126,27 +126,27 @@ func ToDetailDTO(event *eventsureevent.Event) EventDetailDTO {
 	}
 
 	additionalContributions := "none"
-	if event.AdditionalContributions() != nil {
-		additionalContributions = *event.AdditionalContributions()
+	if ep.AdditionalContributions() != nil {
+		additionalContributions = *ep.AdditionalContributions()
 	}
 
 	poolLogic := "none"
-	if event.PoolLogic() != nil {
-		poolLogic = *event.PoolLogic()
+	if ep.PoolLogic() != nil {
+		poolLogic = *ep.PoolLogic()
 	}
 
-	return EventDetailDTO{
-		EventDTO: eventDTO,
-		Rules: &EventRulesDTO{
+	return EpisodeDetailDTO{
+		EpisodeDTO: episodeDTO,
+		Rules: &EpisodeRulesDTO{
 			CoveredEvent: CoveredEventDTO{
-				Event:            event.Title(),
-				EventWindow:      event.EventWindow(),
-				TriggerCondition: event.TriggerCondition(),
+				Event:            ep.Title(),
+				EventWindow:      ep.EventWindow(),
+				TriggerCondition: ep.TriggerCondition(),
 			},
 			Oracle: oracle,
 			FinancialTerms: FinancialTermsDTO{
-				Premium:                event.Premium(),
-				MaxPayout:              event.MaxPayout(),
+				Premium:                ep.Premium(),
+				MaxPayout:              ep.MaxPayout(),
 				AdditionalContributions: additionalContributions,
 			},
 			PoolLogic: poolLogic,
