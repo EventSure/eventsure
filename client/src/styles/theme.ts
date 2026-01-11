@@ -40,6 +40,9 @@ export const theme = {
     // Special - for airplane/flight
     flight: '#38bdf8', // Sky blue
     flightTrail: 'rgba(56, 189, 248, 0.3)',
+
+    // Border
+    border: '#334155',
   },
   spacing: {
     xs: '4px',

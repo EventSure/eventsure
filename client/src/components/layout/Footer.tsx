@@ -164,7 +164,7 @@ const FooterLinks = styled.div`
   }
 `
 
-const NetworkBadge = styled.div`
+const NetworkBadge = styled.span`
   display: inline-flex;
   align-items: center;
   gap: ${theme.spacing.xs};

@@ -342,5 +342,38 @@
   "common": {
     "currency": "원",
     "memberUnit": "명"
+  },
+  "episode": {
+    "state": {
+      "created": "생성됨",
+      "open": "참여 가능",
+      "locked": "잠김",
+      "resolved": "결정됨",
+      "settled": "정산 완료",
+      "closed": "종료됨"
+    },
+    "totalPremium": "총 보험료",
+    "totalPayout": "총 지급액",
+    "surplus": "잉여금",
+    "yourPremium": "내 보험료",
+    "enterAmount": "금액 입력 (ETH)",
+    "join": "에피소드 참여",
+    "joining": "참여 중...",
+    "claim": "보상금 청구",
+    "claiming": "청구 중...",
+    "withdrawSurplus": "잉여금 회수",
+    "withdrawing": "회수 중...",
+    "alreadyClaimed": "이미 청구함",
+    "alreadyWithdrawn": "이미 회수함",
+    "joinSuccess": "에피소드 참여 완료!",
+    "claimSuccess": "보상금 청구 완료!",
+    "withdrawSuccess": "잉여금 회수 완료!",
+    "transactionFailed": "트랜잭션 실패",
+    "connectWallet": "참여하려면 지갑을 연결하세요",
+    "allEpisodes": "모든 에피소드",
+    "episodesAvailable": "개 에피소드 이용 가능",
+    "errorLoading": "에피소드 로딩 실패",
+    "noEpisodes": "에피소드가 없습니다",
+    "noEpisodesDesc": "현재 이용 가능한 보험 에피소드가 없습니다. 곧 다시 확인해주세요!"
   }
 }
