@@ -2,6 +2,7 @@ package http
 
 import (
 	"eventsure-server/interface/http/controller"
+	"eventsure-server/interface/http/middleware"
 
 	"github.com/gorilla/mux"
 )
@@ -32,6 +33,9 @@ func NewRouter(
 // SetupRoutes sets up all routes
 func (r *Router) SetupRoutes(mux *mux.Router) {
 	api := mux.PathPrefix("/api").Subrouter()
+
+	// Apply logging middleware to all API routes
+	api.Use(middleware.LoggingMiddleware)
 
 	// Phase 1: 필수 엔드포인트
 	api.HandleFunc("/episodes", r.episodeController.GetEpisodes).Methods("GET")

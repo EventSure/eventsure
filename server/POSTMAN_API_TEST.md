@@ -8,12 +8,12 @@
 
 ---
 
-## 1. 이벤트 (Events) API
+## 1. 에피소드 (Episodes) API
 
-### 1.1 이벤트 목록 조회
-**GET** `http://localhost:3000/api/events`
+### 1.1 에피소드 목록 조회
+**GET** `http://localhost:3000/api/episodes`
 
-**설명**: 모든 이벤트 목록을 조회합니다.
+**설명**: 모든 에피소드 목록을 조회합니다.
 
 **쿼리 파라미터** (선택사항):
 - `status`: `recruiting` | `active` | `settling` | `completed`
@@ -21,20 +21,20 @@
 
 **예시 요청**:
 ```
-GET http://localhost:3000/api/events
+GET http://localhost:3000/api/episodes
 ```
 
 **예시 요청 (필터링)**:
 ```
-GET http://localhost:3000/api/events?status=recruiting
-GET http://localhost:3000/api/events?category=flightDelay
-GET http://localhost:3000/api/events?status=recruiting&category=flightDelay
+GET http://localhost:3000/api/episodes?status=recruiting
+GET http://localhost:3000/api/episodes?category=flightDelay
+GET http://localhost:3000/api/episodes?status=recruiting&category=flightDelay
 ```
 
 **예상 응답**:
 ```json
 {
-  "events": [
+  "episodes": [
     {
       "id": "ke902",
       "category": "flightDelay",
@@ -76,18 +76,18 @@ GET http://localhost:3000/api/events?status=recruiting&category=flightDelay
 
 ---
 
-### 1.2 이벤트 상세 조회
-**GET** `http://localhost:3000/api/events/{eventId}`
+### 1.2 에피소드 상세 조회
+**GET** `http://localhost:3000/api/episodes/{episodeId}`
 
-**설명**: 특정 이벤트의 상세 정보를 조회합니다.
+**설명**: 특정 에피소드의 상세 정보를 조회합니다.
 
 **경로 파라미터**:
-- `eventId`: 이벤트 ID (예: `ke902`, `jejuTyphoon`)
+- `episodeId`: 에피소드 ID (예: `ke902`, `jejuTyphoon`)
 
 **예시 요청**:
 ```
-GET http://localhost:3000/api/events/ke902
-GET http://localhost:3000/api/events/jejuTyphoon
+GET http://localhost:3000/api/episodes/ke902
+GET http://localhost:3000/api/episodes/jejuTyphoon
 ```
 
 **예상 응답**:
@@ -401,8 +401,8 @@ GET http://localhost:3000/api/transactions/stats
    - `api_base`: `{{base_url}}/api`
 
 ### 요청 URL 예시
-- 전체 URL: `{{api_base}}/events`
-- 또는 직접: `http://localhost:3000/api/events`
+- 전체 URL: `{{api_base}}/episodes`
+- 또는 직접: `http://localhost:3000/api/episodes`
 
 ### 헤더 설정
 일반적으로 헤더 설정이 필요 없습니다. (JSON 자동 인식)
@@ -413,28 +413,28 @@ GET http://localhost:3000/api/transactions/stats
 
 ### 기본 테스트 플로우
 1. ✅ **홈 통계 조회**: `GET /api/stats/home`
-2. ✅ **이벤트 목록 조회**: `GET /api/events`
-3. ✅ **이벤트 상세 조회**: `GET /api/events/ke902`
+2. ✅ **에피소드 목록 조회**: `GET /api/episodes`
+3. ✅ **에피소드 상세 조회**: `GET /api/episodes/ke902`
 4. ✅ **풀 목록 조회**: `GET /api/pools`
 5. ✅ **트랜잭션 목록 조회**: `GET /api/transactions`
 6. ✅ **트랜잭션 통계 조회**: `GET /api/transactions/stats`
 
 ### 필터링 테스트
-1. ✅ **상태별 이벤트**: `GET /api/events?status=recruiting`
-2. ✅ **카테고리별 이벤트**: `GET /api/events?category=flightDelay`
-3. ✅ **조합 필터**: `GET /api/events?status=recruiting&category=flightDelay`
+1. ✅ **상태별 에피소드**: `GET /api/episodes?status=recruiting`
+2. ✅ **카테고리별 에피소드**: `GET /api/episodes?category=flightDelay`
+3. ✅ **조합 필터**: `GET /api/episodes?status=recruiting&category=flightDelay`
 4. ✅ **트랜잭션 타입 필터**: `GET /api/transactions?type=purchase`
 5. ✅ **페이지네이션**: `GET /api/transactions?limit=2&offset=0`
 
 ### 에러 케이스 테스트
-1. ❌ **존재하지 않는 이벤트**: `GET /api/events/notfound` → 404
-2. ❌ **잘못된 쿼리 파라미터**: `GET /api/events?status=invalid` → 빈 결과
+1. ❌ **존재하지 않는 에피소드**: `GET /api/episodes/notfound` → 404
+2. ❌ **잘못된 쿼리 파라미터**: `GET /api/episodes?status=invalid` → 빈 결과
 
 ---
 
-## 샘플 Event ID & Pool ID
+## 샘플 Episode ID & Pool ID
 
-**Event IDs**:
+**Episode IDs**:
 - `ke902` - KE902 항공편 지연 보험
 - `jejuTyphoon` - 제주도 태풍 취소 보험
 
@@ -465,3 +465,20 @@ go run .
 ```bash
 PORT=8080 go run .
 ```
+
+---
+
+## 로그 확인
+
+서버 실행 시 각 API 요청마다 다음과 같은 로그가 출력됩니다:
+
+```
+[GET] /api/episodes - 200 - 1.234ms
+[GET] /api/episodes/ke902 - 200 - 2.345ms
+[GET] /api/pools - 200 - 1.123ms
+[GET] /api/stats/home - 200 - 0.456ms
+[GET] /api/transactions - 200 - 3.567ms
+[GET] /api/transactions/stats - 200 - 0.789ms
+```
+
+로그 형식: `[HTTP Method] Request URI - Status Code - Duration`
