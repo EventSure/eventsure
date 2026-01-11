@@ -19,6 +19,17 @@ abstract contract Episode is IEpisode {
     address public immutable oracle;
     address public immutable factory;
 
+    // ============ Member State ===============
+    struct Member {
+        bool joined;
+        bool payoutClaimed;
+        bool surplusClaimed;
+    }
+
+    mapping(address => Member) public members;
+    
+    address[] public memberList;
+
     modifier onlyFactory() {
         require(msg.sender == factory, "Not factory");
         _;
@@ -38,16 +49,19 @@ abstract contract Episode is IEpisode {
         factory = msg.sender;
         oracle = _oracle;
         state = EpisodeState.Created;
+        emit EpisodeCreated(oracle, factory);
     }
 
     /* ========== State Transitions ========== */
 
     function open() external onlyFactory inState(EpisodeState.Created) {
         state = EpisodeState.Open;
+        emit EpisodeOpened();
     }
 
     function lock() external onlyFactory inState(EpisodeState.Open) {
         state = EpisodeState.Locked;
+        emit EpisodeLocked();
     }
 
     function resolve(bool _eventOccurred)
@@ -57,6 +71,7 @@ abstract contract Episode is IEpisode {
     {
         eventOccurred = _eventOccurred;
         state = EpisodeState.Resolved;
+        emit EpisodeResolved(_eventOccurred);
     }
 
     function settle()
@@ -71,6 +86,7 @@ abstract contract Episode is IEpisode {
             surplus = totalPremium;
         }
         state = EpisodeState.Settled;
+        emit EpisodeSettled(totalPayout, surplus);
     }
 
     function close()
@@ -79,6 +95,7 @@ abstract contract Episode is IEpisode {
         inState(EpisodeState.Settled)
     {
         state = EpisodeState.Closed;
+        emit EpisodeClosed();
     }
 
     /* ========== User Actions ========== */
@@ -89,6 +106,7 @@ abstract contract Episode is IEpisode {
     {
         premiumOf[msg.sender] += premium;
         totalPremium += premium;
+        emit MemberJoined(msg.sender, premium);
     }
 
     function claim()
@@ -100,6 +118,8 @@ abstract contract Episode is IEpisode {
 
         uint256 payout = premiumOf[msg.sender]; // 단순 비례
         claimed[msg.sender] = true;
+
+        emit PayoutClaimed(msg.sender, payout);
 
         // ETH 전송 등
     }
@@ -115,6 +135,8 @@ abstract contract Episode is IEpisode {
             (premiumOf[msg.sender] * surplus) / totalPremium;
 
         surplusWithdrawn[msg.sender] = true;
+
+        emit SurplusClaimed(msg.sender, amount);
 
         // ETH 전송 등
     }
