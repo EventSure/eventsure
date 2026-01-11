@@ -11,6 +11,22 @@ interface IEpisode {
         Closed
     }
 
+    /* ========== Events ========== */
+
+    // Pool
+    event EpisodeCreated(address indexed oracle, address indexed factory);
+    event EpisodeOpened();
+    event EpisodeLocked();
+    event EpisodeResolved(bool eventOccurred);
+    event EpisodeSettled(uint256 totalPayout, uint256 surplus);
+    event EpisodeClosed();
+    
+    // Member
+    event MemberJoined(address indexed member, uint256 premium);
+    event PayoutClaimed(address indexed member, uint256 amount);
+    event SurplusClaimed(address indexed member, uint256 amount);
+    
+
     /* ========== View ========== */
 
     function state() external view returns (EpisodeState);
@@ -20,7 +36,7 @@ interface IEpisode {
 
     /* ========== User Actions ========== */
 
-    function join(uint256 premium) external;
+    function join() external payable;
 
     function claim() external;
     function withdrawSurplus() external;

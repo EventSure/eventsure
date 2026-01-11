@@ -1,9 +1,9 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.20;
 
-import "../interfaces/IEpisode.sol";
+import {IEpisode} from "../interfaces/IEpisode.sol";
 
-abstract contract Episode is IEpisode {
+contract Episode is IEpisode {
     EpisodeState public override state;
 
     uint256 public override totalPremium;
@@ -16,38 +16,64 @@ abstract contract Episode is IEpisode {
 
     bool public eventOccurred;
 
-    address public immutable oracle;
-    address public immutable factory;
+    address public immutable ORACLE;
+    address public immutable FACTORY;
+
+    // ============ Member State ===============
+    struct Member {
+        bool joined;
+        bool payoutClaimed;
+        bool surplusClaimed;
+    }
+
+    mapping(address => Member) public members;
+    
+    address[] public memberList;
 
     modifier onlyFactory() {
-        require(msg.sender == factory, "Not factory");
+        _onlyFactory();
         _;
+    }
+
+    function _onlyFactory() internal view {
+        require(msg.sender == FACTORY, "Not factory");
     }
 
     modifier onlyOracle() {
-        require(msg.sender == oracle, "Not oracle");
+        _onlyOracle();
         _;
+    }
+
+    function _onlyOracle() internal view {
+        require(msg.sender == ORACLE, "Not oracle");
     }
 
     modifier inState(EpisodeState s) {
-        require(state == s, "Invalid state");
+        _inState(s);
         _;
     }
 
+    function _inState(EpisodeState s) internal view {
+        require(state == s, "Invalid state");
+    }
+
     constructor(address _oracle) {
-        factory = msg.sender;
-        oracle = _oracle;
+        FACTORY = msg.sender;
+        ORACLE = _oracle;
         state = EpisodeState.Created;
+        emit EpisodeCreated(ORACLE, FACTORY);
     }
 
     /* ========== State Transitions ========== */
 
     function open() external onlyFactory inState(EpisodeState.Created) {
         state = EpisodeState.Open;
+        emit EpisodeOpened();
     }
 
     function lock() external onlyFactory inState(EpisodeState.Open) {
         state = EpisodeState.Locked;
+        emit EpisodeLocked();
     }
 
     function resolve(bool _eventOccurred)
@@ -57,6 +83,7 @@ abstract contract Episode is IEpisode {
     {
         eventOccurred = _eventOccurred;
         state = EpisodeState.Resolved;
+        emit EpisodeResolved(_eventOccurred);
     }
 
     function settle()
@@ -71,6 +98,7 @@ abstract contract Episode is IEpisode {
             surplus = totalPremium;
         }
         state = EpisodeState.Settled;
+        emit EpisodeSettled(totalPayout, surplus);
     }
 
     function close()
@@ -79,16 +107,20 @@ abstract contract Episode is IEpisode {
         inState(EpisodeState.Settled)
     {
         state = EpisodeState.Closed;
+        emit EpisodeClosed();
     }
 
     /* ========== User Actions ========== */
 
-    function join(uint256 premium)
+    function join()
         external
+        payable
         inState(EpisodeState.Open)
     {
-        premiumOf[msg.sender] += premium;
-        totalPremium += premium;
+        require(msg.value > 0, "Premium must be greater than zero");
+        premiumOf[msg.sender] += msg.value;
+        totalPremium += msg.value;
+        emit MemberJoined(msg.sender, msg.value);
     }
 
     function claim()
@@ -100,6 +132,8 @@ abstract contract Episode is IEpisode {
 
         uint256 payout = premiumOf[msg.sender]; // 단순 비례
         claimed[msg.sender] = true;
+
+        emit PayoutClaimed(msg.sender, payout);
 
         // ETH 전송 등
     }
@@ -115,6 +149,8 @@ abstract contract Episode is IEpisode {
             (premiumOf[msg.sender] * surplus) / totalPremium;
 
         surplusWithdrawn[msg.sender] = true;
+
+        emit SurplusClaimed(msg.sender, amount);
 
         // ETH 전송 등
     }
