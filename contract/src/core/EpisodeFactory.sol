@@ -15,6 +15,9 @@ contract EpisodeFactory {
         uint64 signupEnd;
         uint256 premiumAmount;
         uint256 payoutAmount;
+        string flightName;
+        uint64 departureTime;
+        uint64 estimatedArrivalTime;
     }
 
     EpisodeInfo[] public episodes;
@@ -41,7 +44,10 @@ contract EpisodeFactory {
         uint64 signupStart,
         uint64 signupEnd,
         uint256 premiumAmount,
-        uint256 payoutAmount
+        uint256 payoutAmount,
+        string memory flightName,
+        uint64 departureTime,
+        uint64 estimatedArrivalTime
     )
         external
         onlyOwner
@@ -50,7 +56,14 @@ contract EpisodeFactory {
         if (signupStart >= signupEnd) revert Errors.InvalidTimeRange();
         if (premiumAmount == 0 || payoutAmount == 0) revert Errors.InvalidAmount();
 
-        Episode episode = new Episode(oracle, premiumAmount, payoutAmount);
+        Episode episode = new Episode(
+            oracle,
+            premiumAmount,
+            payoutAmount,
+            flightName,
+            departureTime,
+            estimatedArrivalTime
+        );
         address ep = address(episode);
 
         episodes.push(
@@ -60,7 +73,10 @@ contract EpisodeFactory {
                 signupStart: signupStart,
                 signupEnd: signupEnd,
                 premiumAmount: premiumAmount,
-                payoutAmount: payoutAmount
+                payoutAmount: payoutAmount,
+                flightName: flightName,
+                departureTime: departureTime,
+                estimatedArrivalTime: estimatedArrivalTime
             })
         );
 

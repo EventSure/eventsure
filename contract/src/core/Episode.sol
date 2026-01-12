@@ -20,6 +20,11 @@ contract Episode is IEpisode {
     address public immutable FACTORY;
     uint256 public immutable premiumAmount;
     uint256 public immutable payoutAmount;
+    string public immutable flightName;
+    uint64 public immutable departureTime;
+    uint64 public immutable estimatedArrivalTime;
+
+    uint64 public finalArrivalTime;
 
     // ============ Member State ===============
     struct Member {
@@ -47,11 +52,21 @@ contract Episode is IEpisode {
         _;
     }
 
-    constructor(address _oracle, uint256 _premiumAmount, uint256 _payoutAmount) {
+    constructor(
+        address _oracle,
+        uint256 _premiumAmount,
+        uint256 _payoutAmount,
+        string memory _flightName,
+        uint64 _departureTime,
+        uint64 _estimatedArrivalTime
+    ) {
         FACTORY = msg.sender;
         ORACLE = _oracle;
         premiumAmount = _premiumAmount;
         payoutAmount = _payoutAmount;
+        flightName = _flightName;
+        departureTime = _departureTime;
+        estimatedArrivalTime = _estimatedArrivalTime;
         state = EpisodeState.Created;
         emit EpisodeCreated(ORACLE, FACTORY);
     }
@@ -68,14 +83,15 @@ contract Episode is IEpisode {
         emit EpisodeLocked();
     }
 
-    function resolve(bool _eventOccurred)
+    function resolve(bool _eventOccurred, uint64 _finalArrivalTime)
         external
         onlyOracle
         inState(EpisodeState.Locked)
     {
         eventOccurred = _eventOccurred;
+        finalArrivalTime = _finalArrivalTime;
         state = EpisodeState.Resolved;
-        emit EpisodeResolved(_eventOccurred);
+        emit EpisodeResolved(_eventOccurred, _finalArrivalTime);
     }
 
     function settle()

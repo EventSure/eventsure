@@ -17,7 +17,7 @@ interface IEpisode {
     event EpisodeCreated(address indexed oracle, address indexed factory);
     event EpisodeOpened();
     event EpisodeLocked();
-    event EpisodeResolved(bool eventOccurred);
+    event EpisodeResolved(bool eventOccurred, uint64 finalArrivalTime);
     event EpisodeSettled(uint256 totalPayout, uint256 surplus);
     event EpisodeClosed();
     
@@ -35,6 +35,10 @@ interface IEpisode {
     function surplus() external view returns (uint256);
     function premiumAmount() external view returns (uint256);
     function payoutAmount() external view returns (uint256);
+    function flightName() external view returns (string memory);
+    function departureTime() external view returns (uint64);
+    function estimatedArrivalTime() external view returns (uint64);
+    function finalArrivalTime() external view returns (uint64);
 
     /* ========== User Actions ========== */
 
@@ -47,7 +51,7 @@ interface IEpisode {
 
     function open() external;
     function lock() external;
-    function resolve(bool eventOccurred) external;
+    function resolve(bool eventOccurred, uint64 finalArrivalTime) external;
     function settle() external;
     function close() external;
 }
