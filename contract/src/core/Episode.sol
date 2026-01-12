@@ -18,11 +18,12 @@ contract Episode is IEpisode {
     bool public eventOccurred;
 
     address public immutable FACTORY;
-    uint256 public immutable premiumAmount;
-    uint256 public immutable payoutAmount;
-    string public immutable flightName;
-    uint64 public immutable departureTime;
-    uint64 public immutable estimatedArrivalTime;
+    address public immutable ORACLE;
+    uint256 public immutable PREMIUM_AMOUNT;
+    uint256 public immutable PAYOUT_AMOUNT;
+    string public flightName;
+    uint64 public immutable DEPARTURE_TIME;
+    uint64 public immutable ESTIMATED_ARRIVAL_TIME;
 
     uint64 public finalArrivalTime;
 
@@ -38,18 +39,48 @@ contract Episode is IEpisode {
     address[] public memberList;
 
     modifier onlyFactory() {
-        if (msg.sender != FACTORY) revert Errors.Unauthorized();
+        _onlyFactory();
         _;
+    }
+
+    function _onlyFactory() internal view {
+        if (msg.sender != FACTORY) revert Errors.Unauthorized();
     }
 
     modifier onlyOracle() {
-        if (msg.sender != ORACLE) revert Errors.Unauthorized();
+        _onlyOracle();
         _;
     }
 
+    function _onlyOracle() internal view {
+        if (msg.sender != ORACLE) revert Errors.Unauthorized();
+    }
+
     modifier inState(EpisodeState s) {
-        if (state != s) revert Errors.InvalidState();
+        _inState(s);
         _;
+    }
+
+    function _inState(EpisodeState s) internal view {
+        if (state != s) revert Errors.InvalidState();
+    }
+
+    /* ========== View Functions ========== */
+
+    function premiumAmount() external view override returns (uint256) {
+        return PREMIUM_AMOUNT;
+    }
+
+    function payoutAmount() external view override returns (uint256) {
+        return PAYOUT_AMOUNT;
+    }
+
+    function departureTime() external view override returns (uint64) {
+        return DEPARTURE_TIME;
+    }
+
+    function estimatedArrivalTime() external view override returns (uint64) {
+        return ESTIMATED_ARRIVAL_TIME;
     }
 
     constructor(
@@ -62,11 +93,11 @@ contract Episode is IEpisode {
     ) {
         FACTORY = msg.sender;
         ORACLE = _oracle;
-        premiumAmount = _premiumAmount;
-        payoutAmount = _payoutAmount;
+        PREMIUM_AMOUNT = _premiumAmount;
+        PAYOUT_AMOUNT = _payoutAmount;
         flightName = _flightName;
-        departureTime = _departureTime;
-        estimatedArrivalTime = _estimatedArrivalTime;
+        DEPARTURE_TIME = _departureTime;
+        ESTIMATED_ARRIVAL_TIME = _estimatedArrivalTime;
         state = EpisodeState.Created;
         emit EpisodeCreated(ORACLE, FACTORY);
     }
@@ -99,8 +130,8 @@ contract Episode is IEpisode {
         inState(EpisodeState.Resolved)
     {
         if (eventOccurred) {
-            // Calculate total payout based on number of members and fixed payoutAmount
-            uint256 potentialPayout = payoutAmount * memberList.length;
+            // Calculate total payout based on number of members and fixed PAYOUT_AMOUNT
+            uint256 potentialPayout = PAYOUT_AMOUNT * memberList.length;
             totalPayout = (potentialPayout > totalPremium) ? totalPremium : potentialPayout;
             surplus = totalPremium - totalPayout;
         } else {
@@ -127,7 +158,7 @@ contract Episode is IEpisode {
         payable
         inState(EpisodeState.Open)
     {
-        if (msg.value != premiumAmount) revert Errors.InvalidAmount();
+        if (msg.value != PREMIUM_AMOUNT) revert Errors.InvalidAmount();
         if (members[msg.sender].joined) revert Errors.AlreadyJoined();
 
         members[msg.sender].joined = true;
@@ -145,7 +176,7 @@ contract Episode is IEpisode {
         if (!eventOccurred) revert Errors.NoPayoutAvailable(); // Check if event occurred
         if (claimed[msg.sender]) revert Errors.AlreadyClaimed(); // Check if already claimed
 
-        uint256 payout = payoutAmount; // 고정 지급액
+        uint256 payout = PAYOUT_AMOUNT; // 고정 지급액
         claimed[msg.sender] = true;
 
         emit PayoutClaimed(msg.sender, payout);

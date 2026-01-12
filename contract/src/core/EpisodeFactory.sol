@@ -29,7 +29,7 @@ contract EpisodeFactory {
     }
 
     function _onlyOwner() internal view {
-        revert Errors.Unauthorized();
+        if (msg.sender != owner) revert Errors.Unauthorized();
     }
 
     constructor(address _oracle) {
