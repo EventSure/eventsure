@@ -1,7 +1,8 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.20;
 
-import {Episode} from "./Episode.sol";
+    import {Episode} from "./Episode.sol";
+import {Errors} from "../libraries/Errors.sol";
 
 contract EpisodeFactory {
     address public owner;
@@ -12,6 +13,8 @@ contract EpisodeFactory {
         bytes32 productId;
         uint64 signupStart;
         uint64 signupEnd;
+        uint256 premiumAmount;
+        uint256 payoutAmount;
     }
 
     EpisodeInfo[] public episodes;
@@ -23,7 +26,7 @@ contract EpisodeFactory {
     }
 
     function _onlyOwner() internal view {
-        require(msg.sender == owner, "Not owner");
+        revert Errors.Unauthorized();
     }
 
     constructor(address _oracle) {
@@ -36,15 +39,18 @@ contract EpisodeFactory {
     function createEpisode(
         bytes32 productId,
         uint64 signupStart,
-        uint64 signupEnd
+        uint64 signupEnd,
+        uint256 premiumAmount,
+        uint256 payoutAmount
     )
         external
         onlyOwner
         returns (address)
     {
-        require(signupStart < signupEnd, "Invalid signup window");
+        if (signupStart >= signupEnd) revert Errors.InvalidTimeRange();
+        if (premiumAmount == 0 || payoutAmount == 0) revert Errors.InvalidAmount();
 
-        Episode episode = new Episode(oracle);
+        Episode episode = new Episode(oracle, premiumAmount, payoutAmount);
         address ep = address(episode);
 
         episodes.push(
@@ -52,7 +58,9 @@ contract EpisodeFactory {
                 episode: ep,
                 productId: productId,
                 signupStart: signupStart,
-                signupEnd: signupEnd
+                signupEnd: signupEnd,
+                premiumAmount: premiumAmount,
+                payoutAmount: payoutAmount
             })
         );
 
@@ -67,7 +75,7 @@ contract EpisodeFactory {
         external
         onlyOwner
     {
-        require(isEpisode[ep], "Unknown episode");
+        if (!isEpisode[ep]) revert Errors.InvalidParameter();
         Episode(ep).open();
     }
 
@@ -75,7 +83,7 @@ contract EpisodeFactory {
         external
         onlyOwner
     {
-        require(isEpisode[ep], "Unknown episode");
+        if (!isEpisode[ep]) revert Errors.InvalidParameter();
         Episode(ep).lock();
     }
 
@@ -83,7 +91,7 @@ contract EpisodeFactory {
         external
         onlyOwner
     {
-        require(isEpisode[ep], "Unknown episode");
+        if (!isEpisode[ep]) revert Errors.InvalidParameter();
         Episode(ep).close();
     }
 

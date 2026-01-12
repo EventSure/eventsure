@@ -50,15 +50,23 @@ library Errors {
     /// @notice Thrown when maximum participants limit is reached
     error MaxParticipantsReached();
     
-    /// @notice Thrown when user is not a member
-    error NotMember();
+        /// @notice Thrown when user is not a member
+        error NotMember();
     
-    /// @notice Thrown when claim has already been made
-    error AlreadyClaimed();
+        /// @notice Thrown when claim has already been made
+        error AlreadyClaimed();
     
-    /// @notice Thrown when settlement is not completed
-    error SettlementNotCompleted();
+        /// @notice Thrown when settlement is not completed
+        error SettlementNotCompleted();
+        
+        /// @notice Thrown when no payout is available
+        error NoPayoutAvailable();
     
+        /// @notice Thrown when no surplus is available
+        error NoSurplusAvailable();
+        
+        /// @notice Thrown when surplus has already been withdrawn
+        error SurplusAlreadyWithdrawn();    
     /*━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━*
      *                       ORACLE ERRORS                               *
      *━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━*/

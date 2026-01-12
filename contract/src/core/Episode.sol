@@ -2,6 +2,7 @@
 pragma solidity ^0.8.20;
 
 import {IEpisode} from "../interfaces/IEpisode.sol";
+import {Errors} from "../libraries/Errors.sol";
 
 contract Episode is IEpisode {
     EpisodeState public override state;
@@ -16,8 +17,9 @@ contract Episode is IEpisode {
 
     bool public eventOccurred;
 
-    address public immutable ORACLE;
     address public immutable FACTORY;
+    uint256 public immutable premiumAmount;
+    uint256 public immutable payoutAmount;
 
     // ============ Member State ===============
     struct Member {
@@ -31,35 +33,25 @@ contract Episode is IEpisode {
     address[] public memberList;
 
     modifier onlyFactory() {
-        _onlyFactory();
+        if (msg.sender != FACTORY) revert Errors.Unauthorized();
         _;
-    }
-
-    function _onlyFactory() internal view {
-        require(msg.sender == FACTORY, "Not factory");
     }
 
     modifier onlyOracle() {
-        _onlyOracle();
+        if (msg.sender != ORACLE) revert Errors.Unauthorized();
         _;
-    }
-
-    function _onlyOracle() internal view {
-        require(msg.sender == ORACLE, "Not oracle");
     }
 
     modifier inState(EpisodeState s) {
-        _inState(s);
+        if (state != s) revert Errors.InvalidState();
         _;
     }
 
-    function _inState(EpisodeState s) internal view {
-        require(state == s, "Invalid state");
-    }
-
-    constructor(address _oracle) {
+    constructor(address _oracle, uint256 _premiumAmount, uint256 _payoutAmount) {
         FACTORY = msg.sender;
         ORACLE = _oracle;
+        premiumAmount = _premiumAmount;
+        payoutAmount = _payoutAmount;
         state = EpisodeState.Created;
         emit EpisodeCreated(ORACLE, FACTORY);
     }
@@ -91,8 +83,10 @@ contract Episode is IEpisode {
         inState(EpisodeState.Resolved)
     {
         if (eventOccurred) {
-            totalPayout = totalPremium; // 단순 예시
-            surplus = 0;
+            // Calculate total payout based on number of members and fixed payoutAmount
+            uint256 potentialPayout = payoutAmount * memberList.length;
+            totalPayout = (potentialPayout > totalPremium) ? totalPremium : potentialPayout;
+            surplus = totalPremium - totalPayout;
         } else {
             totalPayout = 0;
             surplus = totalPremium;
@@ -117,7 +111,12 @@ contract Episode is IEpisode {
         payable
         inState(EpisodeState.Open)
     {
-        require(msg.value > 0, "Premium must be greater than zero");
+        if (msg.value != premiumAmount) revert Errors.InvalidAmount();
+        if (members[msg.sender].joined) revert Errors.AlreadyJoined();
+
+        members[msg.sender].joined = true;
+        memberList.push(msg.sender);
+
         premiumOf[msg.sender] += msg.value;
         totalPremium += msg.value;
         emit MemberJoined(msg.sender, msg.value);
@@ -127,31 +126,39 @@ contract Episode is IEpisode {
         external
         inState(EpisodeState.Settled)
     {
-        require(eventOccurred, "No payout");
-        require(!claimed[msg.sender], "Already claimed");
+        if (!eventOccurred) revert Errors.NoPayoutAvailable(); // Check if event occurred
+        if (claimed[msg.sender]) revert Errors.AlreadyClaimed(); // Check if already claimed
 
-        uint256 payout = premiumOf[msg.sender]; // 단순 비례
+        uint256 payout = payoutAmount; // 고정 지급액
         claimed[msg.sender] = true;
 
         emit PayoutClaimed(msg.sender, payout);
 
-        // ETH 전송 등
+        // Perform ETH transfer
+        // Using `call` for robust transfer, checking success and handling re-entrancy risks.
+        (bool success, ) = payable(msg.sender).call{value: payout}("");
+        if (!success) revert Errors.TransferFailed();
     }
 
     function withdrawSurplus()
         external
         inState(EpisodeState.Settled)
     {
-        require(!eventOccurred, "No surplus");
-        require(!surplusWithdrawn[msg.sender], "Already withdrawn");
+        if (eventOccurred) revert Errors.NoSurplusAvailable(); // Check if event occurred (no surplus if event occurred)
+        if (surplusWithdrawn[msg.sender]) revert Errors.SurplusAlreadyWithdrawn(); // Check if already withdrawn
 
-        uint256 amount =
-            (premiumOf[msg.sender] * surplus) / totalPremium;
+        // Calculate the individual surplus share
+        uint256 amount = (premiumOf[msg.sender] * surplus) / totalPremium;
+
+        // Ensure there's actual surplus to withdraw for this member
+        if (amount == 0) revert Errors.NoSurplusAvailable(); // Or a more specific error like "NoIndividualSurplus"
 
         surplusWithdrawn[msg.sender] = true;
 
         emit SurplusClaimed(msg.sender, amount);
 
-        // ETH 전송 등
+        // Perform ETH transfer
+        (bool success, ) = payable(msg.sender).call{value: amount}("");
+        if (!success) revert Errors.TransferFailed();
     }
 }

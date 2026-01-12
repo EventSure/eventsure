@@ -33,6 +33,8 @@ interface IEpisode {
     function totalPremium() external view returns (uint256);
     function totalPayout() external view returns (uint256);
     function surplus() external view returns (uint256);
+    function premiumAmount() external view returns (uint256);
+    function payoutAmount() external view returns (uint256);
 
     /* ========== User Actions ========== */
 
