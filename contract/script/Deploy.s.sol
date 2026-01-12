@@ -1,20 +1,24 @@
 // SPDX-License-Identifier: UNLICENSED
 pragma solidity ^0.8.20;
 
-import {Script} from "forge-std/Script.sol";
+import {Script, console} from "forge-std/Script.sol";
 import {EpisodeFactory} from "../src/core/EpisodeFactory.sol";
+import {FlightOracle} from "../src/core/FlightOracle.sol";
 
 contract Deploy is Script {
+    FlightOracle public oracle;
     EpisodeFactory public factory;
-
-    // A placeholder for the oracle address.
-    // Replace this with the actual oracle address for the target network.
-    address constant ORACLE_ADDRESS = 0x5FbDB2315678afecb367f032d93F642f64180aa3;
 
     function run() public {
         vm.startBroadcast();
 
-        factory = new EpisodeFactory(ORACLE_ADDRESS);
+        // Deploy FlightOracle first
+        oracle = new FlightOracle();
+        console.log("FlightOracle deployed at:", address(oracle));
+
+        // Deploy EpisodeFactory with oracle address
+        factory = new EpisodeFactory(address(oracle));
+        console.log("EpisodeFactory deployed at:", address(factory));
 
         vm.stopBroadcast();
     }
