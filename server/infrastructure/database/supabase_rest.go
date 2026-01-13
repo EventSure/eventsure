@@ -64,10 +64,12 @@ func toString(value interface{}) string {
 // SelectAll selects all rows from a table
 func (c *SupabaseRESTClient) SelectAll(table string) ([]map[string]interface{}, error) {
 	var result []map[string]interface{}
-	_, err := c.Client.From(table).Select("*", "exact", false).ExecuteTo(&result)
+	count, err := c.Client.From(table).Select("*", "exact", false).ExecuteTo(&result)
 	if err != nil {
-		return nil, fmt.Errorf("failed to select from %s: %w", table, err)
+		// 더 상세한 에러 정보 반환
+		return nil, fmt.Errorf("failed to select from %s (count: %v): %w", table, count, err)
 	}
+	// 빈 결과는 에러가 아니므로 nil 반환하지 않음 (RLS 정책으로 인해 빈 결과가 나올 수 있음)
 	return result, nil
 }
 
