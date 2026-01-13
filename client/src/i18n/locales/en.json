@@ -305,7 +305,8 @@
       "financialTerms": "Financial Terms",
       "enRoute": "En route",
       "triggerThreshold": "3h (trigger)",
-      "afterArrival": "After arrival"
+      "afterArrival": "After arrival",
+      "walletRequired": "Please connect your wallet to join the pool."
     },
     "defaultTrigger": "Flight delay ≥ 3 hours",
     "noEpisodes": "No episodes available",

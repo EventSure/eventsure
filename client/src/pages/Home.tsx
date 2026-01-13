@@ -10,7 +10,6 @@ import {
   HowItWorks,
   FAQ,
   ActivePools,
-  ActiveEvents,
 } from "@/components/sections";
 import { Button, GlassCard, StatCard } from "@/components/common";
 

@@ -1,56 +1,15 @@
-import { useState, useEffect, useMemo } from "react";
+import { useState, useEffect, useMemo, useCallback } from "react";
 import styled from "@emotion/styled";
 import { motion } from "framer-motion";
 import { useTranslation } from "react-i18next";
 import { useSearchParams } from "react-router-dom";
-import { useWriteContract, useWaitForTransactionReceipt, useReadContracts } from "wagmi";
-import { formatEther } from "viem";
 import { theme } from "@/styles/theme";
 import { Header, Footer } from "@/components/layout";
-import { EpisodeFactoryABI, EPISODE_FACTORY_ADDRESS, EpisodeABI } from "@/contracts/abis";
-
-const EpisodeState = {
-  Created: 0,
-  Open: 1,
-  Locked: 2,
-  Resolved: 3,
-  Settled: 4,
-  Closed: 5,
-} as const;
-
-const getStateLabel = (state: number) => {
-  switch (state) {
-    case EpisodeState.Created: return 'created';
-    case EpisodeState.Open: return 'recruiting';
-    case EpisodeState.Locked: return 'locked';
-    case EpisodeState.Resolved: return 'resolved';
-    case EpisodeState.Settled: return 'settled';
-    case EpisodeState.Closed: return 'closed';
-    default: return 'unknown';
-  }
-};
-
-const getStateBadgeVariant = (state: number): 'secondary' | 'success' | 'warning' => {
-  switch (state) {
-    case EpisodeState.Open: return 'secondary';
-    case EpisodeState.Settled: return 'success';
-    case EpisodeState.Locked:
-    case EpisodeState.Resolved: return 'warning';
-    default: return 'secondary';
-  }
-};
-
-interface EpisodeData {
-  address: `0x${string}`;
-  flightName: string;
-  premiumAmount: bigint;
-  payoutAmount: bigint;
-  departureTime: bigint;
-  estimatedArrivalTime: bigint;
-  signupEnd: bigint;
-  state: number;
-  totalPremium: bigint;
-}
+import { useEpisodes } from "@/hooks/useEpisodes";
+import { useJoinEpisode } from "@/hooks/useJoinEpisode";
+import type { ViewState } from "@/types/episode";
+import { EpisodeState } from "@/types/episode";
+import * as episodeUtils from "@/utils/episode";
 
 const PageContainer = styled.div`
   min-height: 100vh;
@@ -685,8 +644,6 @@ const WarningIcon = () => (
   </svg>
 );
 
-type ViewState = "LIST" | "RULES" | "JOIN" | "DASHBOARD";
-
 const STEPS: { key: ViewState; index: number }[] = [
   { key: "RULES", index: 0 },
   { key: "JOIN", index: 1 },
@@ -704,75 +661,33 @@ export const Explorer = () => {
   );
   const [isAgreed, setIsAgreed] = useState(false);
   const [timeLeft, setTimeLeft] = useState(12062);
+  const [showWalletPrompt, setShowWalletPrompt] = useState(false);
 
-  const { data: allEpisodesData } = useReadContracts({
-    contracts: [{
-      address: EPISODE_FACTORY_ADDRESS,
-      abi: EpisodeFactoryABI,
-      functionName: 'allEpisodes',
-    }],
-  });
-
-  const episodeAddresses = useMemo(() => {
-    if (!allEpisodesData?.[0]?.result) return [];
-    return allEpisodesData[0].result as `0x${string}`[];
-  }, [allEpisodesData]);
-
-  const { data: episodeDetails } = useReadContracts({
-    contracts: episodeAddresses.flatMap((address) => [
-      { address, abi: EpisodeABI, functionName: 'state' },
-      { address, abi: EpisodeABI, functionName: 'totalPremium' },
-      { address, abi: EpisodeABI, functionName: 'PREMIUM_AMOUNT' },
-      { address, abi: EpisodeABI, functionName: 'PAYOUT_AMOUNT' },
-      { address, abi: EpisodeABI, functionName: 'flightName' },
-      { address, abi: EpisodeABI, functionName: 'DEPARTURE_TIME' },
-      { address, abi: EpisodeABI, functionName: 'ESTIMATED_ARRIVAL_TIME' },
-    ]),
-  });
-
-  const episodes: EpisodeData[] = useMemo(() => {
-    if (!episodeDetails || episodeAddresses.length === 0) return [];
-    
-    return episodeAddresses.map((address, index) => {
-      const baseIndex = index * 7;
-      
-      return {
-        address,
-        state: (episodeDetails[baseIndex]?.result as number) ?? 0,
-        totalPremium: (episodeDetails[baseIndex + 1]?.result as bigint) ?? 0n,
-        premiumAmount: (episodeDetails[baseIndex + 2]?.result as bigint) ?? 0n,
-        payoutAmount: (episodeDetails[baseIndex + 3]?.result as bigint) ?? 0n,
-        flightName: (episodeDetails[baseIndex + 4]?.result as string) ?? '',
-        departureTime: (episodeDetails[baseIndex + 5]?.result as bigint) ?? 0n,
-        estimatedArrivalTime: (episodeDetails[baseIndex + 6]?.result as bigint) ?? 0n,
-        signupEnd: 0n,
-      };
-    }).filter((ep) => ep.flightName);
-  }, [episodeDetails, episodeAddresses]);
+  const { episodes } = useEpisodes();
 
   const selectedEpisode = useMemo(() => {
     return episodes.find((ep) => ep.address === selectedEpisodeAddress);
   }, [episodes, selectedEpisodeAddress]);
 
-  const { data: hash, writeContract, isPending, error } = useWriteContract();
-  const { isLoading: isConfirming, isSuccess: isConfirmed } =
-    useWaitForTransactionReceipt({ hash });
-
-  const handleJoin = () => {
-    if (!selectedEpisode) return;
-    writeContract({
-      address: selectedEpisode.address,
-      abi: EpisodeABI,
-      functionName: "join",
-      value: selectedEpisode.premiumAmount,
-    });
-  };
-
-  useEffect(() => {
-    if (isConfirmed) {
+  const {
+    handleJoin: joinEpisode,
+    isPending,
+    isConfirming,
+    error,
+    isConnected,
+  } = useJoinEpisode({
+    selectedEpisode,
+    onSuccess: useCallback(() => {
       setView("DASHBOARD");
+    }, []),
+  });
+
+  const handleJoinClick = () => {
+    const result = joinEpisode();
+    if (result?.needsConnection) {
+      setShowWalletPrompt(true);
     }
-  }, [isConfirmed]);
+  };
 
   useEffect(() => {
     if (eventId) {
@@ -795,82 +710,23 @@ export const Explorer = () => {
     }
   }, [view]);
 
-  const formatTime = (seconds: number) => {
-    const h = Math.floor(seconds / 3600);
-    const m = Math.floor((seconds % 3600) / 60);
-    const s = seconds % 60;
-    return `${h.toString().padStart(2, "0")}:${m
-      .toString()
-      .padStart(2, "0")}:${s.toString().padStart(2, "0")}`;
-  };
-
   const handleViewRules = (address: `0x${string}`) => {
     setSearchParams({ event: address });
-  };
-
-  const formatDateTime = (timestamp: bigint) => {
-    if (!timestamp) return '';
-    const date = new Date(Number(timestamp) * 1000);
-    const locale = i18n.language === 'ko' ? 'ko-KR' : 'en-US';
-    return date.toLocaleString(locale, {
-      year: 'numeric',
-      month: 'long',
-      day: 'numeric',
-      hour: '2-digit',
-      minute: '2-digit',
-      hour12: false,
-    });
-  };
-
-  const formatDateRange = (start: bigint, end: bigint) => {
-    if (!start || !end) return '';
-    const startDate = new Date(Number(start) * 1000);
-    const endDate = new Date(Number(end) * 1000);
-    const locale = i18n.language === 'ko' ? 'ko-KR' : 'en-US';
-    
-    const startStr = startDate.toLocaleString(locale, {
-      year: 'numeric',
-      month: 'long',
-      day: 'numeric',
-      hour: '2-digit',
-      minute: '2-digit',
-      hour12: false,
-    });
-    
-    const endStr = endDate.toLocaleString(locale, {
-      hour: '2-digit',
-      minute: '2-digit',
-      hour12: false,
-    });
-    
-    return `${startStr} ~ ${endStr}`;
-  };
-
-  const formatMNT = (value: bigint) => {
-    return `${formatEther(value)} MNT`;
-  };
-
-  const getTriggerCondition = (_episode: EpisodeData) => {
-    return t("activeEvents.defaultTrigger");
-  };
-
-  const getResolutionTime = (episode: EpisodeData) => {
-    if (!episode.estimatedArrivalTime) return t("activeEvents.labels.afterArrival");
-    const arrivalDate = new Date(Number(episode.estimatedArrivalTime) * 1000);
-    const locale = i18n.language === 'ko' ? 'ko-KR' : 'en-US';
-    return arrivalDate.toLocaleString(locale, {
-      month: 'long',
-      day: 'numeric',
-      hour: '2-digit',
-      minute: '2-digit',
-      hour12: false,
-    }) + ' ' + t("activeEvents.labels.afterArrival");
   };
 
   const handleBackToList = () => {
     setSearchParams({});
     setIsAgreed(false);
+    setShowWalletPrompt(false);
     setView("LIST");
+  };
+
+  const handleProceedToJoin = () => {
+    if (!isConnected) {
+      setShowWalletPrompt(true);
+      return;
+    }
+    setView("JOIN");
   };
 
   const getCurrentStepIndex = () => {
@@ -945,8 +801,8 @@ export const Explorer = () => {
                 <IconWrapper rotate={45}>
                   <PlaneIcon />
                 </IconWrapper>
-                <Badge variant={getStateBadgeVariant(episode.state)}>
-                  {t(`activeEvents.status.${getStateLabel(episode.state)}`)}
+                <Badge variant={episodeUtils.getStateBadgeVariant(episode.state)}>
+                  {t(`activeEvents.status.${episodeUtils.getStateLabel(episode.state)}`)}
                 </Badge>
               </CardHeader>
               <CategoryLabel>
@@ -955,26 +811,26 @@ export const Explorer = () => {
               <CardTitle>{episode.flightName}</CardTitle>
               <InfoRow style={{ marginTop: theme.spacing.md }}>
                 <CalendarIcon />
-                {formatDateTime(episode.departureTime)}
+                {episodeUtils.formatDateTime(episode.departureTime, i18n.language)}
               </InfoRow>
               <TriggerBox>
                 <Label>{t("activeEvents.labels.trigger")}</Label>
-                <TriggerText>{getTriggerCondition(episode)}</TriggerText>
+                <TriggerText>{episodeUtils.getTriggerCondition(episode, t)}</TriggerText>
               </TriggerBox>
               <StatsRow>
                 <StatItem>
                   <StatLabel>{t("activeEvents.labels.premium")}</StatLabel>
-                  <StatValue>{formatMNT(episode.premiumAmount)}</StatValue>
+                  <StatValue>{episodeUtils.formatMNT(episode.premiumAmount)}</StatValue>
                 </StatItem>
                 <StatItem>
                   <StatLabel>{t("activeEvents.labels.maxPayout")}</StatLabel>
-                  <StatValue highlight>{formatMNT(episode.payoutAmount)}</StatValue>
+                  <StatValue highlight>{episodeUtils.formatMNT(episode.payoutAmount)}</StatValue>
                 </StatItem>
               </StatsRow>
               <StatsRow style={{ borderTop: 'none', paddingTop: 0, marginBottom: theme.spacing.md }}>
                 <StatItem>
                   <StatLabel>{t("activeEvents.labels.poolSize") || "Pool Size"}</StatLabel>
-                  <StatValue>{formatMNT(episode.totalPremium)}</StatValue>
+                  <StatValue>{episodeUtils.formatMNT(episode.totalPremium)}</StatValue>
                 </StatItem>
               </StatsRow>
               <Button 
@@ -983,7 +839,7 @@ export const Explorer = () => {
               >
                 {episode.state === EpisodeState.Open 
                   ? t("activeEvents.labels.viewRules")
-                  : t(`activeEvents.status.${getStateLabel(episode.state)}`)}
+                  : t(`activeEvents.status.${episodeUtils.getStateLabel(episode.state)}`)}
               </Button>
             </GlassCard>
           ))}
@@ -1019,7 +875,7 @@ export const Explorer = () => {
                       fontSize: theme.fontSize.sm,
                     }}
                   >
-                    {formatDateTime(selectedEpisode.departureTime)}
+                    {episodeUtils.formatDateTime(selectedEpisode.departureTime, i18n.language)}
                   </div>
                 </div>
               </DashboardHeader>
@@ -1061,7 +917,7 @@ export const Explorer = () => {
                             {t("activeEvents.labels.eventWindow")}
                           </RuleDetailLabel>
                           <RuleDetailValue>
-                            {formatDateRange(selectedEpisode.departureTime, selectedEpisode.estimatedArrivalTime)}
+                            {episodeUtils.formatDateRange(selectedEpisode.departureTime, selectedEpisode.estimatedArrivalTime, i18n.language)}
                           </RuleDetailValue>
                         </RuleDetailRow>
                         <RuleDetailRow>
@@ -1069,7 +925,7 @@ export const Explorer = () => {
                             {t("activeEvents.labels.triggerCondition")}
                           </RuleDetailLabel>
                           <RuleDetailValue>
-                            {getTriggerCondition(selectedEpisode)}
+                            {episodeUtils.getTriggerCondition(selectedEpisode, t)}
                           </RuleDetailValue>
                         </RuleDetailRow>
                       </RuleDetails>
@@ -1098,7 +954,7 @@ export const Explorer = () => {
                             {t("activeEvents.labels.resolutionTime")}
                           </RuleDetailLabel>
                           <RuleDetailValue>
-                            {getResolutionTime(selectedEpisode)}
+                            {episodeUtils.getResolutionTime(selectedEpisode, i18n.language, t)}
                           </RuleDetailValue>
                         </RuleDetailRow>
                       </RuleDetails>
@@ -1118,13 +974,13 @@ export const Explorer = () => {
                           <RuleDetailLabel>
                             {t("activeEvents.labels.premium")}
                           </RuleDetailLabel>
-                          <RuleDetailValue>{formatMNT(selectedEpisode.premiumAmount)}</RuleDetailValue>
+                          <RuleDetailValue>{episodeUtils.formatMNT(selectedEpisode.premiumAmount)}</RuleDetailValue>
                         </RuleDetailRow>
                         <RuleDetailRow>
                           <RuleDetailLabel>
                             {t("activeEvents.labels.maxPayout")}
                           </RuleDetailLabel>
-                          <RuleDetailValue highlight>{formatMNT(selectedEpisode.payoutAmount)}</RuleDetailValue>
+                          <RuleDetailValue highlight>{episodeUtils.formatMNT(selectedEpisode.payoutAmount)}</RuleDetailValue>
                         </RuleDetailRow>
                         <RuleDetailRow>
                           <RuleDetailLabel>
@@ -1164,10 +1020,24 @@ export const Explorer = () => {
                   <span>{t("activeEvents.labels.checkboxLabel")}</span>
                 </CheckboxContainer>
 
+                {showWalletPrompt && !isConnected && (
+                  <WarningBox style={{ marginBottom: theme.spacing.lg }}>
+                    <WarningIcon />
+                    <div>
+                      <div style={{ fontWeight: theme.fontWeight.semibold, marginBottom: theme.spacing.xs }}>
+                        {t("episode.connectWallet")}
+                      </div>
+                      <div style={{ fontSize: theme.fontSize.xs }}>
+                        {t("activeEvents.labels.walletRequired") || "Please connect your wallet to join the pool."}
+                      </div>
+                    </div>
+                  </WarningBox>
+                )}
+
                 <Button
                   variant="gradient"
                   disabled={!isAgreed}
-                  onClick={() => setView("JOIN")}
+                  onClick={handleProceedToJoin}
                 >
                   {t("activeEvents.labels.joinPool")}
                 </Button>
@@ -1210,27 +1080,27 @@ export const Explorer = () => {
                   <span style={{ color: theme.colors.textSecondary }}>
                     {t("activeEvents.labels.premium")}
                   </span>
-                  <span>{formatMNT(selectedEpisode.premiumAmount)}</span>
+                  <span>{episodeUtils.formatMNT(selectedEpisode.premiumAmount)}</span>
                 </InfoListItem>
                 <InfoListItem>
                   <span style={{ color: theme.colors.textSecondary }}>
                     {t("activeEvents.labels.maxLoss")}
                   </span>
-                  <span style={{ color: theme.colors.secondary }}>{formatMNT(selectedEpisode.premiumAmount)}</span>
+                  <span style={{ color: theme.colors.secondary }}>{episodeUtils.formatMNT(selectedEpisode.premiumAmount)}</span>
                 </InfoListItem>
                 <InfoListItem>
                   <span style={{ color: theme.colors.textSecondary }}>
                     {t("activeEvents.labels.maxPayout")}
                   </span>
                   <span style={{ color: theme.colors.secondary }}>
-                    {formatMNT(selectedEpisode.payoutAmount)}
+                    {episodeUtils.formatMNT(selectedEpisode.payoutAmount)}
                   </span>
                 </InfoListItem>
               </div>
 
               <CountdownBox>
                 <Label>{t("activeEvents.labels.poolClosesIn")}</Label>
-                <CountdownTimer>{formatTime(timeLeft)}</CountdownTimer>
+                <CountdownTimer>{episodeUtils.formatTime(timeLeft)}</CountdownTimer>
               </CountdownBox>
 
               <WarningBox>
@@ -1240,7 +1110,7 @@ export const Explorer = () => {
 
               <Button
                 variant="gradient"
-                onClick={handleJoin}
+                onClick={handleJoinClick}
                 disabled={isPending || isConfirming}
               >
                 {isPending
@@ -1262,6 +1132,19 @@ export const Explorer = () => {
                     ? "Transaction rejected"
                     : "Failed to join. Please try again."}
                 </div>
+              )}
+              {showWalletPrompt && !isConnected && (
+                <WarningBox style={{ marginTop: theme.spacing.md }}>
+                  <WarningIcon />
+                  <div>
+                    <div style={{ fontWeight: theme.fontWeight.semibold, marginBottom: theme.spacing.xs }}>
+                      {t("episode.connectWallet")}
+                    </div>
+                    <div style={{ fontSize: theme.fontSize.xs }}>
+                      {t("activeEvents.labels.walletRequired") || "Please connect your wallet to continue."}
+                    </div>
+                  </div>
+                </WarningBox>
               )}
             </ModalCard>
           </motion.div>
@@ -1293,7 +1176,7 @@ export const Explorer = () => {
                       fontSize: theme.fontSize.sm,
                     }}
                   >
-                    {formatDateTime(selectedEpisode.departureTime)}
+                    {episodeUtils.formatDateTime(selectedEpisode.departureTime, i18n.language)}
                   </div>
                 </div>
                 <Badge variant="success">
@@ -1303,13 +1186,13 @@ export const Explorer = () => {
 
               <CountdownBox style={{ margin: `0 0 ${theme.spacing.xl} 0` }}>
                 <Label>{t("activeEvents.labels.eventEndsIn")}</Label>
-                <CountdownTimer>{formatTime(timeLeft + 18743)}</CountdownTimer>
+                <CountdownTimer>{episodeUtils.formatTime(timeLeft + 18743)}</CountdownTimer>
               </CountdownBox>
 
               <Label>{t("activeEvents.labels.triggerCondition")}</Label>
               <TriggerBox>
                 <TriggerText>
-                  {getTriggerCondition(selectedEpisode)}
+                  {episodeUtils.getTriggerCondition(selectedEpisode, t)}
                 </TriggerText>
               </TriggerBox>
 
