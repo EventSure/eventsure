@@ -35,7 +35,7 @@ func ExampleGetInternalTransactions() {
 	fmt.Println("✓ Etherscan client created successfully")
 
 	// 예제 주소 (Etherscan 예제에서 사용된 주소)
-	address := "0x4Bf598243d0851067F98Ca231d1574bEEcD33954"
+	address := "0xc3f1030491964136a466c699a96395d4B931a2E1"
 	fmt.Printf("\nQuerying internal transactions for address: %s\n", address)
 
 	// 내부 트랜잭션 조회
@@ -55,7 +55,7 @@ func ExampleGetInternalTransactions() {
 
 	if len(response.Result) > 0 {
 		fmt.Println("\nFirst few internal transactions:")
-		maxShow := 3
+		maxShow := 10
 		if len(response.Result) < maxShow {
 			maxShow = len(response.Result)
 		}
@@ -106,7 +106,7 @@ func ExampleGetEventLogs() {
 	fmt.Println("✓ Etherscan client created successfully")
 
 	// 예제 주소 (Etherscan 예제에서 사용된 주소)
-	address := "0xD3a43B1F7B41745AFf8ACf85Bb81855f2890617A"
+	address := "0xe1299CBD3A2C616C884C8cF5590B9c718AAE7D7d"
 	fmt.Printf("\nQuerying event logs for address: %s\n", address)
 
 	// 이벤트 로그 조회

@@ -28,13 +28,19 @@ const (
 	EventHashOpen = "0xe32160d1c0312f45df3d6776bd5470784166b6b0838e429388e9cbfed6eecfa1"
 	// Join event hash
 	EventHashJoin = "0x7f3b9effe05cfb4f31f854004de03199fd03fe56bf38a48b2aa9a9f4402d6e23"
+	// Locked event hash
+	EventHashLocked = "0xf11bd1aff5803887bfd7a098dbc630480ac167ae541d416d1cad2ba71e3a3a07"
+	// Resolved event hash
+	EventHashResolved = "0x5ca8c0d4010082eaf8ea9b4a485d921877231e7522f79b654b9a4d5fee0efcb9"
 )
 
 // EpisodeEventMap maps event signature hashes to their event names
 var EpisodeEventMap = map[string]string{
-	EventHashCreated: "Created",
-	EventHashOpen:    "Open",
-	EventHashJoin:    "Join",
+	EventHashCreated:  "Created",
+	EventHashOpen:     "Open",
+	EventHashJoin:     "Join",
+	EventHashLocked:   "Locked",
+	EventHashResolved: "Resolved",
 }
 
 // EtherscanClient represents an Etherscan API client
@@ -132,7 +138,7 @@ func (c *EtherscanClient) GetInternalTransactions(params GetInternalTransactions
 	if params.Offset != nil {
 		queryParams.Set("offset", strconv.Itoa(*params.Offset))
 	} else {
-		queryParams.Set("offset", "1")
+		queryParams.Set("offset", "1000")
 	}
 
 	if params.Sort != "" {
