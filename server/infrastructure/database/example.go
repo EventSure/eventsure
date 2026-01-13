@@ -103,3 +103,107 @@ func ExampleRESTUsage() {
 		fmt.Printf("Custom query results: %+v\n", customResults)
 	}
 }
+
+// ExampleUserEpisodesSelectAll demonstrates how to select all rows from user_episodes table
+// This example uses the actual table structure from Supabase:
+// - id (int8, Primary Key)
+// - user (varchar)
+// - episode (varchar)
+// - progress (varchar, nullable)
+// - created_at (timestamptz)
+//
+// 환경 변수 설정 방법:
+//
+// REST API 방식 사용 시 (권장):
+//   export SUPABASE_PROJECT_URL=https://vnxebakrejhkakhhxajq.supabase.co
+//   export SUPABASE_API_KEY=sb_publishable_fOo9N-ENOftprDamZtRRfg_BaH9Ctu1
+//
+// PostgreSQL 직접 연결 방식 사용 시:
+//   export SUPABASE_DB_HOST=db.vnxebakrejhkakhhxajq.supabase.co
+//   export SUPABASE_DB_PORT=5432
+//   export SUPABASE_DB_NAME=postgres
+//   export SUPABASE_DB_USER=postgres
+//   export SUPABASE_DB_PASSWORD=your-database-password
+//
+// 또는 연결 문자열 사용:
+//   export SUPABASE_URL=postgresql://postgres:[YOUR-PASSWORD]@db.vnxebakrejhkakhhxajq.supabase.co:5432/postgres
+//
+// 실행 방법:
+//   1. 환경 변수 설정 (위 참조 또는 ENV_SETUP.md 참조)
+//   2. go run cmd/example_user_episodes/main.go
+//   3. 또는 별도의 main 함수에서 database.ExampleUserEpisodesSelectAll() 호출
+func ExampleUserEpisodesSelectAll() {
+	// REST API 방식 (권장)
+	fmt.Println("=== REST API 방식 ===")
+	restClient, err := NewSupabaseRESTClient()
+	if err != nil {
+		log.Fatal("Failed to create Supabase REST client:", err)
+	}
+
+	// user_episodes 테이블에서 모든 데이터 조회
+	userEpisodes, err := restClient.SelectAll("user_episodes")
+	if err != nil {
+		log.Fatal("Failed to select all user_episodes:", err)
+	}
+
+	fmt.Printf("Found %d user_episodes\n", len(userEpisodes))
+	for _, row := range userEpisodes {
+		fmt.Printf("ID: %v, User: %v, Episode: %v, Progress: %v, CreatedAt: %v\n",
+			row["id"],
+			row["user"],
+			row["episode"],
+			row["progress"],
+			row["created_at"],
+		)
+	}
+
+	// PostgreSQL 직접 연결 방식
+	fmt.Println("\n=== PostgreSQL 직접 연결 방식 ===")
+	pgClient, err := NewSupabaseClient()
+	if err != nil {
+		log.Fatal("Failed to connect to Supabase:", err)
+	}
+	defer pgClient.Close()
+
+	ctx := context.Background()
+
+	// user_episodes 테이블에서 모든 데이터 조회
+	rows, err := pgClient.Pool.Query(ctx, `
+		SELECT id, "user", episode, progress, created_at 
+		FROM user_episodes 
+		ORDER BY created_at DESC
+	`)
+	if err != nil {
+		log.Fatal("Failed to query user_episodes:", err)
+	}
+	defer rows.Close()
+
+	var count int
+	for rows.Next() {
+		var id int64
+		var user, episode string
+		var progress *string // nullable
+		var createdAt string
+
+		err := rows.Scan(&id, &user, &episode, &progress, &createdAt)
+		if err != nil {
+			log.Printf("Failed to scan row: %v", err)
+			continue
+		}
+
+		progressStr := "NULL"
+		if progress != nil {
+			progressStr = *progress
+		}
+
+		fmt.Printf("ID: %d, User: %s, Episode: %s, Progress: %s, CreatedAt: %s\n",
+			id, user, episode, progressStr, createdAt)
+		count++
+	}
+
+	if err := rows.Err(); err != nil {
+		log.Fatal("Error iterating rows:", err)
+	}
+
+	fmt.Printf("\nTotal rows: %d\n", count)
+}
