@@ -304,8 +304,11 @@
       "oracle": "오라클",
       "financialTerms": "재무 조건",
       "enRoute": "비행 중",
-      "triggerThreshold": "3h (trigger)"
+      "triggerThreshold": "3h (trigger)",
+      "afterArrival": "도착 직후"
     },
+    "defaultTrigger": "항공편 지연 3시간 이상",
+    "noEpisodes": "이용 가능한 에피소드가 없습니다",
     "events": {
       "ke902": {
         "title": "Flight KE902 Delay",

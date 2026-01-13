@@ -1,26 +1,56 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import styled from "@emotion/styled";
 import { motion } from "framer-motion";
 import { useTranslation } from "react-i18next";
 import { useSearchParams } from "react-router-dom";
-import { useWriteContract, useWaitForTransactionReceipt } from "wagmi";
-import { parseEther } from "viem";
+import { useWriteContract, useWaitForTransactionReceipt, useReadContracts } from "wagmi";
+import { formatEther } from "viem";
 import { theme } from "@/styles/theme";
 import { Header, Footer } from "@/components/layout";
+import { EpisodeFactoryABI, EPISODE_FACTORY_ADDRESS, EpisodeABI } from "@/contracts/abis";
 
-// TODO.jaewi: 각 에피소드 컨트랙트 선택한 것으로 들어가도록. 하드코딩 변경
-const EPISODE_CONTRACT_ADDRESS =
-  "0xD3a43B1F7B41745AFf8ACf85Bb81855f2890617A" as const;
+const EpisodeState = {
+  Created: 0,
+  Open: 1,
+  Locked: 2,
+  Resolved: 3,
+  Settled: 4,
+  Closed: 5,
+} as const;
 
-const EPISODE_ABI = [
-  {
-    name: "join",
-    type: "function",
-    stateMutability: "payable",
-    inputs: [],
-    outputs: [],
-  },
-] as const;
+const getStateLabel = (state: number) => {
+  switch (state) {
+    case EpisodeState.Created: return 'created';
+    case EpisodeState.Open: return 'recruiting';
+    case EpisodeState.Locked: return 'locked';
+    case EpisodeState.Resolved: return 'resolved';
+    case EpisodeState.Settled: return 'settled';
+    case EpisodeState.Closed: return 'closed';
+    default: return 'unknown';
+  }
+};
+
+const getStateBadgeVariant = (state: number): 'secondary' | 'success' | 'warning' => {
+  switch (state) {
+    case EpisodeState.Open: return 'secondary';
+    case EpisodeState.Settled: return 'success';
+    case EpisodeState.Locked:
+    case EpisodeState.Resolved: return 'warning';
+    default: return 'secondary';
+  }
+};
+
+interface EpisodeData {
+  address: `0x${string}`;
+  flightName: string;
+  premiumAmount: bigint;
+  payoutAmount: bigint;
+  departureTime: bigint;
+  estimatedArrivalTime: bigint;
+  signupEnd: bigint;
+  state: number;
+  totalPremium: bigint;
+}
 
 const PageContainer = styled.div`
   min-height: 100vh;
@@ -605,12 +635,6 @@ const PlaneIcon = () => (
   </svg>
 );
 
-const CloudIcon = () => (
-  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
-    <path d="M18 10h-1.26A8 8 0 1 0 9 20h9a5 5 0 0 0 0-10z" />
-  </svg>
-);
-
 const CalendarIcon = () => (
   <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
     <rect x="3" y="4" width="18" height="18" rx="2" ry="2" />
@@ -670,25 +694,77 @@ const STEPS: { key: ViewState; index: number }[] = [
 ];
 
 export const Explorer = () => {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const [searchParams, setSearchParams] = useSearchParams();
   const eventId = searchParams.get("event");
 
   const [view, setView] = useState<ViewState>(eventId ? "RULES" : "LIST");
-  const [selectedEvent, setSelectedEvent] = useState<string | null>(eventId);
+  const [selectedEpisodeAddress, setSelectedEpisodeAddress] = useState<`0x${string}` | null>(
+    eventId as `0x${string}` | null
+  );
   const [isAgreed, setIsAgreed] = useState(false);
   const [timeLeft, setTimeLeft] = useState(12062);
+
+  const { data: allEpisodesData } = useReadContracts({
+    contracts: [{
+      address: EPISODE_FACTORY_ADDRESS,
+      abi: EpisodeFactoryABI,
+      functionName: 'allEpisodes',
+    }],
+  });
+
+  const episodeAddresses = useMemo(() => {
+    if (!allEpisodesData?.[0]?.result) return [];
+    return allEpisodesData[0].result as `0x${string}`[];
+  }, [allEpisodesData]);
+
+  const { data: episodeDetails } = useReadContracts({
+    contracts: episodeAddresses.flatMap((address) => [
+      { address, abi: EpisodeABI, functionName: 'state' },
+      { address, abi: EpisodeABI, functionName: 'totalPremium' },
+      { address, abi: EpisodeABI, functionName: 'PREMIUM_AMOUNT' },
+      { address, abi: EpisodeABI, functionName: 'PAYOUT_AMOUNT' },
+      { address, abi: EpisodeABI, functionName: 'flightName' },
+      { address, abi: EpisodeABI, functionName: 'DEPARTURE_TIME' },
+      { address, abi: EpisodeABI, functionName: 'ESTIMATED_ARRIVAL_TIME' },
+    ]),
+  });
+
+  const episodes: EpisodeData[] = useMemo(() => {
+    if (!episodeDetails || episodeAddresses.length === 0) return [];
+    
+    return episodeAddresses.map((address, index) => {
+      const baseIndex = index * 7;
+      
+      return {
+        address,
+        state: (episodeDetails[baseIndex]?.result as number) ?? 0,
+        totalPremium: (episodeDetails[baseIndex + 1]?.result as bigint) ?? 0n,
+        premiumAmount: (episodeDetails[baseIndex + 2]?.result as bigint) ?? 0n,
+        payoutAmount: (episodeDetails[baseIndex + 3]?.result as bigint) ?? 0n,
+        flightName: (episodeDetails[baseIndex + 4]?.result as string) ?? '',
+        departureTime: (episodeDetails[baseIndex + 5]?.result as bigint) ?? 0n,
+        estimatedArrivalTime: (episodeDetails[baseIndex + 6]?.result as bigint) ?? 0n,
+        signupEnd: 0n,
+      };
+    }).filter((ep) => ep.flightName);
+  }, [episodeDetails, episodeAddresses]);
+
+  const selectedEpisode = useMemo(() => {
+    return episodes.find((ep) => ep.address === selectedEpisodeAddress);
+  }, [episodes, selectedEpisodeAddress]);
 
   const { data: hash, writeContract, isPending, error } = useWriteContract();
   const { isLoading: isConfirming, isSuccess: isConfirmed } =
     useWaitForTransactionReceipt({ hash });
 
   const handleJoin = () => {
+    if (!selectedEpisode) return;
     writeContract({
-      address: EPISODE_CONTRACT_ADDRESS,
-      abi: EPISODE_ABI,
+      address: selectedEpisode.address,
+      abi: EpisodeABI,
       functionName: "join",
-      value: parseEther("0.01"),
+      value: selectedEpisode.premiumAmount,
     });
   };
 
@@ -700,12 +776,12 @@ export const Explorer = () => {
 
   useEffect(() => {
     if (eventId) {
-      setSelectedEvent(eventId);
+      setSelectedEpisodeAddress(eventId as `0x${string}`);
       if (view === "LIST") {
         setView("RULES");
       }
     } else {
-      setSelectedEvent(null);
+      setSelectedEpisodeAddress(null);
       setView("LIST");
     }
   }, [eventId]);
@@ -728,8 +804,67 @@ export const Explorer = () => {
       .padStart(2, "0")}:${s.toString().padStart(2, "0")}`;
   };
 
-  const handleViewRules = (id: string) => {
-    setSearchParams({ event: id });
+  const handleViewRules = (address: `0x${string}`) => {
+    setSearchParams({ event: address });
+  };
+
+  const formatDateTime = (timestamp: bigint) => {
+    if (!timestamp) return '';
+    const date = new Date(Number(timestamp) * 1000);
+    const locale = i18n.language === 'ko' ? 'ko-KR' : 'en-US';
+    return date.toLocaleString(locale, {
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit',
+      hour12: false,
+    });
+  };
+
+  const formatDateRange = (start: bigint, end: bigint) => {
+    if (!start || !end) return '';
+    const startDate = new Date(Number(start) * 1000);
+    const endDate = new Date(Number(end) * 1000);
+    const locale = i18n.language === 'ko' ? 'ko-KR' : 'en-US';
+    
+    const startStr = startDate.toLocaleString(locale, {
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit',
+      hour12: false,
+    });
+    
+    const endStr = endDate.toLocaleString(locale, {
+      hour: '2-digit',
+      minute: '2-digit',
+      hour12: false,
+    });
+    
+    return `${startStr} ~ ${endStr}`;
+  };
+
+  const formatMNT = (value: bigint) => {
+    return `${formatEther(value)} MNT`;
+  };
+
+  const getTriggerCondition = (_episode: EpisodeData) => {
+    return t("activeEvents.defaultTrigger");
+  };
+
+  const getResolutionTime = (episode: EpisodeData) => {
+    if (!episode.estimatedArrivalTime) return t("activeEvents.labels.afterArrival");
+    const arrivalDate = new Date(Number(episode.estimatedArrivalTime) * 1000);
+    const locale = i18n.language === 'ko' ? 'ko-KR' : 'en-US';
+    return arrivalDate.toLocaleString(locale, {
+      month: 'long',
+      day: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit',
+      hour12: false,
+    }) + ' ' + t("activeEvents.labels.afterArrival");
   };
 
   const handleBackToList = () => {
@@ -791,91 +926,74 @@ export const Explorer = () => {
         <SectionSubtitle>{t("activeEvents.subtitle")}</SectionSubtitle>
       </SectionHeader>
 
-      <Grid>
-        <GlassCard
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          whileHover={{ y: -5 }}
-        >
-          <CardHeader>
-            <IconWrapper rotate={45}>
-              <PlaneIcon />
-            </IconWrapper>
-            <Badge>{t("activeEvents.status.recruiting")}</Badge>
-          </CardHeader>
-          <CategoryLabel>
-            {t("activeEvents.categories.flightDelay")}
-          </CategoryLabel>
-          <CardTitle>{t("activeEvents.events.ke902.title")}</CardTitle>
-          <InfoRow style={{ marginTop: theme.spacing.md }}>
-            <CalendarIcon />
-            {t("activeEvents.events.ke902.time")}
-          </InfoRow>
-          <TriggerBox>
-            <Label>{t("activeEvents.labels.trigger")}</Label>
-            <TriggerText>{t("activeEvents.events.ke902.trigger")}</TriggerText>
-          </TriggerBox>
-          <StatsRow>
-            <StatItem>
-              <StatLabel>{t("activeEvents.labels.premium")}</StatLabel>
-              <StatValue>25 USDC</StatValue>
-            </StatItem>
-            <StatItem>
-              <StatLabel>{t("activeEvents.labels.maxPayout")}</StatLabel>
-              <StatValue highlight>300 USDC</StatValue>
-            </StatItem>
-          </StatsRow>
-          <Button onClick={() => handleViewRules("ke902")}>
-            {t("activeEvents.labels.viewRules")}
-          </Button>
-        </GlassCard>
-
-        <GlassCard
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          transition={{ delay: 0.1 }}
-          whileHover={{ y: -5 }}
-        >
-          <CardHeader>
-            <IconWrapper>
-              <CloudIcon />
-            </IconWrapper>
-            <Badge>{t("activeEvents.status.recruiting")}</Badge>
-          </CardHeader>
-          <CategoryLabel>{t("activeEvents.categories.weather")}</CategoryLabel>
-          <CardTitle>{t("activeEvents.events.jejuTyphoon.title")}</CardTitle>
-          <InfoRow style={{ marginTop: theme.spacing.md }}>
-            <CalendarIcon />
-            {t("activeEvents.events.jejuTyphoon.time")}
-          </InfoRow>
-          <TriggerBox>
-            <Label>{t("activeEvents.labels.trigger")}</Label>
-            <TriggerText>
-              {t("activeEvents.events.jejuTyphoon.trigger")}
-            </TriggerText>
-          </TriggerBox>
-          <StatsRow>
-            <StatItem>
-              <StatLabel>{t("activeEvents.labels.premium")}</StatLabel>
-              <StatValue>50 USDC</StatValue>
-            </StatItem>
-            <StatItem>
-              <StatLabel>{t("activeEvents.labels.maxPayout")}</StatLabel>
-              <StatValue highlight>500 USDC</StatValue>
-            </StatItem>
-          </StatsRow>
-          <Button onClick={() => handleViewRules("jejuTyphoon")}>
-            {t("activeEvents.labels.viewRules")}
-          </Button>
-        </GlassCard>
-      </Grid>
+      {episodes.length === 0 ? (
+        <div style={{ textAlign: 'center', color: theme.colors.textSecondary, padding: theme.spacing.xxl }}>
+          {t("activeEvents.noEpisodes") || "No episodes available"}
+        </div>
+      ) : (
+        <Grid>
+          {episodes.map((episode, index) => (
+            <GlassCard
+              key={episode.address}
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ delay: index * 0.1 }}
+              whileHover={{ y: -5 }}
+            >
+              <CardHeader>
+                <IconWrapper rotate={45}>
+                  <PlaneIcon />
+                </IconWrapper>
+                <Badge variant={getStateBadgeVariant(episode.state)}>
+                  {t(`activeEvents.status.${getStateLabel(episode.state)}`)}
+                </Badge>
+              </CardHeader>
+              <CategoryLabel>
+                {t("activeEvents.categories.flightDelay")}
+              </CategoryLabel>
+              <CardTitle>{episode.flightName}</CardTitle>
+              <InfoRow style={{ marginTop: theme.spacing.md }}>
+                <CalendarIcon />
+                {formatDateTime(episode.departureTime)}
+              </InfoRow>
+              <TriggerBox>
+                <Label>{t("activeEvents.labels.trigger")}</Label>
+                <TriggerText>{getTriggerCondition(episode)}</TriggerText>
+              </TriggerBox>
+              <StatsRow>
+                <StatItem>
+                  <StatLabel>{t("activeEvents.labels.premium")}</StatLabel>
+                  <StatValue>{formatMNT(episode.premiumAmount)}</StatValue>
+                </StatItem>
+                <StatItem>
+                  <StatLabel>{t("activeEvents.labels.maxPayout")}</StatLabel>
+                  <StatValue highlight>{formatMNT(episode.payoutAmount)}</StatValue>
+                </StatItem>
+              </StatsRow>
+              <StatsRow style={{ borderTop: 'none', paddingTop: 0, marginBottom: theme.spacing.md }}>
+                <StatItem>
+                  <StatLabel>{t("activeEvents.labels.poolSize") || "Pool Size"}</StatLabel>
+                  <StatValue>{formatMNT(episode.totalPremium)}</StatValue>
+                </StatItem>
+              </StatsRow>
+              <Button 
+                onClick={() => handleViewRules(episode.address)}
+                disabled={episode.state !== EpisodeState.Open}
+              >
+                {episode.state === EpisodeState.Open 
+                  ? t("activeEvents.labels.viewRules")
+                  : t(`activeEvents.status.${getStateLabel(episode.state)}`)}
+              </Button>
+            </GlassCard>
+          ))}
+        </Grid>
+      )}
     </>
   );
 
   const renderDetailView = () => {
-    if (!selectedEvent) return null;
+    if (!selectedEpisode) return null;
 
     switch (view) {
       case "RULES":
@@ -894,16 +1012,14 @@ export const Explorer = () => {
                   <PlaneIcon />
                 </IconWrapper>
                 <div>
-                  <CardTitle>
-                    {t(`activeEvents.events.${selectedEvent}.title`)}
-                  </CardTitle>
+                  <CardTitle>{selectedEpisode.flightName}</CardTitle>
                   <div
                     style={{
                       color: theme.colors.textSecondary,
                       fontSize: theme.fontSize.sm,
                     }}
                   >
-                    {t(`activeEvents.events.${selectedEvent}.subtitle`)}
+                    {formatDateTime(selectedEpisode.departureTime)}
                   </div>
                 </div>
               </DashboardHeader>
@@ -937,7 +1053,7 @@ export const Explorer = () => {
                             {t("activeEvents.labels.event")}
                           </RuleDetailLabel>
                           <RuleDetailValue>
-                            {t(`activeEvents.events.${selectedEvent}.title`)}
+                            {selectedEpisode.flightName}
                           </RuleDetailValue>
                         </RuleDetailRow>
                         <RuleDetailRow>
@@ -945,7 +1061,7 @@ export const Explorer = () => {
                             {t("activeEvents.labels.eventWindow")}
                           </RuleDetailLabel>
                           <RuleDetailValue>
-                            {t(`activeEvents.events.${selectedEvent}.time`)}
+                            {formatDateRange(selectedEpisode.departureTime, selectedEpisode.estimatedArrivalTime)}
                           </RuleDetailValue>
                         </RuleDetailRow>
                         <RuleDetailRow>
@@ -953,7 +1069,7 @@ export const Explorer = () => {
                             {t("activeEvents.labels.triggerCondition")}
                           </RuleDetailLabel>
                           <RuleDetailValue>
-                            {t(`activeEvents.events.${selectedEvent}.trigger`)}
+                            {getTriggerCondition(selectedEpisode)}
                           </RuleDetailValue>
                         </RuleDetailRow>
                       </RuleDetails>
@@ -974,7 +1090,7 @@ export const Explorer = () => {
                             {t("activeEvents.labels.dataSource")}
                           </RuleDetailLabel>
                           <RuleDetailValue>
-                            {t(`activeEvents.events.${selectedEvent}.oracle`)}
+                            FlightAware API
                           </RuleDetailValue>
                         </RuleDetailRow>
                         <RuleDetailRow>
@@ -982,9 +1098,7 @@ export const Explorer = () => {
                             {t("activeEvents.labels.resolutionTime")}
                           </RuleDetailLabel>
                           <RuleDetailValue>
-                            {t(
-                              `activeEvents.events.${selectedEvent}.resolution`
-                            )}
+                            {getResolutionTime(selectedEpisode)}
                           </RuleDetailValue>
                         </RuleDetailRow>
                       </RuleDetails>
@@ -1004,13 +1118,13 @@ export const Explorer = () => {
                           <RuleDetailLabel>
                             {t("activeEvents.labels.premium")}
                           </RuleDetailLabel>
-                          <RuleDetailValue>25 USDC</RuleDetailValue>
+                          <RuleDetailValue>{formatMNT(selectedEpisode.premiumAmount)}</RuleDetailValue>
                         </RuleDetailRow>
                         <RuleDetailRow>
                           <RuleDetailLabel>
                             {t("activeEvents.labels.maxPayout")}
                           </RuleDetailLabel>
-                          <RuleDetailValue highlight>300 USDC</RuleDetailValue>
+                          <RuleDetailValue highlight>{formatMNT(selectedEpisode.payoutAmount)}</RuleDetailValue>
                         </RuleDetailRow>
                         <RuleDetailRow>
                           <RuleDetailLabel>
@@ -1088,7 +1202,7 @@ export const Explorer = () => {
                   marginBottom: theme.spacing.xl,
                 }}
               >
-                {t(`activeEvents.events.${selectedEvent}.title`)}
+                {selectedEpisode.flightName}
               </div>
 
               <div style={{ textAlign: "left" }}>
@@ -1096,20 +1210,20 @@ export const Explorer = () => {
                   <span style={{ color: theme.colors.textSecondary }}>
                     {t("activeEvents.labels.premium")}
                   </span>
-                  <span>25 USDC</span>
+                  <span>{formatMNT(selectedEpisode.premiumAmount)}</span>
                 </InfoListItem>
                 <InfoListItem>
                   <span style={{ color: theme.colors.textSecondary }}>
                     {t("activeEvents.labels.maxLoss")}
                   </span>
-                  <span style={{ color: theme.colors.secondary }}>25 USDC</span>
+                  <span style={{ color: theme.colors.secondary }}>{formatMNT(selectedEpisode.premiumAmount)}</span>
                 </InfoListItem>
                 <InfoListItem>
                   <span style={{ color: theme.colors.textSecondary }}>
                     {t("activeEvents.labels.maxPayout")}
                   </span>
                   <span style={{ color: theme.colors.secondary }}>
-                    300 USDC
+                    {formatMNT(selectedEpisode.payoutAmount)}
                   </span>
                 </InfoListItem>
               </div>
@@ -1172,16 +1286,14 @@ export const Explorer = () => {
                   <Label style={{ marginBottom: 2 }}>
                     {t("activeEvents.labels.yourEpisode")}
                   </Label>
-                  <CardTitle>
-                    {t(`activeEvents.events.${selectedEvent}.title`)}
-                  </CardTitle>
+                  <CardTitle>{selectedEpisode.flightName}</CardTitle>
                   <div
                     style={{
                       color: theme.colors.textSecondary,
                       fontSize: theme.fontSize.sm,
                     }}
                   >
-                    {t(`activeEvents.events.${selectedEvent}.subtitle`)}
+                    {formatDateTime(selectedEpisode.departureTime)}
                   </div>
                 </div>
                 <Badge variant="success">
@@ -1197,7 +1309,7 @@ export const Explorer = () => {
               <Label>{t("activeEvents.labels.triggerCondition")}</Label>
               <TriggerBox>
                 <TriggerText>
-                  {t(`activeEvents.events.${selectedEvent}.trigger`)}
+                  {getTriggerCondition(selectedEpisode)}
                 </TriggerText>
               </TriggerBox>
 

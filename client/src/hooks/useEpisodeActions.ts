@@ -17,7 +17,7 @@ export function useJoinEpisode(episodeAddress: ContractAddress) {
         address: episodeAddress,
         abi: EpisodeABI,
         functionName: 'join',
-        args: [premium],
+        value: premium,
       },
       {
         onSuccess: () => {

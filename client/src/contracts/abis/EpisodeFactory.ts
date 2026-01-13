@@ -2,8 +2,10 @@
  * EpisodeFactory Contract ABI
  * 
  * Factory contract for creating and managing insurance episodes.
- * Admin functions are not exposed in the user-facing UI.
+ * Address: 0x4Bf598243d0851067F98Ca231d1574bEEcD33954
  */
+
+export const EPISODE_FACTORY_ADDRESS = '0xc3f1030491964136a466c699a96395d4B931a2E1' as const
 
 export const EpisodeFactoryABI = [
   {
@@ -30,6 +32,11 @@ export const EpisodeFactoryABI = [
       { name: 'productId', type: 'bytes32' },
       { name: 'signupStart', type: 'uint64' },
       { name: 'signupEnd', type: 'uint64' },
+      { name: 'premiumAmount', type: 'uint256' },
+      { name: 'payoutAmount', type: 'uint256' },
+      { name: 'flightName', type: 'string' },
+      { name: 'departureTime', type: 'uint64' },
+      { name: 'estimatedArrivalTime', type: 'uint64' },
     ],
   },
   {
@@ -54,6 +61,11 @@ export const EpisodeFactoryABI = [
       { name: 'productId', type: 'bytes32' },
       { name: 'signupStart', type: 'uint64' },
       { name: 'signupEnd', type: 'uint64' },
+      { name: 'premiumAmount', type: 'uint256' },
+      { name: 'payoutAmount', type: 'uint256' },
+      { name: 'flightName', type: 'string' },
+      { name: 'departureTime', type: 'uint64' },
+      { name: 'estimatedArrivalTime', type: 'uint64' },
     ],
     outputs: [{ name: '', type: 'address' }],
   },

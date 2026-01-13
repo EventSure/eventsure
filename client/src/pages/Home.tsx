@@ -390,7 +390,6 @@ export const Home = () => {
         </FeaturesSection>
 
         <ActivePools />
-        <ActiveEvents />
         <LiveTransactions />
         <FAQ />
       </Content>
