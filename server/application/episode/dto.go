@@ -20,6 +20,11 @@ type GetUserEpisodesResponse struct {
 	Episodes []UserEpisodeDTO `json:"episodes"`
 }
 
+// GetEpisodeUsersResponse represents response for getting episode users
+type GetEpisodeUsersResponse struct {
+	Users []UserEpisodeDTO `json:"users"`
+}
+
 // UserEpisodeDTO represents a user episode data transfer object
 type UserEpisodeDTO struct {
 	ID        int64   `json:"id"`

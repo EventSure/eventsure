@@ -43,24 +43,45 @@ func (c *EpisodeController) CreateUserEpisode(w http.ResponseWriter, r *http.Req
 	json.NewEncoder(w).Encode(response)
 }
 
-// GetUserEpisodes handles GET /api/user-episodes?user=xxx
+// GetUserEpisodes handles GET /api/user-episodes?user=xxx or GET /api/user-episodes?episode=xxx
 func (c *EpisodeController) GetUserEpisodes(w http.ResponseWriter, r *http.Request) {
 	user := r.URL.Query().Get("user")
-	if user == "" {
-		http.Error(w, "user query parameter is required", http.StatusBadRequest)
-		return
-	}
+	episode := r.URL.Query().Get("episode")
 
-	response, err := c.episodeUseCase.GetUserEpisodes(user)
-	if err != nil {
-		if err.Error() == "user is required" {
-			http.Error(w, err.Error(), http.StatusBadRequest)
+	// user 쿼리 파라미터가 있으면 user의 episodes 조회
+	if user != "" {
+		response, err := c.episodeUseCase.GetUserEpisodes(user)
+		if err != nil {
+			if err.Error() == "user is required" {
+				http.Error(w, err.Error(), http.StatusBadRequest)
+				return
+			}
+			http.Error(w, err.Error(), http.StatusInternalServerError)
 			return
 		}
-		http.Error(w, err.Error(), http.StatusInternalServerError)
+
+		w.Header().Set("Content-Type", "application/json")
+		json.NewEncoder(w).Encode(response)
 		return
 	}
 
-	w.Header().Set("Content-Type", "application/json")
-	json.NewEncoder(w).Encode(response)
+	// episode 쿼리 파라미터가 있으면 episode의 users 조회
+	if episode != "" {
+		response, err := c.episodeUseCase.GetEpisodeUsers(episode)
+		if err != nil {
+			if err.Error() == "episode is required" {
+				http.Error(w, err.Error(), http.StatusBadRequest)
+				return
+			}
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			return
+		}
+
+		w.Header().Set("Content-Type", "application/json")
+		json.NewEncoder(w).Encode(response)
+		return
+	}
+
+	// 둘 다 없으면 에러
+	http.Error(w, "user or episode query parameter is required", http.StatusBadRequest)
 }

@@ -131,3 +131,57 @@ func (uc *UseCase) GetUserEpisodes(user string) (*GetUserEpisodesResponse, error
 		Episodes: episodes,
 	}, nil
 }
+
+// GetEpisodeUsers gets all users for a specific episode
+func (uc *UseCase) GetEpisodeUsers(episode string) (*GetEpisodeUsersResponse, error) {
+	if uc.userEpisodeRepo == nil {
+		return nil, errors.New("user episode repository is not initialized")
+	}
+
+	if episode == "" {
+		return nil, errors.New("episode is required")
+	}
+
+	results, err := uc.userEpisodeRepo.FindByEpisode(episode)
+	if err != nil {
+		return nil, err
+	}
+
+	users := make([]UserEpisodeDTO, len(results))
+	for i, result := range results {
+		user := UserEpisodeDTO{}
+
+		// id는 int64로 변환
+		if id, ok := result["id"].(float64); ok {
+			user.ID = int64(id)
+		} else if id, ok := result["id"].(int64); ok {
+			user.ID = id
+		}
+
+		// user는 string
+		if u, ok := result["user"].(string); ok {
+			user.User = u
+		}
+
+		// episode는 string
+		if ep, ok := result["episode"].(string); ok {
+			user.Episode = ep
+		}
+
+		// progress는 nullable
+		if progress, ok := result["progress"].(string); ok && progress != "" {
+			user.Progress = &progress
+		}
+
+		// created_at은 string
+		if createdAt, ok := result["created_at"].(string); ok {
+			user.CreatedAt = createdAt
+		}
+
+		users[i] = user
+	}
+
+	return &GetEpisodeUsersResponse{
+		Users: users,
+	}, nil
+}
