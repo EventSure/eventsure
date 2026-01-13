@@ -9,24 +9,13 @@ import (
 
 // Router sets up HTTP routes
 type Router struct {
-	episodeController     *controller.EpisodeController
-	poolController        *controller.PoolController
-	transactionController *controller.TransactionController
-	statsController       *controller.StatsController
+	episodeController *controller.EpisodeController
 }
 
 // NewRouter creates a new Router
-func NewRouter(
-	episodeController *controller.EpisodeController,
-	poolController *controller.PoolController,
-	transactionController *controller.TransactionController,
-	statsController *controller.StatsController,
-) *Router {
+func NewRouter(episodeController *controller.EpisodeController) *Router {
 	return &Router{
-		episodeController:     episodeController,
-		poolController:        poolController,
-		transactionController: transactionController,
-		statsController:       statsController,
+		episodeController: episodeController,
 	}
 }
 
@@ -37,14 +26,8 @@ func (r *Router) SetupRoutes(mux *mux.Router) {
 	// Apply logging middleware to all API routes
 	api.Use(middleware.LoggingMiddleware)
 
-	// Phase 1: 필수 엔드포인트
-	api.HandleFunc("/episodes", r.episodeController.GetEpisodes).Methods("GET")
-	api.HandleFunc("/episodes/{episodeId}", r.episodeController.GetEpisodeDetail).Methods("GET")
-	api.HandleFunc("/pools", r.poolController.GetPools).Methods("GET")
-	api.HandleFunc("/stats/home", r.statsController.GetHomeStats).Methods("GET")
-
-	// Phase 2: 중요 엔드포인트
-	api.HandleFunc("/transactions", r.transactionController.GetTransactions).Methods("GET")
-	api.HandleFunc("/transactions/stats", r.transactionController.GetTransactionStats).Methods("GET")
+	// User Episode endpoints
+	api.HandleFunc("/user-episodes", r.episodeController.CreateUserEpisode).Methods("POST")
+	api.HandleFunc("/user-episodes", r.episodeController.GetUserEpisodes).Methods("GET")
 	// TODO: User endpoints will be added later
 }

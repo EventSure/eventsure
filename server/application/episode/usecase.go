@@ -2,74 +2,186 @@ package episode
 
 import (
 	"errors"
-	eventsureepisode "eventsure-server/domain/episode"
+	"eventsure-server/infrastructure/repository"
 )
 
 // UseCase handles episode use cases
 type UseCase struct {
-	episodeRepo eventsureepisode.Repository
+	userEpisodeRepo *repository.UserEpisodeRepository
 }
 
 // NewUseCase creates a new EpisodeUseCase
-func NewUseCase(episodeRepo eventsureepisode.Repository) *UseCase {
+func NewUseCase() *UseCase {
+	userEpisodeRepo, err := repository.NewUserEpisodeRepository()
+	if err != nil {
+		// Repository 초기화 실패 시 nil로 설정
+		userEpisodeRepo = nil
+	}
+
 	return &UseCase{
-		episodeRepo: episodeRepo,
+		userEpisodeRepo: userEpisodeRepo,
 	}
 }
 
-// GetEpisodesQuery represents query for getting episodes
-type GetEpisodesQuery struct {
-	Status   *string
-	Category *string
-}
-
-// GetEpisodes handles getting episodes list
-func (uc *UseCase) GetEpisodes(query GetEpisodesQuery) (*EpisodesResponseDTO, error) {
-	var episodes []*eventsureepisode.Episode
-	var err error
-
-	if query.Status != nil && query.Category != nil {
-		status := eventsureepisode.Status(*query.Status)
-		category := eventsureepisode.Category(*query.Category)
-		episodes, err = uc.episodeRepo.FindByStatusAndCategory(status, category)
-	} else if query.Status != nil {
-		status := eventsureepisode.Status(*query.Status)
-		episodes, err = uc.episodeRepo.FindByStatus(status)
-	} else if query.Category != nil {
-		category := eventsureepisode.Category(*query.Category)
-		episodes, err = uc.episodeRepo.FindByCategory(category)
-	} else {
-		episodes, err = uc.episodeRepo.FindAll()
+// CreateUserEpisode creates a new user_episode record in Supabase
+func (uc *UseCase) CreateUserEpisode(req CreateUserEpisodeRequest) (*CreateUserEpisodeResponse, error) {
+	if uc.userEpisodeRepo == nil {
+		return nil, errors.New("user episode repository is not initialized")
 	}
 
+	if req.User == "" {
+		return nil, errors.New("user is required")
+	}
+	if req.Episode == "" {
+		return nil, errors.New("episode is required")
+	}
+
+	result, err := uc.userEpisodeRepo.Create(req.User, req.Episode)
 	if err != nil {
 		return nil, err
 	}
 
-	episodeDTOs := make([]EpisodeDTO, len(episodes))
-	for i, ep := range episodes {
-		episodeDTOs[i] = ToDTO(ep)
+	if result == nil {
+		return nil, errors.New("failed to create user_episode")
 	}
 
-	return &EpisodesResponseDTO{
-		Episodes: episodeDTOs,
-		Total:    len(episodeDTOs),
-		Page:     1,
-		Limit:    20,
+	// Convert map to response DTO
+	response := &CreateUserEpisodeResponse{}
+
+	// id는 int64로 변환
+	if id, ok := result["id"].(float64); ok {
+		response.ID = int64(id)
+	} else if id, ok := result["id"].(int64); ok {
+		response.ID = id
+	}
+
+	// user는 string
+	if user, ok := result["user"].(string); ok {
+		response.User = user
+	}
+
+	// episode는 string
+	if episode, ok := result["episode"].(string); ok {
+		response.Episode = episode
+	}
+
+	// progress는 nullable
+	if progress, ok := result["progress"].(string); ok && progress != "" {
+		response.Progress = &progress
+	}
+
+	// created_at은 string
+	if createdAt, ok := result["created_at"].(string); ok {
+		response.CreatedAt = createdAt
+	}
+
+	return response, nil
+}
+
+// GetUserEpisodes gets all episodes for a specific user
+func (uc *UseCase) GetUserEpisodes(user string) (*GetUserEpisodesResponse, error) {
+	if uc.userEpisodeRepo == nil {
+		return nil, errors.New("user episode repository is not initialized")
+	}
+
+	if user == "" {
+		return nil, errors.New("user is required")
+	}
+
+	results, err := uc.userEpisodeRepo.FindByUser(user)
+	if err != nil {
+		return nil, err
+	}
+
+	episodes := make([]UserEpisodeDTO, len(results))
+	for i, result := range results {
+		episode := UserEpisodeDTO{}
+
+		// id는 int64로 변환
+		if id, ok := result["id"].(float64); ok {
+			episode.ID = int64(id)
+		} else if id, ok := result["id"].(int64); ok {
+			episode.ID = id
+		}
+
+		// user는 string
+		if u, ok := result["user"].(string); ok {
+			episode.User = u
+		}
+
+		// episode는 string
+		if ep, ok := result["episode"].(string); ok {
+			episode.Episode = ep
+		}
+
+		// progress는 nullable
+		if progress, ok := result["progress"].(string); ok && progress != "" {
+			episode.Progress = &progress
+		}
+
+		// created_at은 string
+		if createdAt, ok := result["created_at"].(string); ok {
+			episode.CreatedAt = createdAt
+		}
+
+		episodes[i] = episode
+	}
+
+	return &GetUserEpisodesResponse{
+		Episodes: episodes,
 	}, nil
 }
 
-// GetEpisodeDetail handles getting episode detail by ID
-func (uc *UseCase) GetEpisodeDetail(episodeID string) (*EpisodeDetailDTO, error) {
-	ep, err := uc.episodeRepo.FindByID(episodeID)
+// GetEpisodeUsers gets all users for a specific episode
+func (uc *UseCase) GetEpisodeUsers(episode string) (*GetEpisodeUsersResponse, error) {
+	if uc.userEpisodeRepo == nil {
+		return nil, errors.New("user episode repository is not initialized")
+	}
+
+	if episode == "" {
+		return nil, errors.New("episode is required")
+	}
+
+	results, err := uc.userEpisodeRepo.FindByEpisode(episode)
 	if err != nil {
 		return nil, err
 	}
 
-	if ep == nil {
-		return nil, errors.New("episode not found")
+	users := make([]UserEpisodeDTO, len(results))
+	for i, result := range results {
+		user := UserEpisodeDTO{}
+
+		// id는 int64로 변환
+		if id, ok := result["id"].(float64); ok {
+			user.ID = int64(id)
+		} else if id, ok := result["id"].(int64); ok {
+			user.ID = id
+		}
+
+		// user는 string
+		if u, ok := result["user"].(string); ok {
+			user.User = u
+		}
+
+		// episode는 string
+		if ep, ok := result["episode"].(string); ok {
+			user.Episode = ep
+		}
+
+		// progress는 nullable
+		if progress, ok := result["progress"].(string); ok && progress != "" {
+			user.Progress = &progress
+		}
+
+		// created_at은 string
+		if createdAt, ok := result["created_at"].(string); ok {
+			user.CreatedAt = createdAt
+		}
+
+		users[i] = user
 	}
 
-	detailDTO := ToDetailDTO(ep)
-	return &detailDTO, nil
+	return &GetEpisodeUsersResponse{
+		Users: users,
+	}, nil
 }
