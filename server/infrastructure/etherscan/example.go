@@ -141,6 +141,8 @@ func ExampleGetEventLogs() {
 			if len(log.Topics) > 0 {
 				fmt.Printf("  First Topic: %s\n", log.Topics[0])
 			}
+			eventSignature := IdentifyEpisodeEvent(log.Topics[0])
+			fmt.Printf("  Identified Event: %s\n", eventSignature)
 			fmt.Printf("  Data: %s\n", log.Data)
 			fmt.Printf("  Gas Price: %s\n", log.GasPrice)
 			fmt.Printf("  Gas Used: %s\n", log.GasUsed)

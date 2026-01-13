@@ -8,6 +8,7 @@ import (
 	"net/url"
 	"os"
 	"strconv"
+	"strings"
 	"time"
 )
 
@@ -17,6 +18,24 @@ const (
 	// DefaultChainID is Ethereum mainnet
 	DefaultChainID = "1"
 )
+
+// Episode event signature hashes (keccak256 of event signatures)
+// These are the first topic (Topics[0]) in event logs
+const (
+	// Created event hash
+	EventHashCreated = "0x7bfc40805a1520800ace0d66775f6c2a2561731beb795fa01b799468076a92ca"
+	// Open event hash
+	EventHashOpen = "0xe32160d1c0312f45df3d6776bd5470784166b6b0838e429388e9cbfed6eecfa1"
+	// Join event hash
+	EventHashJoin = "0x7f3b9effe05cfb4f31f854004de03199fd03fe56bf38a48b2aa9a9f4402d6e23"
+)
+
+// EpisodeEventMap maps event signature hashes to their event names
+var EpisodeEventMap = map[string]string{
+	EventHashCreated: "Created",
+	EventHashOpen:    "Open",
+	EventHashJoin:    "Join",
+}
 
 // EtherscanClient represents an Etherscan API client
 type EtherscanClient struct {
@@ -244,4 +263,30 @@ func (c *EtherscanClient) GetEventLogs(params GetEventLogsParams) (*EventLogsRes
 	}
 
 	return &result, nil
+}
+
+// IdentifyEpisodeEvent identifies an episode event from its first topic (Topics[0])
+// Returns the event name if found in the EpisodeEventMap, otherwise returns "Unknown"
+//
+// Example:
+//
+//	eventName := IdentifyEpisodeEvent("0x7bfc40805a1520800ace0d66775f6c2a2561731beb795fa01b799468076a92ca")
+//	// Returns: "Created"
+func IdentifyEpisodeEvent(topic0 string) string {
+	if topic0 == "" {
+		return "Unknown"
+	}
+
+	// Normalize: ensure lowercase and 0x prefix
+	normalized := strings.ToLower(topic0)
+	if !strings.HasPrefix(normalized, "0x") {
+		normalized = "0x" + normalized
+	}
+
+	// Try lookup with normalized version
+	if eventName, found := EpisodeEventMap[normalized]; found {
+		return eventName
+	}
+
+	return "Unknown"
 }
