@@ -5,8 +5,6 @@ import (
 	"net/http"
 
 	episodeusecase "eventsure-server/application/episode"
-
-	"github.com/gorilla/mux"
 )
 
 // EpisodeController handles HTTP requests for episodes
@@ -21,42 +19,19 @@ func NewEpisodeController(episodeUseCase *episodeusecase.UseCase) *EpisodeContro
 	}
 }
 
-// GetEpisodes handles GET /api/episodes
-func (c *EpisodeController) GetEpisodes(w http.ResponseWriter, r *http.Request) {
-	var status *string
-	var category *string
+// CreateUserEpisode handles POST /api/user-episodes
+func (c *EpisodeController) CreateUserEpisode(w http.ResponseWriter, r *http.Request) {
+	var req episodeusecase.CreateUserEpisodeRequest
 
-	if s := r.URL.Query().Get("status"); s != "" {
-		status = &s
-	}
-	if cat := r.URL.Query().Get("category"); cat != "" {
-		category = &cat
-	}
-
-	query := episodeusecase.GetEpisodesQuery{
-		Status:   status,
-		Category: category,
-	}
-
-	response, err := c.episodeUseCase.GetEpisodes(query)
-	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
+	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
+		http.Error(w, "Invalid request body", http.StatusBadRequest)
 		return
 	}
 
-	w.Header().Set("Content-Type", "application/json")
-	json.NewEncoder(w).Encode(response)
-}
-
-// GetEpisodeDetail handles GET /api/episodes/{episodeId}
-func (c *EpisodeController) GetEpisodeDetail(w http.ResponseWriter, r *http.Request) {
-	vars := mux.Vars(r)
-	episodeID := vars["episodeId"]
-
-	response, err := c.episodeUseCase.GetEpisodeDetail(episodeID)
+	response, err := c.episodeUseCase.CreateUserEpisode(req)
 	if err != nil {
-		if err.Error() == "episode not found" {
-			http.Error(w, err.Error(), http.StatusNotFound)
+		if err.Error() == "user is required" || err.Error() == "episode is required" {
+			http.Error(w, err.Error(), http.StatusBadRequest)
 			return
 		}
 		http.Error(w, err.Error(), http.StatusInternalServerError)
@@ -64,5 +39,6 @@ func (c *EpisodeController) GetEpisodeDetail(w http.ResponseWriter, r *http.Requ
 	}
 
 	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(http.StatusCreated)
 	json.NewEncoder(w).Encode(response)
 }

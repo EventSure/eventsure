@@ -25,21 +25,18 @@ func main() {
 	}
 
 	// Initialize repositories
-	episodeRepo := repository.NewEpisodeRepository()
 	poolRepo := repository.NewPoolRepository()
 	txRepo := repository.NewTransactionRepository()
 
 	// Initialize mock data
-	episodes := mock.CreateMockEpisodes()
 	pools := mock.CreateMockPools()
 	transactions := mock.CreateMockTransactions()
 
-	episodeRepo.InitializeMockData(episodes)
 	poolRepo.InitializeMockData(pools)
 	txRepo.InitializeMockData(transactions)
 
 	// Initialize use cases
-	episodeUseCase := episodeusecase.NewUseCase(episodeRepo)
+	episodeUseCase := episodeusecase.NewUseCase()
 	poolUseCase := poolusecase.NewUseCase(poolRepo)
 	txUseCase := transactionusecase.NewUseCase(txRepo)
 	statsUseCase := statsusecase.NewUseCase()

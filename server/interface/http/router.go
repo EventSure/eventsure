@@ -38,13 +38,14 @@ func (r *Router) SetupRoutes(mux *mux.Router) {
 	api.Use(middleware.LoggingMiddleware)
 
 	// Phase 1: 필수 엔드포인트
-	api.HandleFunc("/episodes", r.episodeController.GetEpisodes).Methods("GET")
-	api.HandleFunc("/episodes/{episodeId}", r.episodeController.GetEpisodeDetail).Methods("GET")
 	api.HandleFunc("/pools", r.poolController.GetPools).Methods("GET")
 	api.HandleFunc("/stats/home", r.statsController.GetHomeStats).Methods("GET")
 
 	// Phase 2: 중요 엔드포인트
 	api.HandleFunc("/transactions", r.transactionController.GetTransactions).Methods("GET")
 	api.HandleFunc("/transactions/stats", r.transactionController.GetTransactionStats).Methods("GET")
+
+	// User Episode endpoints
+	api.HandleFunc("/user-episodes", r.episodeController.CreateUserEpisode).Methods("POST")
 	// TODO: User endpoints will be added later
 }
