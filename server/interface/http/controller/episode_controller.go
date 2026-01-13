@@ -42,3 +42,25 @@ func (c *EpisodeController) CreateUserEpisode(w http.ResponseWriter, r *http.Req
 	w.WriteHeader(http.StatusCreated)
 	json.NewEncoder(w).Encode(response)
 }
+
+// GetUserEpisodes handles GET /api/user-episodes?user=xxx
+func (c *EpisodeController) GetUserEpisodes(w http.ResponseWriter, r *http.Request) {
+	user := r.URL.Query().Get("user")
+	if user == "" {
+		http.Error(w, "user query parameter is required", http.StatusBadRequest)
+		return
+	}
+
+	response, err := c.episodeUseCase.GetUserEpisodes(user)
+	if err != nil {
+		if err.Error() == "user is required" {
+			http.Error(w, err.Error(), http.StatusBadRequest)
+			return
+		}
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	w.Header().Set("Content-Type", "application/json")
+	json.NewEncoder(w).Encode(response)
+}

@@ -14,3 +14,17 @@ type CreateUserEpisodeResponse struct {
 	Progress  *string `json:"progress,omitempty"`
 	CreatedAt string  `json:"created_at"`
 }
+
+// GetUserEpisodesResponse represents response for getting user episodes
+type GetUserEpisodesResponse struct {
+	Episodes []UserEpisodeDTO `json:"episodes"`
+}
+
+// UserEpisodeDTO represents a user episode data transfer object
+type UserEpisodeDTO struct {
+	ID        int64   `json:"id"`
+	User      string  `json:"user"`
+	Episode   string  `json:"episode"`
+	Progress  *string `json:"progress,omitempty"`
+	CreatedAt string  `json:"created_at"`
+}

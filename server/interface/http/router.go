@@ -47,5 +47,6 @@ func (r *Router) SetupRoutes(mux *mux.Router) {
 
 	// User Episode endpoints
 	api.HandleFunc("/user-episodes", r.episodeController.CreateUserEpisode).Methods("POST")
+	api.HandleFunc("/user-episodes", r.episodeController.GetUserEpisodes).Methods("GET")
 	// TODO: User endpoints will be added later
 }
