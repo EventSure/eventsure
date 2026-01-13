@@ -1,6 +1,8 @@
 package http
 
 import (
+	"net/http"
+
 	"eventsure-server/interface/http/controller"
 	"eventsure-server/interface/http/middleware"
 
@@ -21,6 +23,12 @@ func NewRouter(episodeController *controller.EpisodeController) *Router {
 
 // SetupRoutes sets up all routes
 func (r *Router) SetupRoutes(mux *mux.Router) {
+	// Health check endpoint (for Railway/deployment health checks)
+	mux.HandleFunc("/health", func(w http.ResponseWriter, r *http.Request) {
+		w.WriteHeader(http.StatusOK)
+		w.Write([]byte("OK"))
+	}).Methods("GET")
+
 	api := mux.PathPrefix("/api").Subrouter()
 
 	// Apply logging middleware to all API routes
