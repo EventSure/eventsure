@@ -6,11 +6,6 @@ import (
 	"os"
 
 	episodeusecase "eventsure-server/application/episode"
-	poolusecase "eventsure-server/application/pool"
-	statsusecase "eventsure-server/application/stats"
-	transactionusecase "eventsure-server/application/transaction"
-	"eventsure-server/infrastructure/mock"
-	"eventsure-server/infrastructure/repository"
 	httprouter "eventsure-server/interface/http"
 	"eventsure-server/interface/http/controller"
 
@@ -24,36 +19,14 @@ func main() {
 		port = "3000"
 	}
 
-	// Initialize repositories
-	poolRepo := repository.NewPoolRepository()
-	txRepo := repository.NewTransactionRepository()
-
-	// Initialize mock data
-	pools := mock.CreateMockPools()
-	transactions := mock.CreateMockTransactions()
-
-	poolRepo.InitializeMockData(pools)
-	txRepo.InitializeMockData(transactions)
-
 	// Initialize use cases
 	episodeUseCase := episodeusecase.NewUseCase()
-	poolUseCase := poolusecase.NewUseCase(poolRepo)
-	txUseCase := transactionusecase.NewUseCase(txRepo)
-	statsUseCase := statsusecase.NewUseCase()
 
 	// Initialize controllers
 	episodeController := controller.NewEpisodeController(episodeUseCase)
-	poolController := controller.NewPoolController(poolUseCase)
-	txController := controller.NewTransactionController(txUseCase)
-	statsController := controller.NewStatsController(statsUseCase)
 
 	// Initialize router
-	router := httprouter.NewRouter(
-		episodeController,
-		poolController,
-		txController,
-		statsController,
-	)
+	router := httprouter.NewRouter(episodeController)
 
 	// Setup mux
 	r := mux.NewRouter()
