@@ -232,3 +232,45 @@ func (uc *UseCase) GetAllEpisodes() (*GetAllEpisodesResponse, error) {
 		Episodes: episodes,
 	}, nil
 }
+
+// GetEpisodeEvents gets all events for a specific episode contract address
+func (uc *UseCase) GetEpisodeEvents(episodeAddress string) (*GetEpisodeEventsResponse, error) {
+	if episodeAddress == "" {
+		return nil, errors.New("episode address is required")
+	}
+
+	// Create Etherscan client
+	etherscanClient, err := etherscan.NewEtherscanClient()
+	if err != nil {
+		return nil, errors.New("failed to create Etherscan client: " + err.Error())
+	}
+
+	// Get event logs for the episode contract address
+	params := etherscan.GetEventLogsParams{
+		Address: episodeAddress,
+	}
+
+	response, err := etherscanClient.GetEventLogs(params)
+	if err != nil {
+		return nil, errors.New("failed to get event logs: " + err.Error())
+	}
+
+	// Extract event information from event logs
+	events := make([]EpisodeEventDTO, 0, len(response.Result))
+	for _, log := range response.Result {
+		eventName := "Unknown"
+		if len(log.Topics) > 0 {
+			eventName = etherscan.IdentifyEpisodeEvent(log.Topics[0])
+		}
+
+		events = append(events, EpisodeEventDTO{
+			TransactionHash: log.TransactionHash,
+			Event:           eventName,
+			TimeStamp:       log.TimeStamp,
+		})
+	}
+
+	return &GetEpisodeEventsResponse{
+		Events: events,
+	}, nil
+}

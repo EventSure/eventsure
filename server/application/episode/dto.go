@@ -38,3 +38,15 @@ type UserEpisodeDTO struct {
 type GetAllEpisodesResponse struct {
 	Episodes []string `json:"episodes"`
 }
+
+// EpisodeEventDTO represents an episode event
+type EpisodeEventDTO struct {
+	TransactionHash string `json:"transactionHash"`
+	Event           string `json:"event"`
+	TimeStamp       string `json:"timeStamp"`
+}
+
+// GetEpisodeEventsResponse represents response for getting episode events
+type GetEpisodeEventsResponse struct {
+	Events []EpisodeEventDTO `json:"events"`
+}

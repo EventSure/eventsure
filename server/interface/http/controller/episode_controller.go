@@ -5,6 +5,8 @@ import (
 	"net/http"
 
 	episodeusecase "eventsure-server/application/episode"
+
+	"github.com/gorilla/mux"
 )
 
 // EpisodeController handles HTTP requests for episodes
@@ -90,6 +92,27 @@ func (c *EpisodeController) GetUserEpisodes(w http.ResponseWriter, r *http.Reque
 // Returns all episode contract addresses from Etherscan
 func (c *EpisodeController) GetEpisodes(w http.ResponseWriter, r *http.Request) {
 	response, err := c.episodeUseCase.GetAllEpisodes()
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	w.Header().Set("Content-Type", "application/json")
+	json.NewEncoder(w).Encode(response)
+}
+
+// GetEpisodeEvents handles GET /api/episodes/{episode}/events
+// Returns all events for a specific episode contract address
+func (c *EpisodeController) GetEpisodeEvents(w http.ResponseWriter, r *http.Request) {
+	vars := mux.Vars(r)
+	episode := vars["episode"]
+
+	if episode == "" {
+		http.Error(w, "episode parameter is required", http.StatusBadRequest)
+		return
+	}
+
+	response, err := c.episodeUseCase.GetEpisodeEvents(episode)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
