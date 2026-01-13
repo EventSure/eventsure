@@ -85,3 +85,16 @@ func (c *EpisodeController) GetUserEpisodes(w http.ResponseWriter, r *http.Reque
 	// 둘 다 없으면 에러
 	http.Error(w, "user or episode query parameter is required", http.StatusBadRequest)
 }
+
+// GetEpisodes handles GET /api/episodes
+// Returns all episode contract addresses from Etherscan
+func (c *EpisodeController) GetEpisodes(w http.ResponseWriter, r *http.Request) {
+	response, err := c.episodeUseCase.GetAllEpisodes()
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	w.Header().Set("Content-Type", "application/json")
+	json.NewEncoder(w).Encode(response)
+}

@@ -2,7 +2,9 @@ package episode
 
 import (
 	"errors"
+	"eventsure-server/infrastructure/etherscan"
 	"eventsure-server/infrastructure/repository"
+	"os"
 )
 
 // UseCase handles episode use cases
@@ -183,5 +185,50 @@ func (uc *UseCase) GetEpisodeUsers(episode string) (*GetEpisodeUsersResponse, er
 
 	return &GetEpisodeUsersResponse{
 		Users: users,
+	}, nil
+}
+
+// GetAllEpisodes gets all episode contract addresses from Etherscan
+// by querying internal transactions of the EpisodeContractFactory
+func (uc *UseCase) GetAllEpisodes() (*GetAllEpisodesResponse, error) {
+	// Get EpisodeContractFactory address from environment variable
+	factoryAddress := os.Getenv("EPISODE_CONTRACT_FACTORY")
+	if factoryAddress == "" {
+		return nil, errors.New("EPISODE_CONTRACT_FACTORY environment variable is not set")
+	}
+
+	// Create Etherscan client
+	etherscanClient, err := etherscan.NewEtherscanClient()
+	if err != nil {
+		return nil, errors.New("failed to create Etherscan client: " + err.Error())
+	}
+
+	// Get internal transactions for the factory address
+	params := etherscan.GetInternalTransactionsParams{
+		Address: factoryAddress,
+		Sort:    "desc",
+	}
+
+	response, err := etherscanClient.GetInternalTransactions(params)
+	if err != nil {
+		return nil, errors.New("failed to get internal transactions: " + err.Error())
+	}
+
+	// Extract unique contract addresses from the response
+	contractAddressMap := make(map[string]bool)
+	for _, tx := range response.Result {
+		if tx.ContractAddress != "" {
+			contractAddressMap[tx.ContractAddress] = true
+		}
+	}
+
+	// Convert map to slice
+	episodes := make([]string, 0, len(contractAddressMap))
+	for addr := range contractAddressMap {
+		episodes = append(episodes, addr)
+	}
+
+	return &GetAllEpisodesResponse{
+		Episodes: episodes,
 	}, nil
 }

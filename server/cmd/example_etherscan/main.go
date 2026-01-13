@@ -69,9 +69,9 @@ func main() {
 	case "logs", "event-logs":
 		etherscan.ExampleGetEventLogs()
 	case "all", "":
-		fmt.Println("Running all examples...\n")
+		fmt.Println("Running all examples...")
 		etherscan.ExampleGetInternalTransactions()
-		fmt.Println("\n" + strings.Repeat("=", 80) + "\n")
+		fmt.Println("\n" + strings.Repeat("=", 80))
 		etherscan.ExampleGetEventLogs()
 	default:
 		log.Fatalf("Unknown example: %s\nAvailable examples: internal, logs, all", example)

@@ -34,6 +34,9 @@ func (r *Router) SetupRoutes(mux *mux.Router) {
 	// Apply logging middleware to all API routes
 	api.Use(middleware.LoggingMiddleware)
 
+	// Episode endpoints
+	api.HandleFunc("/episodes", r.episodeController.GetEpisodes).Methods("GET")
+
 	// User Episode endpoints
 	api.HandleFunc("/user-episodes", r.episodeController.CreateUserEpisode).Methods("POST")
 	api.HandleFunc("/user-episodes", r.episodeController.GetUserEpisodes).Methods("GET")

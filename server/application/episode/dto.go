@@ -33,3 +33,8 @@ type UserEpisodeDTO struct {
 	Progress  *string `json:"progress,omitempty"`
 	CreatedAt string  `json:"created_at"`
 }
+
+// GetAllEpisodesResponse represents response for getting all episodes (contract addresses)
+type GetAllEpisodesResponse struct {
+	Episodes []string `json:"episodes"`
+}
