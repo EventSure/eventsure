@@ -2,6 +2,9 @@ package episode
 
 import (
 	"errors"
+	"strconv"
+	"time"
+
 	"eventsure-server/infrastructure/etherscan"
 	"eventsure-server/infrastructure/repository"
 	"os"
@@ -263,14 +266,62 @@ func (uc *UseCase) GetEpisodeEvents(episodeAddress string) (*GetEpisodeEventsRes
 			eventName = etherscan.IdentifyEpisodeEvent(log.Topics[0])
 		}
 
+		// Convert timestamp to formatted string
+		formattedTimestamp := formatTimestamp(log.TimeStamp)
+
 		events = append(events, EpisodeEventDTO{
 			TransactionHash: log.TransactionHash,
 			Event:           eventName,
-			TimeStamp:       log.TimeStamp,
+			TimeStamp:       formattedTimestamp,
 		})
 	}
 
 	return &GetEpisodeEventsResponse{
 		Events: events,
 	}, nil
+}
+
+// formatTimestamp converts Etherscan timestamp (hex or decimal string) to "2006-01-02 15:04:05" format
+func formatTimestamp(timestampStr string) string {
+	if timestampStr == "" {
+		return ""
+	}
+
+	// Remove 0x prefix if present
+	timestampStr = removeHexPrefix(timestampStr)
+
+	// Parse as int64 (handles both hex and decimal)
+	var timestamp int64
+	var err error
+
+	// Try parsing as hex first (Etherscan often returns hex)
+	if len(timestampStr) > 0 && (timestampStr[0] >= '0' && timestampStr[0] <= '9' || timestampStr[0] >= 'a' && timestampStr[0] <= 'f' || timestampStr[0] >= 'A' && timestampStr[0] <= 'F') {
+		timestamp, err = strconv.ParseInt(timestampStr, 16, 64)
+		if err != nil {
+			// If hex parsing fails, try decimal
+			timestamp, err = strconv.ParseInt(timestampStr, 10, 64)
+		}
+	} else {
+		// Try decimal parsing
+		timestamp, err = strconv.ParseInt(timestampStr, 10, 64)
+	}
+
+	if err != nil {
+		// If parsing fails, return original string
+		return timestampStr
+	}
+
+	// Convert Unix timestamp to time.Time
+	t := time.Unix(timestamp, 0)
+
+	// Format as "2006-01-02 15:04:05"
+	return t.Format("2006-01-02 15:04:05")
+}
+
+// removeHexPrefix removes "0x" prefix from hex string
+func removeHexPrefix(s string) string {
+	if len(s) >= 2 && s[0:2] == "0x" {
+		return s[2:]
+	}
+	return s
 }
