@@ -1,6 +1,7 @@
 import { createBrowserRouter, RouterProvider, Outlet } from 'react-router-dom'
 import { Home } from '@/pages/Home'
 import { Explorer } from '@/pages/Explorer'
+import { MyPage } from '@/pages/MyPage'
 import { ScrollToTop } from '@/components/common'
 
 const RootLayout = () => {
@@ -24,6 +25,10 @@ const router = createBrowserRouter(
         {
           path: '/explorer',
           element: <Explorer />,
+        },
+        {
+          path: '/mypage',
+          element: <MyPage />,
         },
         {
           path: '/claims',

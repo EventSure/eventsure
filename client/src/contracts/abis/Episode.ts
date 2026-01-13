@@ -1,10 +1,3 @@
-/**
- * Episode Contract ABI
- * 
- * Core insurance episode contract that handles user participation,
- * claims, and surplus withdrawals.
- */
-
 export const EpisodeABI = [
   {
     type: 'function',
@@ -64,23 +57,76 @@ export const EpisodeABI = [
   },
   {
     type: 'function',
-    name: 'oracle',
+    name: 'ORACLE',
     stateMutability: 'view',
     inputs: [],
     outputs: [{ name: '', type: 'address' }],
   },
   {
     type: 'function',
-    name: 'factory',
+    name: 'FACTORY',
     stateMutability: 'view',
     inputs: [],
     outputs: [{ name: '', type: 'address' }],
+  },
+  {
+    type: 'function',
+    name: 'PREMIUM_AMOUNT',
+    stateMutability: 'view',
+    inputs: [],
+    outputs: [{ name: '', type: 'uint256' }],
+  },
+  {
+    type: 'function',
+    name: 'PAYOUT_AMOUNT',
+    stateMutability: 'view',
+    inputs: [],
+    outputs: [{ name: '', type: 'uint256' }],
+  },
+  {
+    type: 'function',
+    name: 'flightName',
+    stateMutability: 'view',
+    inputs: [],
+    outputs: [{ name: '', type: 'string' }],
+  },
+  {
+    type: 'function',
+    name: 'DEPARTURE_TIME',
+    stateMutability: 'view',
+    inputs: [],
+    outputs: [{ name: '', type: 'uint64' }],
+  },
+  {
+    type: 'function',
+    name: 'ESTIMATED_ARRIVAL_TIME',
+    stateMutability: 'view',
+    inputs: [],
+    outputs: [{ name: '', type: 'uint64' }],
+  },
+  {
+    type: 'function',
+    name: 'finalArrivalTime',
+    stateMutability: 'view',
+    inputs: [],
+    outputs: [{ name: '', type: 'uint64' }],
+  },
+  {
+    type: 'function',
+    name: 'members',
+    stateMutability: 'view',
+    inputs: [{ name: 'user', type: 'address' }],
+    outputs: [
+      { name: 'joined', type: 'bool' },
+      { name: 'payoutClaimed', type: 'bool' },
+      { name: 'surplusClaimed', type: 'bool' },
+    ],
   },
   {
     type: 'function',
     name: 'join',
-    stateMutability: 'nonpayable',
-    inputs: [{ name: 'premium', type: 'uint256' }],
+    stateMutability: 'payable',
+    inputs: [],
     outputs: [],
   },
   {
@@ -93,41 +139,6 @@ export const EpisodeABI = [
   {
     type: 'function',
     name: 'withdrawSurplus',
-    stateMutability: 'nonpayable',
-    inputs: [],
-    outputs: [],
-  },
-  {
-    type: 'function',
-    name: 'open',
-    stateMutability: 'nonpayable',
-    inputs: [],
-    outputs: [],
-  },
-  {
-    type: 'function',
-    name: 'lock',
-    stateMutability: 'nonpayable',
-    inputs: [],
-    outputs: [],
-  },
-  {
-    type: 'function',
-    name: 'resolve',
-    stateMutability: 'nonpayable',
-    inputs: [{ name: '_eventOccurred', type: 'bool' }],
-    outputs: [],
-  },
-  {
-    type: 'function',
-    name: 'settle',
-    stateMutability: 'nonpayable',
-    inputs: [],
-    outputs: [],
-  },
-  {
-    type: 'function',
-    name: 'close',
     stateMutability: 'nonpayable',
     inputs: [],
     outputs: [],

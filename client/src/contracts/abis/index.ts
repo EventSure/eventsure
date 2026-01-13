@@ -1,2 +1,2 @@
 export { EpisodeABI } from './Episode'
-export { EpisodeFactoryABI } from './EpisodeFactory'
+export { EpisodeFactoryABI, EPISODE_FACTORY_ADDRESS } from './EpisodeFactory'

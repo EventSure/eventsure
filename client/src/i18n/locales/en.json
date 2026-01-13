@@ -2,6 +2,7 @@
   "header": {
     "home": "Home",
     "explorer": "Explorer",
+    "myPage": "My Page",
     "claims": "Claims",
     "about": "About"
   },
@@ -304,8 +305,14 @@
       "oracle": "Oracle",
       "financialTerms": "Financial Terms",
       "enRoute": "En route",
-      "triggerThreshold": "3h (trigger)"
+      "triggerThreshold": "3h (trigger)",
+      "afterArrival": "After arrival",
+        "walletRequired": "Please connect your wallet to join the pool.",
+        "alreadyJoined": "Already Joined",
+        "alreadyJoinedDesc": "You have already joined this pool."
     },
+    "defaultTrigger": "Flight delay ≥ 3 hours",
+    "noEpisodes": "No episodes available",
     "events": {
       "ke902": {
         "title": "Flight KE902 Delay",
@@ -375,5 +382,19 @@
     "errorLoading": "Failed to load episodes",
     "noEpisodes": "No Episodes Found",
     "noEpisodesDesc": "There are no insurance episodes available at the moment. Check back soon!"
+  },
+  "myPage": {
+    "title": "My Page",
+    "subtitle": "Manage episodes for {{address}}",
+    "activeEpisodes": "Active Episodes",
+    "pastEpisodes": "Past Episodes",
+    "noActiveEpisodes": "No Active Episodes",
+    "noActiveEpisodesDesc": "Join new episodes to get coverage!",
+    "noPastEpisodes": "No Past Episodes",
+    "noPastEpisodesDesc": "Your completed episodes will appear here.",
+    "exploreEpisodes": "Explore Episodes",
+    "connectWallet": "Connect Your Wallet",
+    "connectWalletDesc": "Please connect your wallet to view your episode history.",
+    "loading": "Loading..."
   }
 }
