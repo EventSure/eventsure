@@ -2,7 +2,12 @@ package episode
 
 import (
 	"errors"
+	"strconv"
+	"time"
+
+	"eventsure-server/infrastructure/etherscan"
 	"eventsure-server/infrastructure/repository"
+	"os"
 )
 
 // UseCase handles episode use cases
@@ -184,4 +189,139 @@ func (uc *UseCase) GetEpisodeUsers(episode string) (*GetEpisodeUsersResponse, er
 	return &GetEpisodeUsersResponse{
 		Users: users,
 	}, nil
+}
+
+// GetAllEpisodes gets all episode contract addresses from Etherscan
+// by querying internal transactions of the EpisodeContractFactory
+func (uc *UseCase) GetAllEpisodes() (*GetAllEpisodesResponse, error) {
+	// Get EpisodeContractFactory address from environment variable
+	factoryAddress := os.Getenv("EPISODE_CONTRACT_FACTORY")
+	if factoryAddress == "" {
+		return nil, errors.New("EPISODE_CONTRACT_FACTORY environment variable is not set")
+	}
+
+	// Create Etherscan client
+	etherscanClient, err := etherscan.NewEtherscanClient()
+	if err != nil {
+		return nil, errors.New("failed to create Etherscan client: " + err.Error())
+	}
+
+	// Get internal transactions for the factory address
+	params := etherscan.GetInternalTransactionsParams{
+		Address: factoryAddress,
+		Sort:    "desc",
+	}
+
+	response, err := etherscanClient.GetInternalTransactions(params)
+	if err != nil {
+		return nil, errors.New("failed to get internal transactions: " + err.Error())
+	}
+
+	// Extract unique contract addresses from the response
+	contractAddressMap := make(map[string]bool)
+	for _, tx := range response.Result {
+		if tx.ContractAddress != "" {
+			contractAddressMap[tx.ContractAddress] = true
+		}
+	}
+
+	// Convert map to slice
+	episodes := make([]string, 0, len(contractAddressMap))
+	for addr := range contractAddressMap {
+		episodes = append(episodes, addr)
+	}
+
+	return &GetAllEpisodesResponse{
+		Episodes: episodes,
+	}, nil
+}
+
+// GetEpisodeEvents gets all events for a specific episode contract address
+func (uc *UseCase) GetEpisodeEvents(episodeAddress string) (*GetEpisodeEventsResponse, error) {
+	if episodeAddress == "" {
+		return nil, errors.New("episode address is required")
+	}
+
+	// Create Etherscan client
+	etherscanClient, err := etherscan.NewEtherscanClient()
+	if err != nil {
+		return nil, errors.New("failed to create Etherscan client: " + err.Error())
+	}
+
+	// Get event logs for the episode contract address
+	params := etherscan.GetEventLogsParams{
+		Address: episodeAddress,
+	}
+
+	response, err := etherscanClient.GetEventLogs(params)
+	if err != nil {
+		return nil, errors.New("failed to get event logs: " + err.Error())
+	}
+
+	// Extract event information from event logs
+	events := make([]EpisodeEventDTO, 0, len(response.Result))
+	for _, log := range response.Result {
+		eventName := "Unknown"
+		if len(log.Topics) > 0 {
+			eventName = etherscan.IdentifyEpisodeEvent(log.Topics[0])
+		}
+
+		// Convert timestamp to formatted string
+		formattedTimestamp := formatTimestamp(log.TimeStamp)
+
+		events = append(events, EpisodeEventDTO{
+			TransactionHash: log.TransactionHash,
+			Event:           eventName,
+			TimeStamp:       formattedTimestamp,
+		})
+	}
+
+	return &GetEpisodeEventsResponse{
+		Events: events,
+	}, nil
+}
+
+// formatTimestamp converts Etherscan timestamp (hex or decimal string) to "2006-01-02 15:04:05" format
+func formatTimestamp(timestampStr string) string {
+	if timestampStr == "" {
+		return ""
+	}
+
+	// Remove 0x prefix if present
+	timestampStr = removeHexPrefix(timestampStr)
+
+	// Parse as int64 (handles both hex and decimal)
+	var timestamp int64
+	var err error
+
+	// Try parsing as hex first (Etherscan often returns hex)
+	if len(timestampStr) > 0 && (timestampStr[0] >= '0' && timestampStr[0] <= '9' || timestampStr[0] >= 'a' && timestampStr[0] <= 'f' || timestampStr[0] >= 'A' && timestampStr[0] <= 'F') {
+		timestamp, err = strconv.ParseInt(timestampStr, 16, 64)
+		if err != nil {
+			// If hex parsing fails, try decimal
+			timestamp, err = strconv.ParseInt(timestampStr, 10, 64)
+		}
+	} else {
+		// Try decimal parsing
+		timestamp, err = strconv.ParseInt(timestampStr, 10, 64)
+	}
+
+	if err != nil {
+		// If parsing fails, return original string
+		return timestampStr
+	}
+
+	// Convert Unix timestamp to time.Time
+	t := time.Unix(timestamp, 0)
+
+	// Format as "2006-01-02 15:04:05"
+	return t.Format("2006-01-02 15:04:05")
+}
+
+// removeHexPrefix removes "0x" prefix from hex string
+func removeHexPrefix(s string) string {
+	if len(s) >= 2 && s[0:2] == "0x" {
+		return s[2:]
+	}
+	return s
 }
