@@ -100,6 +100,33 @@ const Actions = styled.div`
   gap: ${theme.spacing.md};
 `
 
+const MyPageButton = styled(Link)`
+  padding: ${theme.spacing.sm} ${theme.spacing.lg};
+  border-radius: ${theme.borderRadius.md};
+  font-size: ${theme.fontSize.md};
+  font-weight: ${theme.fontWeight.semibold};
+  cursor: pointer;
+  transition: all ${theme.transitions.fast};
+  border: 1px solid ${theme.colors.glassBorder};
+  background: transparent;
+  color: ${theme.colors.text};
+  text-decoration: none;
+  display: flex;
+  align-items: center;
+  gap: ${theme.spacing.xs};
+
+  &:hover {
+    background: ${theme.colors.glassBorder};
+    border-color: ${theme.colors.secondary};
+  }
+
+  svg {
+    width: 18px;
+    height: 18px;
+    stroke: currentColor;
+  }
+`
+
 const LanguageSwitcher = styled.button<{ isActive?: boolean }>`
   padding: ${theme.spacing.xs} ${theme.spacing.sm};
   border-radius: ${theme.borderRadius.md};
@@ -215,6 +242,13 @@ export const Header = () => {
               KO
             </LanguageSwitcher>
           </LanguageGroup>
+          <MyPageButton to="/mypage">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+              <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
+              <circle cx="12" cy="7" r="4" />
+            </svg>
+            {t('header.myPage')}
+          </MyPageButton>
           <WalletButton />
         </Actions>
       </HeaderContent>

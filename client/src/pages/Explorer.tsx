@@ -675,6 +675,7 @@ export const Explorer = () => {
     isConfirming,
     error,
     isConnected,
+    hasJoined,
   } = useJoinEpisode({
     selectedEpisode,
     onSuccess: useCallback(() => {
@@ -686,6 +687,9 @@ export const Explorer = () => {
     const result = joinEpisode();
     if (result?.needsConnection) {
       setShowWalletPrompt(true);
+    }
+    if (result?.alreadyJoined) {
+      return;
     }
   };
 
@@ -1108,12 +1112,31 @@ export const Explorer = () => {
                 <span>{t("activeEvents.labels.warning")}</span>
               </WarningBox>
 
+              {hasJoined && (
+                <WarningBox style={{ marginBottom: theme.spacing.md, background: `${theme.colors.success}10`, borderColor: `${theme.colors.success}20` }}>
+                  <svg viewBox="0 0 24 24" fill="none" stroke={theme.colors.success} width="20" height="20" strokeWidth="2">
+                    <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14" />
+                    <polyline points="22 4 12 14.01 9 11.01" />
+                  </svg>
+                  <div>
+                    <div style={{ fontWeight: theme.fontWeight.semibold, marginBottom: theme.spacing.xs, color: theme.colors.success }}>
+                      {t("activeEvents.labels.alreadyJoined") || "Already Joined"}
+                    </div>
+                    <div style={{ fontSize: theme.fontSize.xs }}>
+                      {t("activeEvents.labels.alreadyJoinedDesc") || "You have already joined this pool."}
+                    </div>
+                  </div>
+                </WarningBox>
+              )}
+
               <Button
                 variant="gradient"
                 onClick={handleJoinClick}
-                disabled={isPending || isConfirming}
+                disabled={isPending || isConfirming || hasJoined}
               >
-                {isPending
+                {hasJoined
+                  ? t("activeEvents.labels.alreadyJoined") || "Already Joined"
+                  : isPending
                   ? "Confirm in Wallet..."
                   : isConfirming
                   ? "Joining..."

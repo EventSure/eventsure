@@ -1,5 +1,5 @@
 import { useEffect } from 'react';
-import { useWriteContract, useWaitForTransactionReceipt, useAccount } from 'wagmi';
+import { useWriteContract, useWaitForTransactionReceipt, useAccount, useReadContract } from 'wagmi';
 import { EpisodeABI } from '@/contracts/abis';
 import type { EpisodeData } from '@/types/episode';
 
@@ -13,6 +13,19 @@ export const useJoinEpisode = ({ selectedEpisode, onSuccess }: UseJoinEpisodePro
   const { data: hash, writeContract, isPending, error, reset } = useWriteContract();
   const { isLoading: isConfirming, isSuccess: isConfirmed } = useWaitForTransactionReceipt({ hash });
 
+  // Check if user already joined
+  const { data: memberData } = useReadContract({
+    address: selectedEpisode?.address,
+    abi: EpisodeABI,
+    functionName: 'members',
+    args: address ? [address] : undefined,
+    query: {
+      enabled: !!selectedEpisode && !!address && isConnected,
+    },
+  });
+
+  const hasJoined = memberData ? memberData[0] : false;
+
   const handleJoin = () => {
     if (!isConnected) {
       return { needsConnection: true };
@@ -20,6 +33,10 @@ export const useJoinEpisode = ({ selectedEpisode, onSuccess }: UseJoinEpisodePro
 
     if (!selectedEpisode) {
       return { error: 'No episode selected' };
+    }
+
+    if (hasJoined) {
+      return { alreadyJoined: true };
     }
 
     writeContract({
@@ -47,5 +64,6 @@ export const useJoinEpisode = ({ selectedEpisode, onSuccess }: UseJoinEpisodePro
     reset,
     isConnected,
     address,
+    hasJoined,
   };
 };

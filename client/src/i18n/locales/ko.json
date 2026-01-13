@@ -1,8 +1,9 @@
 {
   "header": {
     "home": "홈",
-    "explorer": "탐색기",
-    "claims": "보상 청구",
+    "explorer": "탐색",
+    "myPage": "마이페이지",
+    "claims": "청구",
     "about": "소개"
   },
   "hero": {
@@ -306,7 +307,9 @@
       "enRoute": "비행 중",
       "triggerThreshold": "3h (trigger)",
       "afterArrival": "도착 직후",
-      "walletRequired": "지갑을 연결하셔야 풀에 참여할 수 있습니다."
+        "walletRequired": "지갑을 연결하셔야 풀에 참여할 수 있습니다.",
+        "alreadyJoined": "이미 참여함",
+        "alreadyJoinedDesc": "이미 이 풀에 참여하셨습니다."
     },
     "defaultTrigger": "항공편 지연 3시간 이상",
     "noEpisodes": "이용 가능한 에피소드가 없습니다",
@@ -379,5 +382,19 @@
     "errorLoading": "에피소드 로딩 실패",
     "noEpisodes": "에피소드가 없습니다",
     "noEpisodesDesc": "현재 이용 가능한 보험 에피소드가 없습니다. 곧 다시 확인해주세요!"
+  },
+  "myPage": {
+    "title": "마이페이지",
+    "subtitle": "{{address}}님의 에피소드 관리",
+    "activeEpisodes": "진행중인 에피소드",
+    "pastEpisodes": "종료된 에피소드",
+    "noActiveEpisodes": "진행중인 에피소드가 없습니다",
+    "noActiveEpisodesDesc": "새로운 에피소드에 참여하여 보장을 받으세요!",
+    "noPastEpisodes": "종료된 에피소드가 없습니다",
+    "noPastEpisodesDesc": "참여하신 에피소드가 종료되면 여기에 표시됩니다.",
+    "exploreEpisodes": "에피소드 둘러보기",
+    "connectWallet": "지갑을 연결해주세요",
+    "connectWalletDesc": "에피소드 내역을 보려면 지갑을 연결해야 합니다.",
+    "loading": "불러오는 중..."
   }
 }
