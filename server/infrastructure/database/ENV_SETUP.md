@@ -2,6 +2,21 @@
 
 `ExampleUserEpisodesSelectAll()` 함수를 실행하기 위한 환경 변수 설정 방법입니다.
 
+## .env 파일 위치
+
+`.env` 파일은 **`server/` 디렉토리**에 저장해야 합니다.
+
+```
+eventsure/
+└── server/              ← .env 파일은 여기에 저장
+    ├── .env             ← 여기!
+    ├── go.mod
+    ├── main.go
+    └── ...
+```
+
+**참고**: 이제 `godotenv`를 사용하여 `.env` 파일이 자동으로 로드됩니다. 수동으로 `export` 할 필요가 없습니다!
+
 ## 방법 1: REST API 방식 (권장)
 
 가장 간단한 방법입니다. Project URL과 API Key만 필요합니다.
@@ -16,18 +31,18 @@ export SUPABASE_PROJECT_URL=https://vnxebakrejhkakhhxajq.supabase.co
 export SUPABASE_API_KEY=sb_publishable_fOo9N-ENOftprDamZtRRfg_BaH9Ctu1
 ```
 
-또는 `.env` 파일 사용:
+또는 `.env` 파일 사용 (권장 - 자동 로드됨):
 
 ```bash
-# .env 파일 생성
+# server/ 디렉토리에 .env 파일 생성
+cd server
 cat > .env << EOF
 SUPABASE_PROJECT_URL=https://vnxebakrejhkakhhxajq.supabase.co
 SUPABASE_API_KEY=sb_publishable_fOo9N-ENOftprDamZtRRfg_BaH9Ctu1
 EOF
-
-# 환경 변수 로드 (필요한 경우)
-export $(cat .env | xargs)
 ```
+
+**중요**: `.env` 파일은 `server/` 디렉토리에 저장하세요. 프로그램이 자동으로 로드합니다!
 
 ### 실행
 

@@ -20,17 +20,6 @@ func NewSupabaseRESTClient() (*SupabaseRESTClient, error) {
 	supabaseURL := os.Getenv("SUPABASE_PROJECT_URL")
 	supabaseKey := os.Getenv("SUPABASE_API_KEY")
 
-	// If not set, try alternative environment variable names
-	if supabaseURL == "" {
-		supabaseURL = os.Getenv("SUPABASE_URL")
-	}
-	if supabaseKey == "" {
-		supabaseKey = os.Getenv("SUPABASE_ANON_KEY")
-	}
-	if supabaseKey == "" {
-		supabaseKey = os.Getenv("SUPABASE_PUBLISHABLE_KEY")
-	}
-
 	if supabaseURL == "" {
 		return nil, fmt.Errorf("SUPABASE_PROJECT_URL or SUPABASE_URL must be set")
 	}
