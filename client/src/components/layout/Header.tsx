@@ -1,9 +1,9 @@
-import styled from '@emotion/styled'
-import { motion } from 'framer-motion'
-import { useAppKit, useAppKitAccount } from '@reown/appkit/react'
-import { useTranslation } from 'react-i18next'
-import { Link, useLocation } from 'react-router-dom'
-import { theme } from '@/styles/theme'
+import styled from "@emotion/styled";
+import { motion } from "framer-motion";
+import { useAppKit, useAppKitAccount } from "@reown/appkit/react";
+import { useTranslation } from "react-i18next";
+import { Link, useLocation } from "react-router-dom";
+import { theme } from "@/styles/theme";
 
 const HeaderContainer = styled(motion.header)`
   position: fixed;
@@ -15,7 +15,7 @@ const HeaderContainer = styled(motion.header)`
   background: ${theme.colors.glass};
   backdrop-filter: blur(12px);
   border-bottom: 1px solid ${theme.colors.glassBorder};
-`
+`;
 
 const HeaderContent = styled.div`
   max-width: 1400px;
@@ -23,19 +23,23 @@ const HeaderContent = styled.div`
   display: flex;
   align-items: center;
   justify-content: space-between;
-`
+`;
 
 const Logo = styled(Link)`
   display: flex;
   align-items: center;
   gap: ${theme.spacing.sm};
   text-decoration: none;
-`
+`;
 
 const LogoIcon = styled.div`
   width: 40px;
   height: 40px;
-  background: linear-gradient(135deg, ${theme.colors.primary} 0%, ${theme.colors.secondary} 100%);
+  background: linear-gradient(
+    135deg,
+    ${theme.colors.primary} 0%,
+    ${theme.colors.secondary} 100%
+  );
   border-radius: ${theme.borderRadius.md};
   display: flex;
   align-items: center;
@@ -46,16 +50,20 @@ const LogoIcon = styled.div`
     height: 24px;
     fill: white;
   }
-`
+`;
 
 const LogoText = styled.span`
   font-size: ${theme.fontSize.xl};
   font-weight: ${theme.fontWeight.bold};
-  background: linear-gradient(135deg, ${theme.colors.primary} 0%, ${theme.colors.secondary} 100%);
+  background: linear-gradient(
+    135deg,
+    ${theme.colors.primary} 0%,
+    ${theme.colors.secondary} 100%
+  );
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
-`
+`;
 
 const Nav = styled.nav`
   display: flex;
@@ -65,12 +73,13 @@ const Nav = styled.nav`
   @media (max-width: ${theme.breakpoints.md}) {
     display: none;
   }
-`
+`;
 
 const NavLink = styled(Link, {
-  shouldForwardProp: (prop) => prop !== '$isActive'
+  shouldForwardProp: (prop) => prop !== "$isActive",
 })<{ $isActive?: boolean }>`
-  color: ${({ $isActive }) => $isActive ? theme.colors.secondary : theme.colors.textSecondary};
+  color: ${({ $isActive }) =>
+    $isActive ? theme.colors.secondary : theme.colors.textSecondary};
   font-weight: ${theme.fontWeight.medium};
   transition: color ${theme.transitions.fast};
   cursor: pointer;
@@ -78,10 +87,13 @@ const NavLink = styled(Link, {
   position: relative;
 
   &:hover {
-    color: ${({ $isActive }) => $isActive ? theme.colors.secondary : theme.colors.text};
+    color: ${({ $isActive }) =>
+      $isActive ? theme.colors.secondary : theme.colors.text};
   }
 
-  ${({ $isActive }) => $isActive && `
+  ${({ $isActive }) =>
+    $isActive &&
+    `
     &::after {
       content: '';
       position: absolute;
@@ -92,13 +104,13 @@ const NavLink = styled(Link, {
       background: ${theme.colors.secondary};
     }
   `}
-`
+`;
 
 const Actions = styled.div`
   display: flex;
   align-items: center;
   gap: ${theme.spacing.md};
-`
+`;
 
 const MyPageButton = styled(Link)`
   padding: ${theme.spacing.sm} ${theme.spacing.lg};
@@ -125,7 +137,7 @@ const MyPageButton = styled(Link)`
     height: 18px;
     stroke: currentColor;
   }
-`
+`;
 
 const LanguageSwitcher = styled.button<{ isActive?: boolean }>`
   padding: ${theme.spacing.xs} ${theme.spacing.sm};
@@ -135,14 +147,15 @@ const LanguageSwitcher = styled.button<{ isActive?: boolean }>`
   cursor: pointer;
   transition: all ${theme.transitions.fast};
   border: 1px solid ${theme.colors.glassBorder};
-  background: ${({ isActive }) => isActive ? theme.colors.primary : 'transparent'};
-  color: ${({ isActive }) => isActive ? 'white' : theme.colors.textSecondary};
+  background: ${({ isActive }) =>
+    isActive ? theme.colors.primary : "transparent"};
+  color: ${({ isActive }) => (isActive ? "white" : theme.colors.textSecondary)};
 
   &:hover {
     border-color: ${theme.colors.primary};
-    color: ${({ isActive }) => isActive ? 'white' : theme.colors.text};
+    color: ${({ isActive }) => (isActive ? "white" : theme.colors.text)};
   }
-`
+`;
 
 const LanguageGroup = styled.div`
   display: flex;
@@ -150,7 +163,7 @@ const LanguageGroup = styled.div`
   background: ${theme.colors.surface};
   border-radius: ${theme.borderRadius.md};
   padding: 2px;
-`
+`;
 
 const ConnectWalletButton = styled.button`
   padding: ${theme.spacing.sm} ${theme.spacing.lg};
@@ -160,7 +173,11 @@ const ConnectWalletButton = styled.button`
   cursor: pointer;
   transition: all ${theme.transitions.fast};
   border: 1px solid ${theme.colors.primary};
-  background: linear-gradient(135deg, ${theme.colors.primary} 0%, ${theme.colors.primaryDark} 100%);
+  background: linear-gradient(
+    135deg,
+    ${theme.colors.primary} 0%,
+    ${theme.colors.primaryDark} 100%
+  );
   color: ${theme.colors.text};
 
   &:hover {
@@ -172,43 +189,42 @@ const ConnectWalletButton = styled.button`
     opacity: 0.5;
     cursor: not-allowed;
   }
-`
+`;
 
 const WalletButton = () => {
-  const { open } = useAppKit()
-  const { address, isConnected } = useAppKitAccount()
+  const { open } = useAppKit();
+  const { address, isConnected } = useAppKitAccount();
 
   return (
     <ConnectWalletButton onClick={() => open()}>
-      {isConnected && address 
+      {isConnected && address
         ? `${address.slice(0, 6)}...${address.slice(-4)}`
-        : 'Connect Wallet'
-      }
+        : "Connect Wallet"}
     </ConnectWalletButton>
-  )
-}
+  );
+};
 
 export const Header = () => {
-  const { t, i18n } = useTranslation()
-  const location = useLocation()
+  const { t, i18n } = useTranslation();
+  const location = useLocation();
 
   const changeLanguage = (lng: string) => {
-    i18n.changeLanguage(lng)
-    localStorage.setItem('language', lng)
-  }
+    i18n.changeLanguage(lng);
+    localStorage.setItem("language", lng);
+  };
 
   const isActive = (path: string) => {
-    if (path === '/') {
-      return location.pathname === '/'
+    if (path === "/") {
+      return location.pathname === "/";
     }
-    return location.pathname.startsWith(path)
-  }
+    return location.pathname.startsWith(path);
+  };
 
   return (
     <HeaderContainer
       initial={{ y: -100, opacity: 0 }}
       animate={{ y: 0, opacity: 1 }}
-      transition={{ duration: 0.6, ease: 'easeOut' }}
+      transition={{ duration: 0.6, ease: "easeOut" }}
     >
       <HeaderContent>
         <Logo to="/">
@@ -221,14 +237,22 @@ export const Header = () => {
         </Logo>
 
         <Nav>
-          <NavLink to="/" $isActive={isActive('/')}>{t('header.home')}</NavLink>
-          <NavLink to="/explorer" $isActive={isActive('/explorer')}>{t('header.explorer')}</NavLink>
-          <NavLink to="/claims" $isActive={isActive('/claims')}>{t('header.claims')}</NavLink>
-          <NavLink to="/about" $isActive={isActive('/about')}>{t('header.about')}</NavLink>
+          <NavLink to="/" $isActive={isActive("/")}>
+            {t("header.home")}
+          </NavLink>
+          <NavLink to="/explorer" $isActive={isActive("/explorer")}>
+            {t("header.explorer")}
+          </NavLink>
+          <NavLink to="/claims" $isActive={isActive("/claims")}>
+            {t("header.claims")}
+          </NavLink>
+          <NavLink to="/about" $isActive={isActive("/about")}>
+            {t("header.about")}
+          </NavLink>
         </Nav>
 
         <Actions>
-          <LanguageGroup>
+          {/* <LanguageGroup>
             <LanguageSwitcher 
               isActive={i18n.language === 'en'} 
               onClick={() => changeLanguage('en')}
@@ -241,17 +265,17 @@ export const Header = () => {
             >
               KO
             </LanguageSwitcher>
-          </LanguageGroup>
+          </LanguageGroup> */}
           <MyPageButton to="/mypage">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
               <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
               <circle cx="12" cy="7" r="4" />
             </svg>
-            {t('header.myPage')}
+            {t("header.myPage")}
           </MyPageButton>
           <WalletButton />
         </Actions>
       </HeaderContent>
     </HeaderContainer>
-  )
-}
+  );
+};
