@@ -3,6 +3,7 @@ import { Home } from "@/pages/Home";
 import { Explorer } from "@/pages/Explorer";
 import { MyEpisodes } from "@/pages/MyPage";
 import { EventHistory } from "@/pages/EventHistory";
+import Admin from "@/pages/Admin";
 import { ScrollToTop } from "@/components/common";
 
 const RootLayout = () => {
@@ -34,6 +35,10 @@ const router = createBrowserRouter(
         {
           path: "/history",
           element: <EventHistory />,
+        },
+        {
+          path: "/eventsure-admin",
+          element: <Admin />,
         },
         {
           path: "/claims",
