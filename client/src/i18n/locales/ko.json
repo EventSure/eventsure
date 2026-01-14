@@ -309,7 +309,10 @@
     "title": "진행중인 보험",
     "subtitle": "각 이벤트의 규칙을 확인한 후 참여하세요. 모든 조건은 사전에 확정됩니다.",
     "status": {
-      "recruiting": "모집중",
+      "created": "생성됨",
+      "open": "참여 가능",
+      "locked": "잠김",
+      "resolved": "결정됨",
       "inForce": "IN FORCE"
     },
     "categories": {
