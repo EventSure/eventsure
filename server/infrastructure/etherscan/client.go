@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
+	"math/rand"
 	"net/http"
 	"net/url"
 	"os"
@@ -45,17 +46,28 @@ var EpisodeEventMap = map[string]string{
 
 // EtherscanClient represents an Etherscan API client
 type EtherscanClient struct {
-	apiKey  string
-	chainID string
-	baseURL string
-	client  *http.Client
+	apiKeys    []string
+	chainID    string
+	baseURL    string
+	client     *http.Client
+	maxRetries int
 }
 
 // NewEtherscanClient creates a new Etherscan API client
 func NewEtherscanClient() (*EtherscanClient, error) {
-	apiKey := os.Getenv("ETHERSCAN_API_KEY")
-	if apiKey == "" {
-		return nil, fmt.Errorf("ETHERSCAN_API_KEY must be set")
+	apiKey1 := os.Getenv("ETHERSCAN_API_KEY_1")
+	apiKey2 := os.Getenv("ETHERSCAN_API_KEY_2")
+
+	var apiKeys []string
+	if apiKey1 != "" {
+		apiKeys = append(apiKeys, apiKey1)
+	}
+	if apiKey2 != "" {
+		apiKeys = append(apiKeys, apiKey2)
+	}
+
+	if len(apiKeys) == 0 {
+		return nil, fmt.Errorf("at least one of ETHERSCAN_API_KEY_1 or ETHERSCAN_API_KEY_2 must be set")
 	}
 
 	chainID := os.Getenv("ETHERSCAN_CHAIN_ID")
@@ -64,13 +76,19 @@ func NewEtherscanClient() (*EtherscanClient, error) {
 	}
 
 	return &EtherscanClient{
-		apiKey:  apiKey,
-		chainID: chainID,
-		baseURL: EtherscanAPIBaseURL,
+		apiKeys:    apiKeys,
+		chainID:    chainID,
+		baseURL:    EtherscanAPIBaseURL,
+		maxRetries: 2,
 		client: &http.Client{
 			Timeout: 30 * time.Second,
 		},
 	}, nil
+}
+
+// getRandomAPIKey returns a random API key from the available keys
+func (c *EtherscanClient) getRandomAPIKey() string {
+	return c.apiKeys[rand.Intn(len(c.apiKeys))]
 }
 
 // InternalTransaction represents an internal transaction
@@ -110,71 +128,83 @@ type GetInternalTransactionsParams struct {
 
 // GetInternalTransactions retrieves the internal transaction history of a specified address
 func (c *EtherscanClient) GetInternalTransactions(params GetInternalTransactionsParams) (*InternalTransactionsResponse, error) {
-	queryParams := url.Values{}
-	queryParams.Set("apikey", c.apiKey)
-	queryParams.Set("chainid", c.chainID)
-	queryParams.Set("module", "account")
-	queryParams.Set("action", "txlistinternal")
-	queryParams.Set("address", params.Address)
+	var lastErr error
 
-	if params.StartBlock != nil {
-		queryParams.Set("startblock", strconv.FormatInt(*params.StartBlock, 10))
-	} else {
-		queryParams.Set("startblock", "0")
+	for attempt := 0; attempt <= c.maxRetries; attempt++ {
+		queryParams := url.Values{}
+		queryParams.Set("apikey", c.getRandomAPIKey())
+		queryParams.Set("chainid", c.chainID)
+		queryParams.Set("module", "account")
+		queryParams.Set("action", "txlistinternal")
+		queryParams.Set("address", params.Address)
+
+		if params.StartBlock != nil {
+			queryParams.Set("startblock", strconv.FormatInt(*params.StartBlock, 10))
+		} else {
+			queryParams.Set("startblock", "0")
+		}
+
+		if params.EndBlock != nil {
+			queryParams.Set("endblock", strconv.FormatInt(*params.EndBlock, 10))
+		} else {
+			queryParams.Set("endblock", "9999999999")
+		}
+
+		if params.Page != nil {
+			queryParams.Set("page", strconv.Itoa(*params.Page))
+		} else {
+			queryParams.Set("page", "1")
+		}
+
+		if params.Offset != nil {
+			queryParams.Set("offset", strconv.Itoa(*params.Offset))
+		} else {
+			queryParams.Set("offset", "1000")
+		}
+
+		if params.Sort != "" {
+			queryParams.Set("sort", params.Sort)
+		} else {
+			queryParams.Set("sort", "desc")
+		}
+
+		reqURL := fmt.Sprintf("%s?%s", c.baseURL, queryParams.Encode())
+
+		resp, err := c.client.Get(reqURL)
+		if err != nil {
+			lastErr = fmt.Errorf("failed to make request: %w", err)
+			continue
+		}
+
+		if resp.StatusCode != http.StatusOK {
+			body, _ := io.ReadAll(resp.Body)
+			resp.Body.Close()
+			lastErr = fmt.Errorf("unexpected status code %d: %s", resp.StatusCode, string(body))
+			continue
+		}
+
+		body, err := io.ReadAll(resp.Body)
+		resp.Body.Close()
+		if err != nil {
+			lastErr = fmt.Errorf("failed to read response body: %w", err)
+			continue
+		}
+
+		var result InternalTransactionsResponse
+		if err := json.Unmarshal(body, &result); err != nil {
+			lastErr = fmt.Errorf("failed to unmarshal response: %w", err)
+			continue
+		}
+
+		if result.Status != "1" {
+			lastErr = fmt.Errorf("etherscan API error: %s", result.Message)
+			continue
+		}
+
+		return &result, nil
 	}
 
-	if params.EndBlock != nil {
-		queryParams.Set("endblock", strconv.FormatInt(*params.EndBlock, 10))
-	} else {
-		queryParams.Set("endblock", "9999999999")
-	}
-
-	if params.Page != nil {
-		queryParams.Set("page", strconv.Itoa(*params.Page))
-	} else {
-		queryParams.Set("page", "1")
-	}
-
-	if params.Offset != nil {
-		queryParams.Set("offset", strconv.Itoa(*params.Offset))
-	} else {
-		queryParams.Set("offset", "1000")
-	}
-
-	if params.Sort != "" {
-		queryParams.Set("sort", params.Sort)
-	} else {
-		queryParams.Set("sort", "desc")
-	}
-
-	reqURL := fmt.Sprintf("%s?%s", c.baseURL, queryParams.Encode())
-
-	resp, err := c.client.Get(reqURL)
-	if err != nil {
-		return nil, fmt.Errorf("failed to make request: %w", err)
-	}
-	defer resp.Body.Close()
-
-	if resp.StatusCode != http.StatusOK {
-		body, _ := io.ReadAll(resp.Body)
-		return nil, fmt.Errorf("unexpected status code %d: %s", resp.StatusCode, string(body))
-	}
-
-	body, err := io.ReadAll(resp.Body)
-	if err != nil {
-		return nil, fmt.Errorf("failed to read response body: %w", err)
-	}
-
-	var result InternalTransactionsResponse
-	if err := json.Unmarshal(body, &result); err != nil {
-		return nil, fmt.Errorf("failed to unmarshal response: %w", err)
-	}
-
-	if result.Status != "1" {
-		return nil, fmt.Errorf("etherscan API error: %s", result.Message)
-	}
-
-	return &result, nil
+	return nil, fmt.Errorf("failed after %d retries: %w", c.maxRetries+1, lastErr)
 }
 
 // EventLog represents an event log
@@ -210,65 +240,77 @@ type GetEventLogsParams struct {
 
 // GetEventLogs retrieves event logs from a specific address
 func (c *EtherscanClient) GetEventLogs(params GetEventLogsParams) (*EventLogsResponse, error) {
-	queryParams := url.Values{}
-	queryParams.Set("apikey", c.apiKey)
-	queryParams.Set("chainid", c.chainID)
-	queryParams.Set("module", "logs")
-	queryParams.Set("action", "getLogs")
-	queryParams.Set("address", params.Address)
+	var lastErr error
 
-	if params.FromBlock != nil {
-		queryParams.Set("fromBlock", strconv.FormatInt(*params.FromBlock, 10))
-	} else {
-		queryParams.Set("fromBlock", "0")
+	for attempt := 0; attempt <= c.maxRetries; attempt++ {
+		queryParams := url.Values{}
+		queryParams.Set("apikey", c.getRandomAPIKey())
+		queryParams.Set("chainid", c.chainID)
+		queryParams.Set("module", "logs")
+		queryParams.Set("action", "getLogs")
+		queryParams.Set("address", params.Address)
+
+		if params.FromBlock != nil {
+			queryParams.Set("fromBlock", strconv.FormatInt(*params.FromBlock, 10))
+		} else {
+			queryParams.Set("fromBlock", "0")
+		}
+
+		if params.ToBlock != nil {
+			queryParams.Set("toBlock", strconv.FormatInt(*params.ToBlock, 10))
+		} else {
+			queryParams.Set("toBlock", "latest")
+		}
+
+		if params.Page != nil {
+			queryParams.Set("page", strconv.Itoa(*params.Page))
+		} else {
+			queryParams.Set("page", "1")
+		}
+
+		if params.Offset != nil {
+			queryParams.Set("offset", strconv.Itoa(*params.Offset))
+		} else {
+			queryParams.Set("offset", "1000")
+		}
+
+		reqURL := fmt.Sprintf("%s?%s", c.baseURL, queryParams.Encode())
+
+		resp, err := c.client.Get(reqURL)
+		if err != nil {
+			lastErr = fmt.Errorf("failed to make request: %w", err)
+			continue
+		}
+
+		if resp.StatusCode != http.StatusOK {
+			body, _ := io.ReadAll(resp.Body)
+			resp.Body.Close()
+			lastErr = fmt.Errorf("unexpected status code %d: %s", resp.StatusCode, string(body))
+			continue
+		}
+
+		body, err := io.ReadAll(resp.Body)
+		resp.Body.Close()
+		if err != nil {
+			lastErr = fmt.Errorf("failed to read response body: %w", err)
+			continue
+		}
+
+		var result EventLogsResponse
+		if err := json.Unmarshal(body, &result); err != nil {
+			lastErr = fmt.Errorf("failed to unmarshal response: %w", err)
+			continue
+		}
+
+		if result.Status != "1" {
+			lastErr = fmt.Errorf("etherscan API error: %s", result.Message)
+			continue
+		}
+
+		return &result, nil
 	}
 
-	if params.ToBlock != nil {
-		queryParams.Set("toBlock", strconv.FormatInt(*params.ToBlock, 10))
-	} else {
-		queryParams.Set("toBlock", "latest")
-	}
-
-	if params.Page != nil {
-		queryParams.Set("page", strconv.Itoa(*params.Page))
-	} else {
-		queryParams.Set("page", "1")
-	}
-
-	if params.Offset != nil {
-		queryParams.Set("offset", strconv.Itoa(*params.Offset))
-	} else {
-		queryParams.Set("offset", "1000")
-	}
-
-	reqURL := fmt.Sprintf("%s?%s", c.baseURL, queryParams.Encode())
-
-	resp, err := c.client.Get(reqURL)
-	if err != nil {
-		return nil, fmt.Errorf("failed to make request: %w", err)
-	}
-	defer resp.Body.Close()
-
-	if resp.StatusCode != http.StatusOK {
-		body, _ := io.ReadAll(resp.Body)
-		return nil, fmt.Errorf("unexpected status code %d: %s", resp.StatusCode, string(body))
-	}
-
-	body, err := io.ReadAll(resp.Body)
-	if err != nil {
-		return nil, fmt.Errorf("failed to read response body: %w", err)
-	}
-
-	var result EventLogsResponse
-	if err := json.Unmarshal(body, &result); err != nil {
-		return nil, fmt.Errorf("failed to unmarshal response: %w", err)
-	}
-
-	if result.Status != "1" {
-		return nil, fmt.Errorf("etherscan API error: %s", result.Message)
-	}
-
-	return &result, nil
+	return nil, fmt.Errorf("failed after %d retries: %w", c.maxRetries+1, lastErr)
 }
 
 // IdentifyEpisodeEvent identifies an episode event from its first topic (Topics[0])
