@@ -2,6 +2,7 @@ import { createBrowserRouter, RouterProvider, Outlet } from 'react-router-dom'
 import { Home } from '@/pages/Home'
 import { Explorer } from '@/pages/Explorer'
 import { MyPage } from '@/pages/MyPage'
+import { EventHistory } from '@/pages/EventHistory'
 import { ScrollToTop } from '@/components/common'
 
 const RootLayout = () => {
@@ -29,6 +30,10 @@ const router = createBrowserRouter(
         {
           path: '/mypage',
           element: <MyPage />,
+        },
+        {
+          path: '/history',
+          element: <EventHistory />,
         },
         {
           path: '/claims',

@@ -2,6 +2,7 @@
   "header": {
     "home": "Home",
     "explorer": "Explorer",
+    "history": "Event History",
     "myPage": "My Page",
     "claims": "Claims",
     "about": "About"
@@ -116,6 +117,20 @@
       "networkStatus": "Network Status",
       "acrossAll": "Across all transactions",
       "participants": "Active participants"
+    }
+  },
+  "eventHistory": {
+    "title": "Event History",
+    "subtitle": "Explore the lifecycle of insurance episodes on Mantle Network.",
+    "noEpisodes": "No episodes yet",
+    "noEpisodesDesc": "When insurance episodes are created, they will appear here.",
+    "noEvents": "No event history found",
+    "events": {
+      "created": "Episode Created",
+      "open": "Opened for Participation",
+      "join": "New Participant Joined",
+      "locked": "Episode Locked",
+      "resolved": "Episode Resolved"
     }
   },
   "howItWorks": {

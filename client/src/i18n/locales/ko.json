@@ -2,6 +2,7 @@
   "header": {
     "home": "홈",
     "explorer": "탐색",
+    "history": "이벤트 히스토리",
     "myPage": "마이페이지",
     "claims": "청구",
     "about": "소개"
@@ -116,6 +117,20 @@
       "networkStatus": "네트워크 상태",
       "acrossAll": "전체 거래 기준",
       "participants": "참여중인 사용자"
+    }
+  },
+  "eventHistory": {
+    "title": "이벤트 히스토리",
+    "subtitle": "Mantle 네트워크에서 보험 에피소드의 라이프사이클을 탐색하세요.",
+    "noEpisodes": "에피소드가 없습니다",
+    "noEpisodesDesc": "보험 에피소드가 생성되면 여기에 표시됩니다.",
+    "noEvents": "이벤트 히스토리가 없습니다",
+    "events": {
+      "created": "에피소드 생성",
+      "open": "참여 시작",
+      "join": "새 참여자 합류",
+      "locked": "에피소드 잠금",
+      "resolved": "에피소드 정산 완료"
     }
   },
   "howItWorks": {

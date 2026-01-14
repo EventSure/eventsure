@@ -212,6 +212,9 @@ export const Header = () => {
           <NavLink to="/explorer" $isActive={isActive("/explorer")}>
             {t("header.explorer")}
           </NavLink>
+          <NavLink to="/history" $isActive={isActive("/history")}>
+            {t("header.history")}
+          </NavLink>
           {/* <NavLink to="/claims" $isActive={isActive("/claims")}>
             {t("header.claims")}
           </NavLink> */}
