@@ -7,7 +7,7 @@ import { WorldMap } from "@/components/WorldMap";
 import { Header, Footer } from "@/components/layout";
 import { LiveTransactions } from "@/components/dashboard";
 import { HowItWorks, FAQ, ActivePools } from "@/components/sections";
-import { Button, GlassCard, StatCard } from "@/components/common";
+import { Button, GlassCard } from "@/components/common";
 
 const PageContainer = styled.div`
   min-height: 100vh;
@@ -184,47 +184,6 @@ const WhatIsDescription = styled(motion.div)`
     color: ${theme.colors.primary};
     font-weight: ${theme.fontWeight.bold};
   }
-`;
-
-const StatsSection = styled(motion.section)`
-  padding: ${theme.spacing.xxl} ${theme.spacing.xl};
-  display: flex;
-  justify-content: center;
-`;
-
-const StatsGrid = styled.div`
-  display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  gap: ${theme.spacing.lg};
-  max-width: 1000px;
-  width: 100%;
-
-  @media (max-width: ${theme.breakpoints.lg}) {
-    grid-template-columns: repeat(2, 1fr);
-  }
-
-  @media (max-width: ${theme.breakpoints.sm}) {
-    grid-template-columns: 1fr;
-  }
-`;
-
-const StatValue = styled.div`
-  font-size: ${theme.fontSize.xxxl};
-  font-weight: ${theme.fontWeight.bold};
-  background: linear-gradient(
-    135deg,
-    ${theme.colors.primary},
-    ${theme.colors.secondary}
-  );
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
-  margin-bottom: ${theme.spacing.xs};
-`;
-
-const StatLabel = styled.div`
-  font-size: ${theme.fontSize.sm};
-  color: ${theme.colors.textSecondary};
 `;
 
 const FeaturesGrid = styled.div`

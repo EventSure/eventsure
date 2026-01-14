@@ -83,6 +83,31 @@ const Grid = styled.div`
   }
 `;
 
+const FilterContainer = styled.div`
+  display: flex;
+  gap: ${theme.spacing.sm};
+  margin-bottom: ${theme.spacing.xl};
+  flex-wrap: wrap;
+  justify-content: center;
+`;
+
+const FilterButton = styled.button<{ $active: boolean }>`
+  padding: ${theme.spacing.sm} ${theme.spacing.lg};
+  border-radius: ${theme.borderRadius.full};
+  font-size: ${theme.fontSize.sm};
+  font-weight: ${theme.fontWeight.medium};
+  cursor: pointer;
+  transition: all ${theme.transitions.fast};
+  border: 1px solid ${({ $active }) => $active ? theme.colors.secondary : theme.colors.glassBorder};
+  background: ${({ $active }) => $active ? `${theme.colors.secondary}20` : 'transparent'};
+  color: ${({ $active }) => $active ? theme.colors.secondary : theme.colors.textSecondary};
+
+  &:hover {
+    border-color: ${theme.colors.secondary};
+    color: ${theme.colors.secondary};
+  }
+`;
+
 const GlassCard = styled(motion.div)`
   background: ${theme.colors.glass};
   backdrop-filter: blur(12px);
@@ -575,6 +600,35 @@ const ActionRow = styled.div`
   gap: ${theme.spacing.md};
 `;
 
+const LoadingContainer = styled.div`
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: ${theme.spacing.xxxl};
+  gap: ${theme.spacing.lg};
+`;
+
+const LoadingSpinner = styled.div`
+  width: 48px;
+  height: 48px;
+  border: 3px solid ${theme.colors.glassBorder};
+  border-top-color: ${theme.colors.secondary};
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+
+  @keyframes spin {
+    to {
+      transform: rotate(360deg);
+    }
+  }
+`;
+
+const LoadingText = styled.div`
+  color: ${theme.colors.textSecondary};
+  font-size: ${theme.fontSize.md};
+`;
+
 const CheckIcon = () => (
   <svg
     viewBox="0 0 24 24"
@@ -650,6 +704,16 @@ const STEPS: { key: ViewState; index: number }[] = [
   { key: "DASHBOARD", index: 2 },
 ];
 
+type FilterState = 'all' | 'created' | 'open' | 'locked' | 'resolved';
+
+const FILTER_OPTIONS: { key: FilterState; state?: number }[] = [
+  { key: 'all' },
+  { key: 'open', state: EpisodeState.Open },
+  { key: 'created', state: EpisodeState.Created },
+  { key: 'locked', state: EpisodeState.Locked },
+  { key: 'resolved', state: EpisodeState.Resolved },
+];
+
 export const Explorer = () => {
   const { t, i18n } = useTranslation();
   const [searchParams, setSearchParams] = useSearchParams();
@@ -662,8 +726,21 @@ export const Explorer = () => {
   const [isAgreed, setIsAgreed] = useState(false);
   const [timeLeft, setTimeLeft] = useState(12062);
   const [showWalletPrompt, setShowWalletPrompt] = useState(false);
+  const [filter, setFilter] = useState<FilterState>('all');
 
-  const { episodes } = useEpisodes();
+  const { episodes, isLoading } = useEpisodes();
+
+  const sortedAndFilteredEpisodes = useMemo(() => {
+    const filtered = filter === 'all' 
+      ? episodes 
+      : episodes.filter(ep => ep.state === FILTER_OPTIONS.find(f => f.key === filter)?.state);
+    
+    return [...filtered].sort((a, b) => {
+      if (a.state === EpisodeState.Open && b.state !== EpisodeState.Open) return -1;
+      if (a.state !== EpisodeState.Open && b.state === EpisodeState.Open) return 1;
+      return 0;
+    });
+  }, [episodes, filter]);
 
   const selectedEpisode = useMemo(() => {
     return episodes.find((ep) => ep.address === selectedEpisodeAddress);
@@ -786,13 +863,30 @@ export const Explorer = () => {
         <SectionSubtitle>{t("activeEvents.subtitle")}</SectionSubtitle>
       </SectionHeader>
 
-      {episodes.length === 0 ? (
+      <FilterContainer>
+        {FILTER_OPTIONS.map((option) => (
+          <FilterButton
+            key={option.key}
+            $active={filter === option.key}
+            onClick={() => setFilter(option.key)}
+          >
+            {t(`activeEvents.status.${option.key}`)}
+          </FilterButton>
+        ))}
+      </FilterContainer>
+
+      {isLoading ? (
+        <LoadingContainer>
+          <LoadingSpinner />
+          <LoadingText>{t("myPage.loading") || "Loading..."}</LoadingText>
+        </LoadingContainer>
+      ) : sortedAndFilteredEpisodes.length === 0 ? (
         <div style={{ textAlign: 'center', color: theme.colors.textSecondary, padding: theme.spacing.xxl }}>
           {t("activeEvents.noEpisodes") || "No episodes available"}
         </div>
       ) : (
         <Grid>
-          {episodes.map((episode, index) => (
+          {sortedAndFilteredEpisodes.map((episode, index) => (
             <GlassCard
               key={episode.address}
               initial={{ opacity: 0, y: 20 }}

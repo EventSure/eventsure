@@ -139,32 +139,6 @@ const MyPageButton = styled(Link)`
   }
 `;
 
-const LanguageSwitcher = styled.button<{ isActive?: boolean }>`
-  padding: ${theme.spacing.xs} ${theme.spacing.sm};
-  border-radius: ${theme.borderRadius.md};
-  font-size: ${theme.fontSize.sm};
-  font-weight: ${theme.fontWeight.medium};
-  cursor: pointer;
-  transition: all ${theme.transitions.fast};
-  border: 1px solid ${theme.colors.glassBorder};
-  background: ${({ isActive }) =>
-    isActive ? theme.colors.primary : "transparent"};
-  color: ${({ isActive }) => (isActive ? "white" : theme.colors.textSecondary)};
-
-  &:hover {
-    border-color: ${theme.colors.primary};
-    color: ${({ isActive }) => (isActive ? "white" : theme.colors.text)};
-  }
-`;
-
-const LanguageGroup = styled.div`
-  display: flex;
-  gap: 2px;
-  background: ${theme.colors.surface};
-  border-radius: ${theme.borderRadius.md};
-  padding: 2px;
-`;
-
 const ConnectWalletButton = styled.button`
   padding: ${theme.spacing.sm} ${theme.spacing.lg};
   border-radius: ${theme.borderRadius.md};
@@ -205,13 +179,8 @@ const WalletButton = () => {
 };
 
 export const Header = () => {
-  const { t, i18n } = useTranslation();
+  const { t } = useTranslation();
   const location = useLocation();
-
-  const changeLanguage = (lng: string) => {
-    i18n.changeLanguage(lng);
-    localStorage.setItem("language", lng);
-  };
 
   const isActive = (path: string) => {
     if (path === "/") {
@@ -243,9 +212,9 @@ export const Header = () => {
           <NavLink to="/explorer" $isActive={isActive("/explorer")}>
             {t("header.explorer")}
           </NavLink>
-          <NavLink to="/claims" $isActive={isActive("/claims")}>
+          {/* <NavLink to="/claims" $isActive={isActive("/claims")}>
             {t("header.claims")}
-          </NavLink>
+          </NavLink> */}
           <NavLink to="/about" $isActive={isActive("/about")}>
             {t("header.about")}
           </NavLink>

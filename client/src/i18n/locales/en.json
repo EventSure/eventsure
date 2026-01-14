@@ -309,6 +309,7 @@
     "title": "Active Events",
     "subtitle": "Check the rules for each event before participating. All conditions are fixed in advance.",
     "status": {
+      "all": "All",
       "created": "Created",
       "open": "Open",
       "locked": "Locked",

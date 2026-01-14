@@ -12,7 +12,7 @@ const fetchEpisodeAddresses = async (): Promise<`0x${string}`[]> => {
     throw new Error('Failed to fetch episodes from API');
   }
   const data = await response.json();
-  return data.episodes as `0x${string}`[];
+  return (data.episodes as string[]).map(addr => addr.toLowerCase() as `0x${string}`)
 };
 
 export const useEpisodes = () => {
