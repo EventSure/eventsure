@@ -1,9 +1,9 @@
 {
   "header": {
     "home": "Home",
-    "explorer": "Explorer",
+    "explorer": "Episode Explorer",
     "history": "Event History",
-    "myPage": "My Page",
+    "myEpisodes": "My Episodes",
     "claims": "Claims",
     "about": "About"
   },
@@ -97,7 +97,11 @@
     "description3": "EventSure flips that.",
     "description4": "Here, insurance is not a promise.",
     "description5": "It is a fixed agreement around a real-world event.",
-    "process": ["You read the rules.", "You decide to join.", "The outcome is resolved automatically."]
+    "process": [
+      "You read the rules.",
+      "You decide to join.",
+      "The outcome is resolved automatically."
+    ]
   },
   "liveTransactions": {
     "badge": "Live on Mantle",
@@ -167,7 +171,11 @@
       "step3": {
         "title": "Outcome Is Resolved",
         "description": "When the event ends, oracle data determines whether the trigger condition is met.",
-        "list": ["no manual review", "no interpretation", "no human intervention"],
+        "list": [
+          "no manual review",
+          "no interpretation",
+          "no human intervention"
+        ],
         "listPrefix": "There is:",
         "footer": "The result is resolved automatically."
       },
@@ -186,17 +194,28 @@
       "step2": {
         "title": "Review the Rules",
         "description": "Understand exactly:",
-        "list": ["what is covered", "how outcomes are determined", "and what your maximum loss is before you participate"]
+        "list": [
+          "what is covered",
+          "how outcomes are determined",
+          "and what your maximum loss is before you participate"
+        ]
       },
       "step3": {
         "title": "Join the Pool",
         "description": "You don't buy insurance. You join a risk pool with others facing the same event.",
-        "list": ["Your risk is capped upfront.", "There are no additional contributions later."]
+        "list": [
+          "Your risk is capped upfront.",
+          "There are no additional contributions later."
+        ]
       },
       "step4": {
         "title": "Automatic Resolution",
         "description": "When the event ends, oracle data resolves the outcome automatically.",
-        "list": ["No claims.", "No interpretation.", "No additional actions required."]
+        "list": [
+          "No claims.",
+          "No interpretation.",
+          "No additional actions required."
+        ]
       }
     }
   },
@@ -321,8 +340,8 @@
   },
   "activeEvents": {
     "badge": "EPISODE EXPLORER",
-    "title": "Active Events",
-    "subtitle": "Check the rules for each event before participating. All conditions are fixed in advance.",
+    "title": "Active Episodes",
+    "subtitle": "Check the rules for each episode before participating. All conditions are fixed in advance.",
     "status": {
       "all": "All",
       "created": "Created",
@@ -343,6 +362,7 @@
       "trigger": "Trigger",
       "premium": "Premium",
       "maxPayout": "Max payout",
+      "poolSize": "Pool Size",
       "maxLoss": "Max Loss",
       "event": "Event",
       "eventWindow": "Event window",
@@ -354,7 +374,7 @@
       "poolLogicDesc": "Homogeneous risk pool. Surplus returned pro-rata to members.",
       "none": "None",
       "checkboxLabel": "I understand these rules. I acknowledge that outcomes are determined automatically by the oracle with no negotiation or appeal.",
-      "joinPool": "Join Pool",
+      "joinEpisode": "Join Episode",
       "confirmAndJoin": "Confirm & Join",
       "poolClosesIn": "Pool closes in",
       "eventEndsIn": "Event ends in",
@@ -366,7 +386,7 @@
       "currentDelay": "Current delay",
       "progressToTrigger": "Progress to trigger",
       "referenceOnly": "Real-time data is for reference only. Final outcome is determined solely by oracle resolution at the specified time.",
-      "viewResolution": "View Resolution",
+      "viewMyEpisodes": "View My Episodes",
       "episodeRules": "Episode Rules",
       "readOnly": "Read-only",
       "coveredEvent": "Covered Event",
@@ -375,9 +395,9 @@
       "enRoute": "En route",
       "triggerThreshold": "3h (trigger)",
       "afterArrival": "After arrival",
-        "walletRequired": "Please connect your wallet to join the pool.",
-        "alreadyJoined": "Already Joined",
-        "alreadyJoinedDesc": "You have already joined this pool."
+      "walletRequired": "Please connect your wallet to join the pool.",
+      "alreadyJoined": "Already Joined",
+      "alreadyJoinedDesc": "You have already joined this pool."
     },
     "defaultTrigger": "Flight delay ≥ 3 hours",
     "noEpisodes": "No episodes available",
@@ -451,8 +471,8 @@
     "noEpisodes": "No Episodes Found",
     "noEpisodesDesc": "There are no insurance episodes available at the moment. Check back soon!"
   },
-  "myPage": {
-    "title": "My Page",
+  "myEpisodes": {
+    "title": "My Episodes",
     "subtitle": "Manage episodes for {{address}}",
     "activeEpisodes": "Active Episodes",
     "pastEpisodes": "Past Episodes",
@@ -463,6 +483,9 @@
     "exploreEpisodes": "Explore Episodes",
     "connectWallet": "Connect Your Wallet",
     "connectWalletDesc": "Please connect your wallet to view your episode history.",
-    "loading": "Loading..."
+    "loading": "Loading...",
+    "labels": {
+      "viewRules": "View Rules"
+    }
   }
 }

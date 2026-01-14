@@ -1,9 +1,9 @@
-import { createBrowserRouter, RouterProvider, Outlet } from 'react-router-dom'
-import { Home } from '@/pages/Home'
-import { Explorer } from '@/pages/Explorer'
-import { MyPage } from '@/pages/MyPage'
-import { EventHistory } from '@/pages/EventHistory'
-import { ScrollToTop } from '@/components/common'
+import { createBrowserRouter, RouterProvider, Outlet } from "react-router-dom";
+import { Home } from "@/pages/Home";
+import { Explorer } from "@/pages/Explorer";
+import { MyEpisodes } from "@/pages/MyPage";
+import { EventHistory } from "@/pages/EventHistory";
+import { ScrollToTop } from "@/components/common";
 
 const RootLayout = () => {
   return (
@@ -11,8 +11,8 @@ const RootLayout = () => {
       <ScrollToTop />
       <Outlet />
     </>
-  )
-}
+  );
+};
 
 const router = createBrowserRouter(
   [
@@ -20,37 +20,37 @@ const router = createBrowserRouter(
       element: <RootLayout />,
       children: [
         {
-          path: '/',
+          path: "/",
           element: <Home />,
         },
         {
-          path: '/explorer',
+          path: "/explorer",
           element: <Explorer />,
         },
         {
-          path: '/mypage',
-          element: <MyPage />,
+          path: "/myepisodes",
+          element: <MyEpisodes />,
         },
         {
-          path: '/history',
+          path: "/history",
           element: <EventHistory />,
         },
         {
-          path: '/claims',
+          path: "/claims",
           element: <Home />,
         },
         {
-          path: '/about',
+          path: "/about",
           element: <Home />,
         },
       ],
     },
   ],
   {
-    basename: '/eventsure',
+    basename: "/eventsure",
   }
-)
+);
 
 export const Router = () => {
-  return <RouterProvider router={router} />
-}
+  return <RouterProvider router={router} />;
+};

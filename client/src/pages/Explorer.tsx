@@ -2,7 +2,7 @@ import { useState, useEffect, useMemo, useCallback } from "react";
 import styled from "@emotion/styled";
 import { motion } from "framer-motion";
 import { useTranslation } from "react-i18next";
-import { useSearchParams } from "react-router-dom";
+import { useSearchParams, useNavigate } from "react-router-dom";
 import { theme } from "@/styles/theme";
 import { Header, Footer } from "@/components/layout";
 import { useEpisodes } from "@/hooks/useEpisodes";
@@ -98,9 +98,13 @@ const FilterButton = styled.button<{ $active: boolean }>`
   font-weight: ${theme.fontWeight.medium};
   cursor: pointer;
   transition: all ${theme.transitions.fast};
-  border: 1px solid ${({ $active }) => $active ? theme.colors.secondary : theme.colors.glassBorder};
-  background: ${({ $active }) => $active ? `${theme.colors.secondary}20` : 'transparent'};
-  color: ${({ $active }) => $active ? theme.colors.secondary : theme.colors.textSecondary};
+  border: 1px solid
+    ${({ $active }) =>
+      $active ? theme.colors.secondary : theme.colors.glassBorder};
+  background: ${({ $active }) =>
+    $active ? `${theme.colors.secondary}20` : "transparent"};
+  color: ${({ $active }) =>
+    $active ? theme.colors.secondary : theme.colors.textSecondary};
 
   &:hover {
     border-color: ${theme.colors.secondary};
@@ -315,21 +319,27 @@ const StepWrapper = styled.div`
   align-items: center;
 `;
 
-const Step = styled.button<{ $isActive: boolean; $isCompleted: boolean; $isClickable: boolean }>`
+const Step = styled.button<{
+  $isActive: boolean;
+  $isCompleted: boolean;
+  $isClickable: boolean;
+}>`
   display: flex;
   flex-direction: column;
   align-items: center;
   gap: ${theme.spacing.sm};
   background: none;
   border: none;
-  cursor: ${({ $isClickable }) => $isClickable ? 'pointer' : 'default'};
+  cursor: ${({ $isClickable }) => ($isClickable ? "pointer" : "default")};
   padding: ${theme.spacing.sm} ${theme.spacing.md};
   transition: all ${theme.transitions.fast};
   min-width: 100px;
-  opacity: ${({ $isClickable, $isActive, $isCompleted }) => ($isClickable || $isActive || $isCompleted) ? 1 : 0.5};
+  opacity: ${({ $isClickable, $isActive, $isCompleted }) =>
+    $isClickable || $isActive || $isCompleted ? 1 : 0.5};
 
   &:hover {
-    transform: ${({ $isClickable }) => $isClickable ? 'translateY(-2px)' : 'none'};
+    transform: ${({ $isClickable }) =>
+      $isClickable ? "translateY(-2px)" : "none"};
   }
 `;
 
@@ -705,37 +715,42 @@ const STEPS: { key: ViewState; index: number }[] = [
   { key: "DASHBOARD", index: 2 },
 ];
 
-type FilterState = 'all' | 'created' | 'open' | 'locked' | 'resolved';
+type FilterState = "all" | "created" | "open" | "locked" | "resolved";
 
 const FILTER_OPTIONS: { key: FilterState; state?: number }[] = [
-  { key: 'all' },
-  { key: 'open', state: EpisodeState.Open },
-  { key: 'created', state: EpisodeState.Created },
-  { key: 'locked', state: EpisodeState.Locked },
-  { key: 'resolved', state: EpisodeState.Resolved },
+  { key: "all" },
+  { key: "open", state: EpisodeState.Open },
+  { key: "created", state: EpisodeState.Created },
+  { key: "locked", state: EpisodeState.Locked },
+  { key: "resolved", state: EpisodeState.Resolved },
 ];
 
 export const Explorer = () => {
   const { t, i18n } = useTranslation();
+  const routerNavigate = useNavigate();
   const [searchParams, setSearchParams] = useSearchParams();
   const eventId = searchParams.get("event");
 
   const [view, setView] = useState<ViewState>(eventId ? "RULES" : "LIST");
-  const [selectedEpisodeAddress, setSelectedEpisodeAddress] = useState<`0x${string}` | null>(
-    eventId as `0x${string}` | null
-  );
+  const [selectedEpisodeAddress, setSelectedEpisodeAddress] = useState<
+    `0x${string}` | null
+  >((eventId?.toLowerCase() as `0x${string}`) || null);
   const [isAgreed, setIsAgreed] = useState(false);
   const [timeLeft, setTimeLeft] = useState(12062);
   const [showWalletPrompt, setShowWalletPrompt] = useState(false);
-  const [filter, setFilter] = useState<FilterState>('all');
+  const [filter, setFilter] = useState<FilterState>("all");
 
   const { episodes, isLoading } = useEpisodes();
 
   const sortedAndFilteredEpisodes = useMemo(() => {
-    const filtered = filter === 'all' 
-      ? episodes 
-      : episodes.filter(ep => ep.state === FILTER_OPTIONS.find(f => f.key === filter)?.state);
-    
+    const filtered =
+      filter === "all"
+        ? episodes
+        : episodes.filter(
+            (ep) =>
+              ep.state === FILTER_OPTIONS.find((option) => option.key === filter)?.state
+          );
+
     return [...filtered].sort((a, b) => {
       if (a.state === EpisodeState.Open && b.state !== EpisodeState.Open) return -1;
       if (a.state !== EpisodeState.Open && b.state === EpisodeState.Open) return 1;
@@ -744,7 +759,10 @@ export const Explorer = () => {
   }, [episodes, filter]);
 
   const selectedEpisode = useMemo(() => {
-    return episodes.find((ep) => ep.address === selectedEpisodeAddress);
+    if (!selectedEpisodeAddress) return undefined;
+    return episodes.find(
+      (ep) => ep.address.toLowerCase() === selectedEpisodeAddress.toLowerCase()
+    );
   }, [episodes, selectedEpisodeAddress]);
 
   const {
@@ -773,7 +791,7 @@ export const Explorer = () => {
 
   useEffect(() => {
     if (eventId) {
-      setSelectedEpisodeAddress(eventId as `0x${string}`);
+      setSelectedEpisodeAddress(eventId.toLowerCase() as `0x${string}`);
       if (view === "LIST") {
         setView("RULES");
       }
@@ -819,7 +837,7 @@ export const Explorer = () => {
   const handleStepClick = (targetView: ViewState) => {
     const currentIndex = getCurrentStepIndex();
     const targetIndex = STEPS.find((s) => s.key === targetView)?.index ?? -1;
-    
+
     if (targetIndex <= currentIndex) {
       setView(targetView);
     }
@@ -886,10 +904,16 @@ export const Explorer = () => {
       {isLoading ? (
         <LoadingContainer>
           <LoadingSpinner />
-          <LoadingText>{t("myPage.loading") || "Loading..."}</LoadingText>
+          <LoadingText>{t("myEpisodes.loading") || "Loading..."}</LoadingText>
         </LoadingContainer>
       ) : sortedAndFilteredEpisodes.length === 0 ? (
-        <div style={{ textAlign: 'center', color: theme.colors.textSecondary, padding: theme.spacing.xxl }}>
+        <div
+          style={{
+            textAlign: "center",
+            color: theme.colors.textSecondary,
+            padding: theme.spacing.xxl,
+          }}
+        >
           {t("activeEvents.noEpisodes") || "No episodes available"}
         </div>
       ) : (
@@ -907,8 +931,14 @@ export const Explorer = () => {
                 <IconWrapper rotate={45}>
                   <PlaneIcon />
                 </IconWrapper>
-                <Badge variant={episodeUtils.getStateBadgeVariant(episode.state)}>
-                  {t(`activeEvents.status.${episodeUtils.getStateLabel(episode.state)}`)}
+                <Badge
+                  variant={episodeUtils.getStateBadgeVariant(episode.state)}
+                >
+                  {t(
+                    `activeEvents.status.${episodeUtils.getStateLabel(
+                      episode.state
+                    )}`
+                  )}
                 </Badge>
               </CardHeader>
               <CategoryLabel>
@@ -917,35 +947,58 @@ export const Explorer = () => {
               <CardTitle>{episode.flightName}</CardTitle>
               <InfoRow style={{ marginTop: theme.spacing.md }}>
                 <CalendarIcon />
-                {episodeUtils.formatDateTime(episode.departureTime, i18n.language)}
+                {episodeUtils.formatDateTime(
+                  episode.departureTime,
+                  i18n.language
+                )}
               </InfoRow>
               <TriggerBox>
                 <Label>{t("activeEvents.labels.trigger")}</Label>
-                <TriggerText>{episodeUtils.getTriggerCondition(episode, t)}</TriggerText>
+                <TriggerText>
+                  {episodeUtils.getTriggerCondition(episode, t)}
+                </TriggerText>
               </TriggerBox>
               <StatsRow>
                 <StatItem>
                   <StatLabel>{t("activeEvents.labels.premium")}</StatLabel>
-                  <StatValue>{episodeUtils.formatMNT(episode.premiumAmount)}</StatValue>
+                  <StatValue>
+                    {episodeUtils.formatMNT(episode.premiumAmount)}
+                  </StatValue>
                 </StatItem>
                 <StatItem>
                   <StatLabel>{t("activeEvents.labels.maxPayout")}</StatLabel>
-                  <StatValue highlight>{episodeUtils.formatMNT(episode.payoutAmount)}</StatValue>
+                  <StatValue highlight>
+                    {episodeUtils.formatMNT(episode.payoutAmount)}
+                  </StatValue>
                 </StatItem>
               </StatsRow>
-              <StatsRow style={{ borderTop: 'none', paddingTop: 0, marginBottom: theme.spacing.md }}>
+              <StatsRow
+                style={{
+                  borderTop: "none",
+                  paddingTop: 0,
+                  marginBottom: theme.spacing.md,
+                }}
+              >
                 <StatItem>
-                  <StatLabel>{t("activeEvents.labels.poolSize") || "Pool Size"}</StatLabel>
-                  <StatValue>{episodeUtils.formatMNT(episode.totalPremium)}</StatValue>
+                  <StatLabel>
+                    {t("activeEvents.labels.poolSize") || "Pool Size"}
+                  </StatLabel>
+                  <StatValue>
+                    {episodeUtils.formatMNT(episode.totalPremium)}
+                  </StatValue>
                 </StatItem>
               </StatsRow>
-              <Button 
+              <Button
                 onClick={() => handleViewRules(episode.address)}
                 disabled={episode.state !== EpisodeState.Open}
               >
-                {episode.state === EpisodeState.Open 
+                {episode.state === EpisodeState.Open
                   ? t("activeEvents.labels.viewRules")
-                  : t(`activeEvents.status.${episodeUtils.getStateLabel(episode.state)}`)}
+                  : t(
+                      `activeEvents.status.${episodeUtils.getStateLabel(
+                        episode.state
+                      )}`
+                    )}
               </Button>
             </GlassCard>
           ))}
@@ -981,7 +1034,10 @@ export const Explorer = () => {
                       fontSize: theme.fontSize.sm,
                     }}
                   >
-                    {episodeUtils.formatDateTime(selectedEpisode.departureTime, i18n.language)}
+                    {episodeUtils.formatDateTime(
+                      selectedEpisode.departureTime,
+                      i18n.language
+                    )}
                   </div>
                 </div>
               </DashboardHeader>
@@ -1023,7 +1079,11 @@ export const Explorer = () => {
                             {t("activeEvents.labels.eventWindow")}
                           </RuleDetailLabel>
                           <RuleDetailValue>
-                            {episodeUtils.formatDateRange(selectedEpisode.departureTime, selectedEpisode.estimatedArrivalTime, i18n.language)}
+                            {episodeUtils.formatDateRange(
+                              selectedEpisode.departureTime,
+                              selectedEpisode.estimatedArrivalTime,
+                              i18n.language
+                            )}
                           </RuleDetailValue>
                         </RuleDetailRow>
                         <RuleDetailRow>
@@ -1031,7 +1091,10 @@ export const Explorer = () => {
                             {t("activeEvents.labels.triggerCondition")}
                           </RuleDetailLabel>
                           <RuleDetailValue>
-                            {episodeUtils.getTriggerCondition(selectedEpisode, t)}
+                            {episodeUtils.getTriggerCondition(
+                              selectedEpisode,
+                              t
+                            )}
                           </RuleDetailValue>
                         </RuleDetailRow>
                       </RuleDetails>
@@ -1051,16 +1114,18 @@ export const Explorer = () => {
                           <RuleDetailLabel>
                             {t("activeEvents.labels.dataSource")}
                           </RuleDetailLabel>
-                          <RuleDetailValue>
-                            FlightAware API
-                          </RuleDetailValue>
+                          <RuleDetailValue>FlightAware API</RuleDetailValue>
                         </RuleDetailRow>
                         <RuleDetailRow>
                           <RuleDetailLabel>
                             {t("activeEvents.labels.resolutionTime")}
                           </RuleDetailLabel>
                           <RuleDetailValue>
-                            {episodeUtils.getResolutionTime(selectedEpisode, i18n.language, t)}
+                            {episodeUtils.getResolutionTime(
+                              selectedEpisode,
+                              i18n.language,
+                              t
+                            )}
                           </RuleDetailValue>
                         </RuleDetailRow>
                       </RuleDetails>
@@ -1080,13 +1145,21 @@ export const Explorer = () => {
                           <RuleDetailLabel>
                             {t("activeEvents.labels.premium")}
                           </RuleDetailLabel>
-                          <RuleDetailValue>{episodeUtils.formatMNT(selectedEpisode.premiumAmount)}</RuleDetailValue>
+                          <RuleDetailValue>
+                            {episodeUtils.formatMNT(
+                              selectedEpisode.premiumAmount
+                            )}
+                          </RuleDetailValue>
                         </RuleDetailRow>
                         <RuleDetailRow>
                           <RuleDetailLabel>
                             {t("activeEvents.labels.maxPayout")}
                           </RuleDetailLabel>
-                          <RuleDetailValue highlight>{episodeUtils.formatMNT(selectedEpisode.payoutAmount)}</RuleDetailValue>
+                          <RuleDetailValue highlight>
+                            {episodeUtils.formatMNT(
+                              selectedEpisode.payoutAmount
+                            )}
+                          </RuleDetailValue>
                         </RuleDetailRow>
                         <RuleDetailRow>
                           <RuleDetailLabel>
@@ -1130,11 +1203,17 @@ export const Explorer = () => {
                   <WarningBox style={{ marginBottom: theme.spacing.lg }}>
                     <WarningIcon />
                     <div>
-                      <div style={{ fontWeight: theme.fontWeight.semibold, marginBottom: theme.spacing.xs }}>
+                      <div
+                        style={{
+                          fontWeight: theme.fontWeight.semibold,
+                          marginBottom: theme.spacing.xs,
+                        }}
+                      >
                         {t("episode.connectWallet")}
                       </div>
                       <div style={{ fontSize: theme.fontSize.xs }}>
-                        {t("activeEvents.labels.walletRequired") || "Please connect your wallet to join the pool."}
+                        {t("activeEvents.labels.walletRequired") ||
+                          "Please connect your wallet to join the pool."}
                       </div>
                     </div>
                   </WarningBox>
@@ -1145,7 +1224,7 @@ export const Explorer = () => {
                   disabled={!isAgreed}
                   onClick={handleProceedToJoin}
                 >
-                  {t("activeEvents.labels.joinPool")}
+                  {t("activeEvents.labels.joinEpisode")}
                 </Button>
               </div>
             </GlassCard>
@@ -1170,7 +1249,7 @@ export const Explorer = () => {
                 <PlaneIcon />
               </IconWrapper>
               <CardTitle style={{ marginBottom: theme.spacing.xs }}>
-                {t("activeEvents.labels.joinPool")}
+                {t("activeEvents.labels.joinEpisode")}
               </CardTitle>
               <div
                 style={{
@@ -1186,13 +1265,17 @@ export const Explorer = () => {
                   <span style={{ color: theme.colors.textSecondary }}>
                     {t("activeEvents.labels.premium")}
                   </span>
-                  <span>{episodeUtils.formatMNT(selectedEpisode.premiumAmount)}</span>
+                  <span>
+                    {episodeUtils.formatMNT(selectedEpisode.premiumAmount)}
+                  </span>
                 </InfoListItem>
                 <InfoListItem>
                   <span style={{ color: theme.colors.textSecondary }}>
                     {t("activeEvents.labels.maxLoss")}
                   </span>
-                  <span style={{ color: theme.colors.secondary }}>{episodeUtils.formatMNT(selectedEpisode.premiumAmount)}</span>
+                  <span style={{ color: theme.colors.secondary }}>
+                    {episodeUtils.formatMNT(selectedEpisode.premiumAmount)}
+                  </span>
                 </InfoListItem>
                 <InfoListItem>
                   <span style={{ color: theme.colors.textSecondary }}>
@@ -1206,7 +1289,9 @@ export const Explorer = () => {
 
               <CountdownBox>
                 <Label>{t("activeEvents.labels.poolClosesIn")}</Label>
-                <CountdownTimer>{episodeUtils.formatTime(timeLeft)}</CountdownTimer>
+                <CountdownTimer>
+                  {episodeUtils.formatTime(timeLeft)}
+                </CountdownTimer>
               </CountdownBox>
 
               <WarningBox>
@@ -1215,17 +1300,38 @@ export const Explorer = () => {
               </WarningBox>
 
               {hasJoined && (
-                <WarningBox style={{ marginBottom: theme.spacing.md, background: `${theme.colors.success}10`, borderColor: `${theme.colors.success}20` }}>
-                  <svg viewBox="0 0 24 24" fill="none" stroke={theme.colors.success} width="20" height="20" strokeWidth="2">
+                <WarningBox
+                  style={{
+                    marginBottom: theme.spacing.md,
+                    background: `${theme.colors.success}10`,
+                    borderColor: `${theme.colors.success}20`,
+                  }}
+                >
+                  <svg
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke={theme.colors.success}
+                    width="20"
+                    height="20"
+                    strokeWidth="2"
+                  >
                     <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14" />
                     <polyline points="22 4 12 14.01 9 11.01" />
                   </svg>
                   <div>
-                    <div style={{ fontWeight: theme.fontWeight.semibold, marginBottom: theme.spacing.xs, color: theme.colors.success }}>
-                      {t("activeEvents.labels.alreadyJoined") || "Already Joined"}
+                    <div
+                      style={{
+                        fontWeight: theme.fontWeight.semibold,
+                        marginBottom: theme.spacing.xs,
+                        color: theme.colors.success,
+                      }}
+                    >
+                      {t("activeEvents.labels.alreadyJoined") ||
+                        "Already Joined"}
                     </div>
                     <div style={{ fontSize: theme.fontSize.xs }}>
-                      {t("activeEvents.labels.alreadyJoinedDesc") || "You have already joined this pool."}
+                      {t("activeEvents.labels.alreadyJoinedDesc") ||
+                        "You have already joined this pool."}
                     </div>
                   </div>
                 </WarningBox>
@@ -1262,11 +1368,17 @@ export const Explorer = () => {
                 <WarningBox style={{ marginTop: theme.spacing.md }}>
                   <WarningIcon />
                   <div>
-                    <div style={{ fontWeight: theme.fontWeight.semibold, marginBottom: theme.spacing.xs }}>
+                    <div
+                      style={{
+                        fontWeight: theme.fontWeight.semibold,
+                        marginBottom: theme.spacing.xs,
+                      }}
+                    >
                       {t("episode.connectWallet")}
                     </div>
                     <div style={{ fontSize: theme.fontSize.xs }}>
-                      {t("activeEvents.labels.walletRequired") || "Please connect your wallet to continue."}
+                      {t("activeEvents.labels.walletRequired") ||
+                        "Please connect your wallet to continue."}
                     </div>
                   </div>
                 </WarningBox>
@@ -1301,7 +1413,10 @@ export const Explorer = () => {
                       fontSize: theme.fontSize.sm,
                     }}
                   >
-                    {episodeUtils.formatDateTime(selectedEpisode.departureTime, i18n.language)}
+                    {episodeUtils.formatDateTime(
+                      selectedEpisode.departureTime,
+                      i18n.language
+                    )}
                   </div>
                 </div>
                 <Badge variant="success">
@@ -1311,7 +1426,9 @@ export const Explorer = () => {
 
               <CountdownBox style={{ margin: `0 0 ${theme.spacing.xl} 0` }}>
                 <Label>{t("activeEvents.labels.eventEndsIn")}</Label>
-                <CountdownTimer>{episodeUtils.formatTime(timeLeft + 18743)}</CountdownTimer>
+                <CountdownTimer>
+                  {episodeUtils.formatTime(timeLeft + 18743)}
+                </CountdownTimer>
               </CountdownBox>
 
               <Label>{t("activeEvents.labels.triggerCondition")}</Label>
@@ -1393,11 +1510,8 @@ export const Explorer = () => {
               </div>
 
               <ActionRow>
-                <Button variant="outline" onClick={() => setView("RULES")}>
-                  {t("activeEvents.labels.viewRulesShort")}
-                </Button>
-                <Button variant="outline">
-                  {t("activeEvents.labels.viewResolution")}
+                <Button onClick={() => routerNavigate("/myepisodes")}>
+                  {t("activeEvents.labels.viewMyEpisodes")}
                 </Button>
               </ActionRow>
             </GlassCard>
@@ -1416,6 +1530,27 @@ export const Explorer = () => {
         <Section>
           {view === "LIST" ? (
             <Container>{renderListView()}</Container>
+          ) : isLoading ? (
+            <DetailContainer>
+              <LoadingContainer>
+                <LoadingSpinner />
+                <LoadingText>
+                  {t("myEpisodes.loading") || "Loading..."}
+                </LoadingText>
+              </LoadingContainer>
+            </DetailContainer>
+          ) : !selectedEpisode ? (
+            <DetailContainer>
+              <div style={{ textAlign: "center", padding: theme.spacing.xxxl }}>
+                <h3>{t("activeEvents.noEpisodes") || "Episode not found"}</h3>
+                <BackLink
+                  onClick={handleBackToList}
+                  style={{ margin: "20px auto" }}
+                >
+                  {t("activeEvents.labels.backToEvents")}
+                </BackLink>
+              </div>
+            </DetailContainer>
           ) : (
             <DetailContainer>{renderDetailView()}</DetailContainer>
           )}
