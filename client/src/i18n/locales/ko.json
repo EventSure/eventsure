@@ -43,14 +43,14 @@
     "subtext": "모든 조건은 사전에 확정됩니다.",
     "filters": {
       "all": "전체",
-      "recruiting": "모집중",
-      "active": "진행중",
-      "settling": "정산중"
+      "open": "참여 가능",
+      "locked": "진행중",
+      "resolved": "정산 완료"
     },
     "status": {
-      "recruiting": "모집중",
-      "active": "진행중",
-      "settling": "정산중"
+      "open": "참여 가능",
+      "locked": "진행중",
+      "resolved": "정산 완료"
     },
     "labels": {
       "coverageCondition": "보장 조건",
@@ -59,7 +59,7 @@
       "members": "조합원",
       "endDate": "종료일",
       "poolSize": "풀 규모",
-      "join": "가입하기"
+      "comingSoon": "준비중"
     },
     "categories": {
       "flightDelay": "항공 지연",
@@ -104,18 +104,18 @@
     "titleHighlight": "투명성",
     "description": "모든 거래가 온체인에 기록됩니다. 완전한 투명성으로 프로토콜 작동을 확인하세요.",
     "feedTitle": "실시간 거래 피드",
+    "mockBadge": "미리보기",
     "txTypes": {
-      "purchase": "보험 구매",
-      "claim": "보상 청구",
-      "payout": "보상 지급",
-      "stake": "풀 스테이킹"
+      "join": "에피소드 참여",
+      "triggered": "이벤트 발생",
+      "payout": "보상 지급"
     },
     "stats": {
       "volume": "총 거래량 (24시간)",
-      "activePolicies": "활성 보험",
+      "activeEpisodes": "활성 에피소드",
       "networkStatus": "네트워크 상태",
       "acrossAll": "전체 거래 기준",
-      "protected": "보호받는 여행자"
+      "participants": "참여중인 사용자"
     }
   },
   "howItWorks": {

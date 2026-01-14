@@ -315,20 +315,21 @@ const StepWrapper = styled.div`
   align-items: center;
 `;
 
-const Step = styled.button<{ $isActive: boolean; $isCompleted: boolean }>`
+const Step = styled.button<{ $isActive: boolean; $isCompleted: boolean; $isClickable: boolean }>`
   display: flex;
   flex-direction: column;
   align-items: center;
   gap: ${theme.spacing.sm};
   background: none;
   border: none;
-  cursor: pointer;
+  cursor: ${({ $isClickable }) => $isClickable ? 'pointer' : 'default'};
   padding: ${theme.spacing.sm} ${theme.spacing.md};
   transition: all ${theme.transitions.fast};
   min-width: 100px;
+  opacity: ${({ $isClickable, $isActive, $isCompleted }) => ($isClickable || $isActive || $isCompleted) ? 1 : 0.5};
 
   &:hover {
-    transform: translateY(-2px);
+    transform: ${({ $isClickable }) => $isClickable ? 'translateY(-2px)' : 'none'};
   }
 `;
 
@@ -816,7 +817,12 @@ export const Explorer = () => {
   };
 
   const handleStepClick = (targetView: ViewState) => {
-    setView(targetView);
+    const currentIndex = getCurrentStepIndex();
+    const targetIndex = STEPS.find((s) => s.key === targetView)?.index ?? -1;
+    
+    if (targetIndex <= currentIndex) {
+      setView(targetView);
+    }
   };
 
   const renderStepper = () => {
@@ -827,12 +833,14 @@ export const Explorer = () => {
         {STEPS.map((step, index) => {
           const isActive = step.key === view;
           const isCompleted = index < currentIndex;
+          const isClickable = index <= currentIndex;
 
           return (
             <StepWrapper key={step.key}>
               <Step
                 $isActive={isActive}
                 $isCompleted={isCompleted}
+                $isClickable={isClickable}
                 onClick={() => handleStepClick(step.key)}
               >
                 <StepCircle $isActive={isActive} $isCompleted={isCompleted}>

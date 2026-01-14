@@ -152,7 +152,7 @@ const PoolTitle = styled.h3`
   margin: 0;
 `
 
-const StatusBadge = styled.span<{ status: 'recruiting' | 'active' | 'settling' }>`
+const StatusBadge = styled.span<{ status: 'open' | 'locked' | 'resolved' }>`
   padding: ${theme.spacing.xs} ${theme.spacing.md};
   border-radius: ${theme.borderRadius.full};
   font-size: ${theme.fontSize.xs};
@@ -160,19 +160,19 @@ const StatusBadge = styled.span<{ status: 'recruiting' | 'active' | 'settling' }
   
   ${({ status }) => {
     switch (status) {
-      case 'recruiting':
+      case 'open':
         return `
           background: ${theme.colors.secondary}20;
           border: 1px solid ${theme.colors.secondary}40;
           color: ${theme.colors.secondary};
         `
-      case 'active':
+      case 'locked':
         return `
           background: ${theme.colors.primary}20;
           border: 1px solid ${theme.colors.primary}40;
           color: ${theme.colors.primary};
         `
-      case 'settling':
+      case 'resolved':
         return `
           background: ${theme.colors.warning}20;
           border: 1px solid ${theme.colors.warning}40;
@@ -279,39 +279,25 @@ const ProgressFill = styled.div<{ percent: number }>`
   transition: width ${theme.transitions.normal};
 `
 
-const JoinButton = styled.button`
+const ComingSoonButton = styled.button`
   width: 100%;
   padding: ${theme.spacing.md} ${theme.spacing.lg};
-  background: linear-gradient(135deg, ${theme.colors.secondary}, ${theme.colors.secondaryDark});
-  border: none;
+  background: ${theme.colors.surface};
+  border: 1px solid ${theme.colors.glassBorder};
   border-radius: ${theme.borderRadius.lg};
-  color: ${theme.colors.background};
+  color: ${theme.colors.textMuted};
   font-size: ${theme.fontSize.md};
   font-weight: ${theme.fontWeight.semibold};
-  cursor: pointer;
+  cursor: not-allowed;
   display: flex;
   align-items: center;
   justify-content: center;
   gap: ${theme.spacing.sm};
-  transition: all ${theme.transitions.fast};
   margin-top: auto;
-
-  &:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 4px 20px ${theme.colors.secondary}40;
-  }
-
-  svg {
-    width: 18px;
-    height: 18px;
-    stroke: currentColor;
-    fill: none;
-    stroke-width: 2;
-  }
 `
 
-type PoolStatus = 'recruiting' | 'active' | 'settling'
-type FilterKey = 'all' | 'recruiting' | 'active' | 'settling'
+type PoolStatus = 'open' | 'locked' | 'resolved'
+type FilterKey = 'all' | 'open' | 'locked' | 'resolved'
 
 interface PoolData {
   id: string
@@ -333,7 +319,7 @@ const poolsData: PoolData[] = [
   {
     id: '1',
     categoryKey: 'flightDelay',
-    status: 'recruiting',
+    status: 'open',
     titleKey: 'activePools.pools.incheonTokyo.title',
     descriptionKey: 'activePools.pools.incheonTokyo.description',
     conditionKey: 'activePools.pools.incheonTokyo.condition',
@@ -348,7 +334,7 @@ const poolsData: PoolData[] = [
   {
     id: '2',
     categoryKey: 'weather',
-    status: 'recruiting',
+    status: 'open',
     titleKey: 'activePools.pools.jejuTyphoon.title',
     descriptionKey: 'activePools.pools.jejuTyphoon.description',
     conditionKey: 'activePools.pools.jejuTyphoon.condition',
@@ -363,7 +349,7 @@ const poolsData: PoolData[] = [
   {
     id: '3',
     categoryKey: 'flightDelay',
-    status: 'active',
+    status: 'locked',
     titleKey: 'activePools.pools.gimpoJeju.title',
     descriptionKey: 'activePools.pools.gimpoJeju.description',
     conditionKey: 'activePools.pools.gimpoJeju.condition',
@@ -378,7 +364,7 @@ const poolsData: PoolData[] = [
   {
     id: '4',
     categoryKey: 'tripCancel',
-    status: 'settling',
+    status: 'resolved',
     titleKey: 'activePools.pools.tokyoCherry.title',
     descriptionKey: 'activePools.pools.tokyoCherry.description',
     conditionKey: 'activePools.pools.tokyoCherry.condition',
@@ -394,9 +380,9 @@ const poolsData: PoolData[] = [
 
 const filterMap: Record<FilterKey, PoolStatus | null> = {
   'all': null,
-  'recruiting': 'recruiting',
-  'active': 'active',
-  'settling': 'settling',
+  'open': 'open',
+  'locked': 'locked',
+  'resolved': 'resolved',
 }
 
 const PlaneIcon = () => (
@@ -467,7 +453,7 @@ export const ActivePools = () => {
     return pool.status === statusFilter
   })
 
-  const filters: FilterKey[] = ['all', 'recruiting', 'active', 'settling']
+  const filters: FilterKey[] = ['all', 'open', 'locked', 'resolved']
 
   return (
     <Section>
@@ -563,10 +549,9 @@ export const ActivePools = () => {
                 </ProgressBar>
               </PoolSizeContainer>
 
-              <JoinButton>
-                {t('activePools.labels.join')}
-                <ArrowIcon />
-              </JoinButton>
+              <ComingSoonButton disabled>
+                {t('activePools.labels.comingSoon')}
+              </ComingSoonButton>
             </PoolCard>
           ))}
         </PoolsGrid>

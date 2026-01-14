@@ -43,14 +43,14 @@
     "subtext": "All conditions are predetermined.",
     "filters": {
       "all": "All",
-      "recruiting": "Recruiting",
-      "active": "Active",
-      "settling": "Settling"
+      "open": "Open",
+      "locked": "Locked",
+      "resolved": "Resolved"
     },
     "status": {
-      "recruiting": "Recruiting",
-      "active": "Active",
-      "settling": "Settling"
+      "open": "Open",
+      "locked": "Locked",
+      "resolved": "Resolved"
     },
     "labels": {
       "coverageCondition": "Coverage Condition",
@@ -59,7 +59,7 @@
       "members": "Members",
       "endDate": "End Date",
       "poolSize": "Pool Size",
-      "join": "Join Now"
+      "comingSoon": "Coming Soon"
     },
     "categories": {
       "flightDelay": "Flight Delay",
@@ -104,18 +104,18 @@
     "titleHighlight": "Transparency",
     "description": "Every transaction is recorded on-chain. Watch the protocol in action with complete transparency.",
     "feedTitle": "Live Transaction Feed",
+    "mockBadge": "Preview",
     "txTypes": {
-      "purchase": "Policy Purchased",
-      "claim": "Claim Submitted",
-      "payout": "Payout Sent",
-      "stake": "Pool Staked"
+      "join": "Episode Joined",
+      "triggered": "Event Triggered",
+      "payout": "Payout Sent"
     },
     "stats": {
       "volume": "Total Volume (24h)",
-      "activePolicies": "Active Policies",
+      "activeEpisodes": "Active Episodes",
       "networkStatus": "Network Status",
       "acrossAll": "Across all transactions",
-      "protected": "Protected travelers"
+      "participants": "Active participants"
     }
   },
   "howItWorks": {
