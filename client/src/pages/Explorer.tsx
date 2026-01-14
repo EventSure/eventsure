@@ -605,12 +605,6 @@ const DashboardStats = styled.div`
   margin-bottom: ${theme.spacing.xl};
 `;
 
-const ActionRow = styled.div`
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: ${theme.spacing.md};
-`;
-
 const LoadingContainer = styled.div`
   display: flex;
   flex-direction: column;
@@ -727,7 +721,7 @@ const FILTER_OPTIONS: { key: FilterState; state?: number }[] = [
 
 export const Explorer = () => {
   const { t, i18n } = useTranslation();
-  const routerNavigate = useNavigate();
+  const navigate = useNavigate();
   const [searchParams, setSearchParams] = useSearchParams();
   const eventId = searchParams.get("event");
 
@@ -748,12 +742,15 @@ export const Explorer = () => {
         ? episodes
         : episodes.filter(
             (ep) =>
-              ep.state === FILTER_OPTIONS.find((option) => option.key === filter)?.state
+              ep.state ===
+              FILTER_OPTIONS.find((option) => option.key === filter)?.state
           );
 
     return [...filtered].sort((a, b) => {
-      if (a.state === EpisodeState.Open && b.state !== EpisodeState.Open) return -1;
-      if (a.state !== EpisodeState.Open && b.state === EpisodeState.Open) return 1;
+      if (a.state === EpisodeState.Open && b.state !== EpisodeState.Open)
+        return -1;
+      if (a.state !== EpisodeState.Open && b.state === EpisodeState.Open)
+        return 1;
       return 0;
     });
   }, [episodes, filter]);
@@ -838,7 +835,10 @@ export const Explorer = () => {
     const currentIndex = getCurrentStepIndex();
     const targetIndex = STEPS.find((s) => s.key === targetView)?.index ?? -1;
 
-    if (targetIndex <= currentIndex) {
+    if (
+      targetIndex <= currentIndex ||
+      (hasJoined && targetView === "DASHBOARD")
+    ) {
       setView(targetView);
     }
   };
@@ -851,7 +851,8 @@ export const Explorer = () => {
         {STEPS.map((step, index) => {
           const isActive = step.key === view;
           const isCompleted = index < currentIndex;
-          const isClickable = index <= currentIndex;
+          const isClickable =
+            index <= currentIndex || (hasJoined && step.key === "DASHBOARD");
 
           return (
             <StepWrapper key={step.key}>
@@ -1329,10 +1330,21 @@ export const Explorer = () => {
                       {t("activeEvents.labels.alreadyJoined") ||
                         "Already Joined"}
                     </div>
-                    <div style={{ fontSize: theme.fontSize.xs }}>
+                    <div
+                      style={{
+                        fontSize: theme.fontSize.xs,
+                        marginBottom: theme.spacing.sm,
+                      }}
+                    >
                       {t("activeEvents.labels.alreadyJoinedDesc") ||
                         "You have already joined this pool."}
                     </div>
+                    <BackLink
+                      onClick={() => setView("DASHBOARD")}
+                      style={{ color: theme.colors.success, marginBottom: 0 }}
+                    >
+                      {t("activeEvents.steps.dashboard.title")} →
+                    </BackLink>
                   </div>
                 </WarningBox>
               )}
@@ -1509,11 +1521,11 @@ export const Explorer = () => {
                 {t("activeEvents.labels.referenceOnly")}
               </div>
 
-              <ActionRow>
-                <Button onClick={() => routerNavigate("/myepisodes")}>
+              <div style={{ marginTop: theme.spacing.xl }}>
+                <Button onClick={() => navigate("/myepisodes")}>
                   {t("activeEvents.labels.viewMyEpisodes")}
                 </Button>
-              </ActionRow>
+              </div>
             </GlassCard>
           </motion.div>
         );
