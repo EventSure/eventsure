@@ -1,13 +1,10 @@
-import { useState } from "react";
 import styled from "@emotion/styled";
-import { motion, AnimatePresence } from "framer-motion";
+import { motion } from "framer-motion";
 import { useTranslation } from "react-i18next";
 import { useQuery } from "@tanstack/react-query";
 import { theme } from "@/styles/theme";
 import { Header, Footer } from "@/components/layout";
 import { useEpisodes } from "@/hooks/useEpisodes";
-import * as episodeUtils from "@/utils/episode";
-import { EpisodeState } from "@/types/episode";
 
 const PageContainer = styled.div`
   min-height: 100vh;
@@ -52,73 +49,6 @@ const PageSubtitle = styled.p`
   margin: 0 auto;
 `;
 
-const EpisodeCard = styled(motion.div)<{ $isExpanded: boolean }>`
-  background: ${theme.colors.glass};
-  backdrop-filter: blur(12px);
-  border: 1px solid ${({ $isExpanded }) => $isExpanded ? `${theme.colors.secondary}60` : theme.colors.glassBorder};
-  border-radius: ${theme.borderRadius.xl};
-  margin-bottom: ${theme.spacing.lg};
-  overflow: hidden;
-  transition: border-color ${theme.transitions.normal};
-  cursor: pointer;
-
-  &:hover {
-    border-color: ${theme.colors.secondary}40;
-  }
-`;
-
-const CardHeader = styled.div`
-  padding: ${theme.spacing.xl};
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  gap: ${theme.spacing.lg};
-
-  @media (max-width: ${theme.breakpoints.sm}) {
-    flex-direction: column;
-    align-items: flex-start;
-  }
-`;
-
-const EpisodeMainInfo = styled.div`
-  display: flex;
-  align-items: center;
-  gap: ${theme.spacing.lg};
-`;
-
-const IconWrapper = styled.div`
-  width: 56px;
-  height: 56px;
-  border-radius: ${theme.borderRadius.lg};
-  background: ${theme.colors.surfaceLight};
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  flex-shrink: 0;
-
-  svg {
-    width: 28px;
-    height: 28px;
-    stroke: ${theme.colors.secondary};
-    fill: none;
-    stroke-width: 2;
-    transform: rotate(45deg);
-  }
-`;
-
-const EpisodeDetails = styled.div`
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
-`;
-
-const FlightName = styled.h3`
-  font-size: ${theme.fontSize.xl};
-  font-weight: ${theme.fontWeight.bold};
-  color: ${theme.colors.text};
-  margin: 0;
-`;
-
 const EpisodeAddress = styled.div`
   font-family: 'JetBrains Mono', monospace;
   font-size: ${theme.fontSize.xs};
@@ -141,44 +71,6 @@ const EpisodeAddress = styled.div`
       color: ${theme.colors.secondary};
     }
   }
-`;
-
-const StatusBadge = styled.span<{ state: number }>`
-  padding: ${theme.spacing.xs} ${theme.spacing.md};
-  border-radius: ${theme.borderRadius.full};
-  font-size: ${theme.fontSize.xs};
-  font-weight: ${theme.fontWeight.bold};
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
-  background: ${({ state }) => {
-    switch (state) {
-      case EpisodeState.Open: return `${theme.colors.success}20`;
-      case EpisodeState.Locked: return `${theme.colors.warning}20`;
-      case EpisodeState.Resolved: return `${theme.colors.accent}20`;
-      default: return `${theme.colors.textMuted}20`;
-    }
-  }};
-  border: 1px solid ${({ state }) => {
-    switch (state) {
-      case EpisodeState.Open: return `${theme.colors.success}40`;
-      case EpisodeState.Locked: return `${theme.colors.warning}40`;
-      case EpisodeState.Resolved: return `${theme.colors.accent}40`;
-      default: return `${theme.colors.textMuted}40`;
-    }
-  }};
-  color: ${({ state }) => {
-    switch (state) {
-      case EpisodeState.Open: return theme.colors.success;
-      case EpisodeState.Locked: return theme.colors.warning;
-      case EpisodeState.Resolved: return theme.colors.accent;
-      default: return theme.colors.textMuted;
-    }
-  }};
-`;
-
-const ExpandContent = styled(motion.div)`
-  border-top: 1px solid ${theme.colors.glassBorder};
-  background: rgba(0, 0, 0, 0.2);
 `;
 
 const TimelineContainer = styled.div`
@@ -356,12 +248,6 @@ const EmptyTitle = styled.h3`
 const EmptyText = styled.p`
   color: ${theme.colors.textSecondary};
 `;
-
-const PlaneIcon = () => (
-  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
-    <path d="M21 16v-2l-8-5V3.5c0-.83-.67-1.5-1.5-1.5S10 2.67 10 3.5V9l-8 5v2l8-2.5V19l-2 1.5V22l3.5-1 3.5 1v-1.5L13 19v-5.5l8 2.5z" />
-  </svg>
-);
 
 const ExternalIcon = () => (
   <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
