@@ -1,4 +1,4 @@
-import{cx as O,cC as b,dI as c,dJ as C,dy as T,dq as j,db as m,cD as u,dt as $,dc as l,cB as g,cA as p,cT as I,d9 as E,cM as D,cV as W,cQ as N,cR as V,cS as z,cO as q,da as M,cN as B}from"./index-Dzv37aQ1.js";const K=O`
+import{cy as O,cD as b,dJ as c,dK as C,dz as T,dr as j,dc as m,cE as u,du as $,dd as l,cC as g,cB as p,cU as I,da as E,cN as D,cW as B,cR as z,cS as N,cT as V,cP as K,db as q,cO as W}from"./index-BeULVfBl.js";const M=O`
   :host > wui-grid {
     max-height: 360px;
     overflow: auto;
@@ -38,7 +38,7 @@ import{cx as O,cC as b,dI as c,dJ as C,dy as T,dq as j,db as m,cD as u,dt as $,d
         >
           <wui-text variant="md-medium" color="primary">${r.id}</wui-text>
         </wui-list-item>
-      `)}selectCurrency(e){e&&(c.setPaymentCurrency(e),$.close())}};k.styles=K;A([l()],k.prototype,"selectedCurrency",void 0);A([l()],k.prototype,"currencies",void 0);A([l()],k.prototype,"currencyImages",void 0);A([l()],k.prototype,"checked",void 0);k=A([g("w3m-onramp-fiat-select-view")],k);const F=O`
+      `)}selectCurrency(e){e&&(c.setPaymentCurrency(e),$.close())}};k.styles=M;A([l()],k.prototype,"selectedCurrency",void 0);A([l()],k.prototype,"currencies",void 0);A([l()],k.prototype,"currencyImages",void 0);A([l()],k.prototype,"checked",void 0);k=A([g("w3m-onramp-fiat-select-view")],k);const F=O`
   button {
     padding: ${({spacing:t})=>t[3]};
     border-radius: ${({borderRadius:t})=>t[4]};
@@ -129,7 +129,7 @@ import{cx as O,cC as b,dI as c,dJ as C,dy as T,dq as j,db as m,cD as u,dt as $,d
             ?disabled=${!e.url}
             data-testid=${`onramp-provider-${e.name}`}
           ></w3m-onramp-provider-item>
-        `)}onClickProvider(e){c.setSelectedProvider(e),D.push("BuyInProgress"),W.openHref(c.state.selectedProvider?.url||e.url,"popupWindow","width=600,height=800,scrollbars=yes"),N.sendEvent({type:"track",event:"SELECT_BUY_PROVIDER",properties:{provider:e.name,isSmartAccount:V(I.state.activeChain)===z.ACCOUNT_TYPES.SMART_ACCOUNT}})}};L([l()],U.prototype,"providers",void 0);U=L([g("w3m-onramp-providers-view")],U);const Y=O`
+        `)}onClickProvider(e){c.setSelectedProvider(e),D.push("BuyInProgress"),B.openHref(c.state.selectedProvider?.url||e.url,"popupWindow","width=600,height=800,scrollbars=yes"),z.sendEvent({type:"track",event:"SELECT_BUY_PROVIDER",properties:{provider:e.name,isSmartAccount:N(I.state.activeChain)===V.ACCOUNT_TYPES.SMART_ACCOUNT}})}};L([l()],U.prototype,"providers",void 0);U=L([g("w3m-onramp-providers-view")],U);const Y=O`
   :host > wui-grid {
     max-height: 360px;
     overflow: auto;
@@ -246,7 +246,7 @@ import{cx as O,cC as b,dI as c,dJ as C,dy as T,dq as j,db as m,cD as u,dt as $,d
   wui-link {
     padding: ${({spacing:t})=>t["01"]} ${({spacing:t})=>t[2]};
   }
-`;var y=function(t,e,r,n){var s=arguments.length,i=s<3?e:n===null?n=Object.getOwnPropertyDescriptor(e,r):n,o;if(typeof Reflect=="object"&&typeof Reflect.decorate=="function")i=Reflect.decorate(t,e,r,n);else for(var a=t.length-1;a>=0;a--)(o=t[a])&&(i=(s<3?o(i):s>3?o(e,r,i):o(e,r))||i);return s>3&&i&&Object.defineProperty(e,r,i),i};let d=class extends b{constructor(){super(),this.unsubscribe=[],this.selectedOnRampProvider=c.state.selectedProvider,this.uri=q.state.wcUri,this.ready=!1,this.showRetry=!1,this.buffering=!1,this.error=!1,this.isMobile=!1,this.onRetry=void 0,this.unsubscribe.push(c.subscribeKey("selectedProvider",e=>{this.selectedOnRampProvider=e}))}disconnectedCallback(){this.intervalId&&clearInterval(this.intervalId)}render(){let e="Continue in external window";this.error?e="Buy failed":this.selectedOnRampProvider&&(e=`Buy in ${this.selectedOnRampProvider?.label}`);const r=this.error?"Buy can be declined from your side or due to and error on the provider app":"We’ll notify you once your Buy is processed";return u`
+`;var y=function(t,e,r,n){var s=arguments.length,i=s<3?e:n===null?n=Object.getOwnPropertyDescriptor(e,r):n,o;if(typeof Reflect=="object"&&typeof Reflect.decorate=="function")i=Reflect.decorate(t,e,r,n);else for(var a=t.length-1;a>=0;a--)(o=t[a])&&(i=(s<3?o(i):s>3?o(e,r,i):o(e,r))||i);return s>3&&i&&Object.defineProperty(e,r,i),i};let d=class extends b{constructor(){super(),this.unsubscribe=[],this.selectedOnRampProvider=c.state.selectedProvider,this.uri=K.state.wcUri,this.ready=!1,this.showRetry=!1,this.buffering=!1,this.error=!1,this.isMobile=!1,this.onRetry=void 0,this.unsubscribe.push(c.subscribeKey("selectedProvider",e=>{this.selectedOnRampProvider=e}))}disconnectedCallback(){this.intervalId&&clearInterval(this.intervalId)}render(){let e="Continue in external window";this.error?e="Buy failed":this.selectedOnRampProvider&&(e=`Buy in ${this.selectedOnRampProvider?.label}`);const r=this.error?"Buy can be declined from your side or due to and error on the provider app":"We’ll notify you once your Buy is processed";return u`
       <wui-flex
         data-error=${m(this.error)}
         data-retry=${this.showRetry}
@@ -295,10 +295,10 @@ import{cx as O,cC as b,dI as c,dJ as C,dy as T,dq as j,db as m,cD as u,dt as $,d
           Copy link
         </wui-link>
       </wui-flex>
-    `}onTryAgain(){this.selectedOnRampProvider&&(this.error=!1,W.openHref(this.selectedOnRampProvider.url,"popupWindow","width=600,height=800,scrollbars=yes"))}tryAgainTemplate(){return this.selectedOnRampProvider?.url?u`<wui-button size="md" variant="accent" @click=${this.onTryAgain.bind(this)}>
+    `}onTryAgain(){this.selectedOnRampProvider&&(this.error=!1,B.openHref(this.selectedOnRampProvider.url,"popupWindow","width=600,height=800,scrollbars=yes"))}tryAgainTemplate(){return this.selectedOnRampProvider?.url?u`<wui-button size="md" variant="accent" @click=${this.onTryAgain.bind(this)}>
       <wui-icon color="inherit" slot="iconLeft" name="refresh"></wui-icon>
       Try again
-    </wui-button>`:null}loaderTemplate(){const e=M.state.themeVariables["--w3m-border-radius-master"],r=e?parseInt(e.replace("px",""),10):4;return u`<wui-loading-thumbnail radius=${r*9}></wui-loading-thumbnail>`}onCopyUri(){if(!this.selectedOnRampProvider?.url){B.showError("No link found"),D.goBack();return}try{W.copyToClopboard(this.selectedOnRampProvider.url),B.showSuccess("Link copied")}catch{B.showError("Failed to copy")}}};d.styles=Q;y([l()],d.prototype,"intervalId",void 0);y([l()],d.prototype,"selectedOnRampProvider",void 0);y([l()],d.prototype,"uri",void 0);y([l()],d.prototype,"ready",void 0);y([l()],d.prototype,"showRetry",void 0);y([l()],d.prototype,"buffering",void 0);y([l()],d.prototype,"error",void 0);y([p({type:Boolean})],d.prototype,"isMobile",void 0);y([p()],d.prototype,"onRetry",void 0);d=y([g("w3m-buy-in-progress-view")],d);var X=function(t,e,r,n){var s=arguments.length,i=s<3?e:n===null?n=Object.getOwnPropertyDescriptor(e,r):n,o;if(typeof Reflect=="object"&&typeof Reflect.decorate=="function")i=Reflect.decorate(t,e,r,n);else for(var a=t.length-1;a>=0;a--)(o=t[a])&&(i=(s<3?o(i):s>3?o(e,r,i):o(e,r))||i);return s>3&&i&&Object.defineProperty(e,r,i),i};let S=class extends b{render(){return u`
+    </wui-button>`:null}loaderTemplate(){const e=q.state.themeVariables["--w3m-border-radius-master"],r=e?parseInt(e.replace("px",""),10):4;return u`<wui-loading-thumbnail radius=${r*9}></wui-loading-thumbnail>`}onCopyUri(){if(!this.selectedOnRampProvider?.url){W.showError("No link found"),D.goBack();return}try{B.copyToClopboard(this.selectedOnRampProvider.url),W.showSuccess("Link copied")}catch{W.showError("Failed to copy")}}};d.styles=Q;y([l()],d.prototype,"intervalId",void 0);y([l()],d.prototype,"selectedOnRampProvider",void 0);y([l()],d.prototype,"uri",void 0);y([l()],d.prototype,"ready",void 0);y([l()],d.prototype,"showRetry",void 0);y([l()],d.prototype,"buffering",void 0);y([l()],d.prototype,"error",void 0);y([p({type:Boolean})],d.prototype,"isMobile",void 0);y([p()],d.prototype,"onRetry",void 0);d=y([g("w3m-buy-in-progress-view")],d);var X=function(t,e,r,n){var s=arguments.length,i=s<3?e:n===null?n=Object.getOwnPropertyDescriptor(e,r):n,o;if(typeof Reflect=="object"&&typeof Reflect.decorate=="function")i=Reflect.decorate(t,e,r,n);else for(var a=t.length-1;a>=0;a--)(o=t[a])&&(i=(s<3?o(i):s>3?o(e,r,i):o(e,r))||i);return s>3&&i&&Object.defineProperty(e,r,i),i};let S=class extends b{render(){return u`
       <wui-flex
         flexDirection="column"
         .padding=${["6","10","5","10"]}
