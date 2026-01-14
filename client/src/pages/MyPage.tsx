@@ -61,7 +61,9 @@ const SectionTitle = styled.h2`
   gap: ${theme.spacing.md};
 `;
 
-const Badge = styled.span<{ variant?: "secondary" | "success" | "warning" | "error" }>`
+const Badge = styled.span<{
+  variant?: "secondary" | "success" | "warning" | "error";
+}>`
   padding: ${theme.spacing.xs} ${theme.spacing.md};
   border-radius: ${theme.borderRadius.full};
   font-size: ${theme.fontSize.xs};
@@ -256,13 +258,36 @@ const ExploreButton = styled.button`
   font-weight: ${theme.fontWeight.semibold};
   cursor: pointer;
   transition: all ${theme.transitions.fast};
-  background: linear-gradient(135deg, ${theme.colors.secondary}, ${theme.colors.secondaryDark});
+  background: linear-gradient(
+    135deg,
+    ${theme.colors.secondary},
+    ${theme.colors.secondaryDark}
+  );
   border: none;
   color: ${theme.colors.background};
 
   &:hover {
     transform: translateY(-2px);
     box-shadow: 0 4px 20px ${theme.colors.secondary}40;
+  }
+`;
+
+const ViewRulesButton = styled.button`
+  width: 100%;
+  padding: ${theme.spacing.md} ${theme.spacing.lg};
+  border-radius: ${theme.borderRadius.lg};
+  font-size: ${theme.fontSize.md};
+  font-weight: ${theme.fontWeight.semibold};
+  cursor: pointer;
+  transition: all ${theme.transitions.fast};
+  background: transparent;
+  border: 1px solid ${theme.colors.glassBorder};
+  color: ${theme.colors.text};
+  margin-top: ${theme.spacing.lg};
+
+  &:hover {
+    border-color: ${theme.colors.secondary};
+    background: ${theme.colors.glassBorder};
   }
 `;
 
@@ -277,7 +302,7 @@ const PlaneIcon = () => (
   </svg>
 );
 
-export const MyPage = () => {
+export const MyEpisodes = () => {
   const { t, i18n } = useTranslation();
   const navigate = useNavigate();
   const { isConnected, address } = useAccount();
@@ -317,8 +342,8 @@ export const MyPage = () => {
                     <circle cx="12" cy="7" r="4" />
                   </svg>
                 </EmptyIcon>
-                <EmptyTitle>{t("myPage.connectWallet")}</EmptyTitle>
-                <EmptyText>{t("myPage.connectWalletDesc")}</EmptyText>
+                <EmptyTitle>{t("myEpisodes.connectWallet")}</EmptyTitle>
+                <EmptyText>{t("myEpisodes.connectWalletDesc")}</EmptyText>
               </ConnectPrompt>
             </Container>
           </Section>
@@ -336,7 +361,7 @@ export const MyPage = () => {
           <Section>
             <Container>
               <EmptyState>
-                <EmptyTitle>{t("myPage.loading")}</EmptyTitle>
+                <EmptyTitle>{t("myEpisodes.loading")}</EmptyTitle>
               </EmptyState>
             </Container>
           </Section>
@@ -353,14 +378,16 @@ export const MyPage = () => {
         <Section>
           <Container>
             <PageHeader>
-              <PageTitle>{t("myPage.title")}</PageTitle>
+              <PageTitle>{t("myEpisodes.title")}</PageTitle>
               <PageSubtitle>
-                {t("myPage.subtitle", { address: `${address?.slice(0, 6)}...${address?.slice(-4)}` })}
+                {t("myEpisodes.subtitle", {
+                  address: `${address?.slice(0, 6)}...${address?.slice(-4)}`,
+                })}
               </PageSubtitle>
             </PageHeader>
 
             <SectionTitle>
-              {t("myPage.activeEpisodes")}
+              {t("myEpisodes.activeEpisodes")}
               <Badge variant="success">{activeEpisodes.length}</Badge>
             </SectionTitle>
 
@@ -369,10 +396,10 @@ export const MyPage = () => {
                 <EmptyIcon>
                   <PlaneIcon />
                 </EmptyIcon>
-                <EmptyTitle>{t("myPage.noActiveEpisodes")}</EmptyTitle>
-                <EmptyText>{t("myPage.noActiveEpisodesDesc")}</EmptyText>
+                <EmptyTitle>{t("myEpisodes.noActiveEpisodes")}</EmptyTitle>
+                <EmptyText>{t("myEpisodes.noActiveEpisodesDesc")}</EmptyText>
                 <ExploreButton onClick={() => navigate("/explorer")}>
-                  {t("myPage.exploreEpisodes")}
+                  {t("myEpisodes.exploreEpisodes")}
                 </ExploreButton>
               </EmptyState>
             ) : (
@@ -389,44 +416,72 @@ export const MyPage = () => {
                       <EpisodeInfo>
                         <EpisodeTitle>{episode.flightName}</EpisodeTitle>
                         <EpisodeDate>
-                          {episodeUtils.formatDateTime(episode.departureTime, i18n.language)}
+                          {episodeUtils.formatDateTime(
+                            episode.departureTime,
+                            i18n.language
+                          )}
                         </EpisodeDate>
                         <TriggerInfo>
                           {episodeUtils.getTriggerCondition(episode, t)}
                         </TriggerInfo>
                       </EpisodeInfo>
-                      <Badge variant={episodeUtils.getStateBadgeVariant(episode.state)}>
-                        {t(`activeEvents.status.${episodeUtils.getStateLabel(episode.state)}`)}
+                      <Badge
+                        variant={episodeUtils.getStateBadgeVariant(
+                          episode.state
+                        )}
+                      >
+                        {t(
+                          `activeEvents.status.${episodeUtils.getStateLabel(
+                            episode.state
+                          )}`
+                        )}
                       </Badge>
                     </EpisodeHeader>
 
                     <EpisodeStats>
                       <StatItem>
-                        <StatLabel>{t("activeEvents.labels.premium")}</StatLabel>
-                        <StatValue>{episodeUtils.formatMNT(episode.premiumAmount)}</StatValue>
+                        <StatLabel>
+                          {t("activeEvents.labels.premium")}
+                        </StatLabel>
+                        <StatValue>
+                          {episodeUtils.formatMNT(episode.premiumAmount)}
+                        </StatValue>
                       </StatItem>
                       <StatItem>
-                        <StatLabel>{t("activeEvents.labels.maxPayout")}</StatLabel>
+                        <StatLabel>
+                          {t("activeEvents.labels.maxPayout")}
+                        </StatLabel>
                         <StatValue highlight>
                           {episodeUtils.formatMNT(episode.payoutAmount)}
                         </StatValue>
                       </StatItem>
                       <StatItem>
-                        <StatLabel>{t("activeEvents.labels.poolSize")}</StatLabel>
-                        <StatValue>{episodeUtils.formatMNT(episode.totalPremium)}</StatValue>
+                        <StatLabel>
+                          {t("activeEvents.labels.poolSize")}
+                        </StatLabel>
+                        <StatValue>
+                          {episodeUtils.formatMNT(episode.totalPremium)}
+                        </StatValue>
                       </StatItem>
                     </EpisodeStats>
 
-                    {(episode.state === EpisodeState.Open || episode.state === EpisodeState.Locked) && (
+                    {(episode.state === EpisodeState.Open ||
+                      episode.state === EpisodeState.Locked) && (
                       <MonitoringSection>
                         <LiveBadge>{t("activeEvents.labels.live")}</LiveBadge>
                         <MonitoringStats>
                           <StatItem>
-                            <StatLabel>{t("activeEvents.labels.flightStatus")}</StatLabel>
-                            <StatValue>{t("activeEvents.labels.enRoute")}</StatValue>
+                            <StatLabel>
+                              {t("activeEvents.labels.flightStatus")}
+                            </StatLabel>
+                            <StatValue>
+                              {t("activeEvents.labels.enRoute")}
+                            </StatValue>
                           </StatItem>
                           <StatItem>
-                            <StatLabel>{t("activeEvents.labels.currentDelay")}</StatLabel>
+                            <StatLabel>
+                              {t("activeEvents.labels.currentDelay")}
+                            </StatLabel>
                             <StatValue style={{ color: theme.colors.warning }}>
                               1h 30m
                             </StatValue>
@@ -434,13 +489,21 @@ export const MyPage = () => {
                         </MonitoringStats>
                       </MonitoringSection>
                     )}
+
+                    <ViewRulesButton
+                      onClick={() =>
+                        navigate(`/explorer?event=${episode.address}`)
+                      }
+                    >
+                      {t("myEpisodes.labels.viewRules")}
+                    </ViewRulesButton>
                   </EpisodeCard>
                 ))}
               </EpisodeList>
             )}
 
             <SectionTitle>
-              {t("myPage.pastEpisodes")}
+              {t("myEpisodes.pastEpisodes")}
               <Badge>{pastEpisodes.length}</Badge>
             </SectionTitle>
 
@@ -452,8 +515,8 @@ export const MyPage = () => {
                     <polyline points="12 6 12 12 16 14" />
                   </svg>
                 </EmptyIcon>
-                <EmptyTitle>{t("myPage.noPastEpisodes")}</EmptyTitle>
-                <EmptyText>{t("myPage.noPastEpisodesDesc")}</EmptyText>
+                <EmptyTitle>{t("myEpisodes.noPastEpisodes")}</EmptyTitle>
+                <EmptyText>{t("myEpisodes.noPastEpisodesDesc")}</EmptyText>
               </EmptyState>
             ) : (
               <EpisodeList>
@@ -469,31 +532,52 @@ export const MyPage = () => {
                       <EpisodeInfo>
                         <EpisodeTitle>{episode.flightName}</EpisodeTitle>
                         <EpisodeDate>
-                          {episodeUtils.formatDateTime(episode.departureTime, i18n.language)}
+                          {episodeUtils.formatDateTime(
+                            episode.departureTime,
+                            i18n.language
+                          )}
                         </EpisodeDate>
                         <TriggerInfo>
                           {episodeUtils.getTriggerCondition(episode, t)}
                         </TriggerInfo>
                       </EpisodeInfo>
-                      <Badge variant={episodeUtils.getStateBadgeVariant(episode.state)}>
-                        {t(`activeEvents.status.${episodeUtils.getStateLabel(episode.state)}`)}
+                      <Badge
+                        variant={episodeUtils.getStateBadgeVariant(
+                          episode.state
+                        )}
+                      >
+                        {t(
+                          `activeEvents.status.${episodeUtils.getStateLabel(
+                            episode.state
+                          )}`
+                        )}
                       </Badge>
                     </EpisodeHeader>
 
                     <EpisodeStats>
                       <StatItem>
-                        <StatLabel>{t("activeEvents.labels.premium")}</StatLabel>
-                        <StatValue>{episodeUtils.formatMNT(episode.premiumAmount)}</StatValue>
+                        <StatLabel>
+                          {t("activeEvents.labels.premium")}
+                        </StatLabel>
+                        <StatValue>
+                          {episodeUtils.formatMNT(episode.premiumAmount)}
+                        </StatValue>
                       </StatItem>
                       <StatItem>
-                        <StatLabel>{t("activeEvents.labels.maxPayout")}</StatLabel>
+                        <StatLabel>
+                          {t("activeEvents.labels.maxPayout")}
+                        </StatLabel>
                         <StatValue highlight>
                           {episodeUtils.formatMNT(episode.payoutAmount)}
                         </StatValue>
                       </StatItem>
                       <StatItem>
-                        <StatLabel>{t("activeEvents.labels.poolSize")}</StatLabel>
-                        <StatValue>{episodeUtils.formatMNT(episode.totalPremium)}</StatValue>
+                        <StatLabel>
+                          {t("activeEvents.labels.poolSize")}
+                        </StatLabel>
+                        <StatValue>
+                          {episodeUtils.formatMNT(episode.totalPremium)}
+                        </StatValue>
                       </StatItem>
                     </EpisodeStats>
                   </EpisodeCard>

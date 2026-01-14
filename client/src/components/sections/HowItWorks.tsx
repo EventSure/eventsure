@@ -7,11 +7,13 @@ const Section = styled.section`
   padding: ${theme.spacing.xxxl} ${theme.spacing.xl};
   position: relative;
   overflow: hidden;
+  background: ${theme.colors.background};
 `
 
 const Container = styled.div`
   max-width: 1200px;
   margin: 0 auto;
+  position: relative;
 `
 
 const SectionHeader = styled.div`
@@ -37,12 +39,17 @@ const SectionTitle = styled.h2`
   font-size: ${theme.fontSize.xxxl};
   font-weight: ${theme.fontWeight.bold};
   margin-bottom: ${theme.spacing.md};
+  color: ${theme.colors.text};
 
   span {
     background: linear-gradient(135deg, ${theme.colors.primary}, ${theme.colors.secondary});
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     background-clip: text;
+  }
+
+  @media (max-width: ${theme.breakpoints.md}) {
+    font-size: ${theme.fontSize.xxl};
   }
 `
 
@@ -53,184 +60,222 @@ const SectionDescription = styled.p`
   margin: 0 auto;
 `
 
-const StepsContainer = styled.div`
-  display: flex;
-  flex-direction: column;
-  gap: ${theme.spacing.xxl};
-  position: relative;
-
-  &::before {
-    content: '';
-    position: absolute;
-    left: 50%;
-    top: 0;
-    bottom: 0;
-    width: 2px;
-    background: linear-gradient(
-      to bottom,
-      transparent,
-      ${theme.colors.primary}40,
-      ${theme.colors.secondary}40,
-      transparent
-    );
-    transform: translateX(-50%);
-
-    @media (max-width: ${theme.breakpoints.lg}) {
-      left: 24px;
-    }
-  }
-`
-
-const StepRow = styled(motion.div)<{ reverse?: boolean }>`
+const FlowsContainer = styled.div`
   display: grid;
   grid-template-columns: 1fr auto 1fr;
-  gap: ${theme.spacing.xl};
-  align-items: center;
+  gap: ${theme.spacing.xxl};
+  margin-top: ${theme.spacing.xxxl};
+  position: relative;
 
   @media (max-width: ${theme.breakpoints.lg}) {
-    grid-template-columns: auto 1fr;
-    gap: ${theme.spacing.lg};
+    grid-template-columns: 1fr;
+    gap: ${theme.spacing.xl};
   }
 `
 
-const StepContent = styled.div<{ align?: 'left' | 'right' }>`
-  text-align: ${({ align }) => align || 'left'};
-
-  @media (max-width: ${theme.breakpoints.lg}) {
-    text-align: left;
-    order: 2;
-  }
-`
-
-const StepNumber = styled.div`
-  width: 48px;
-  height: 48px;
-  border-radius: 50%;
-  background: linear-gradient(135deg, ${theme.colors.primary}, ${theme.colors.secondary});
+const FlowColumn = styled.div`
   display: flex;
-  align-items: center;
-  justify-content: center;
+  flex-direction: column;
+  gap: ${theme.spacing.lg};
+`
+
+const ColumnHeader = styled.div`
+  margin-bottom: ${theme.spacing.xl};
+  text-align: center;
+`
+
+const ColumnTitle = styled.h3`
   font-size: ${theme.fontSize.xl};
   font-weight: ${theme.fontWeight.bold};
-  color: white;
-  position: relative;
-  z-index: 2;
-  box-shadow: ${theme.shadows.glowStrong};
+  color: ${theme.colors.text};
+  margin-bottom: ${theme.spacing.xs};
 `
 
-const StepCard = styled.div`
-  background: ${theme.colors.glass};
-  backdrop-filter: blur(12px);
-  border: 1px solid ${theme.colors.glassBorder};
-  border-radius: ${theme.borderRadius.xl};
-  padding: ${theme.spacing.xl};
-  max-width: 400px;
+const ColumnSubtitle = styled.p`
+  font-size: ${theme.fontSize.sm};
+  color: ${theme.colors.textSecondary};
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+`
+
+const DividerWrapper = styled.div`
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  position: relative;
+  min-width: 120px;
 
   @media (max-width: ${theme.breakpoints.lg}) {
-    max-width: 100%;
+    min-width: unset;
+    padding: ${theme.spacing.xl} 0;
   }
 `
 
-const StepIcon = styled.div`
-  width: 56px;
-  height: 56px;
-  background: linear-gradient(135deg, ${theme.colors.primary}20, ${theme.colors.secondary}20);
-  border-radius: ${theme.borderRadius.lg};
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  margin-bottom: ${theme.spacing.md};
+const VerticalLine = styled.div`
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 2px;
+  background: linear-gradient(to bottom, 
+    transparent, 
+    ${theme.colors.primary} 15%, 
+    ${theme.colors.primary} 85%, 
+    transparent
+  );
+  box-shadow: 0 0 15px ${theme.colors.primary};
+  opacity: 0.5;
 
-  svg {
-    width: 28px;
-    height: 28px;
-    stroke: ${theme.colors.primary};
-    fill: none;
-    stroke-width: 2;
-    stroke-linecap: round;
-    stroke-linejoin: round;
-  }
-`
-
-const StepTitle = styled.h3`
-  font-size: ${theme.fontSize.xl};
-  font-weight: ${theme.fontWeight.semibold};
-  margin-bottom: ${theme.spacing.sm};
-  color: ${theme.colors.text};
-`
-
-const StepDescription = styled.p`
-  font-size: ${theme.fontSize.md};
-  color: ${theme.colors.textSecondary};
-  line-height: 1.6;
-`
-
-const Spacer = styled.div`
   @media (max-width: ${theme.breakpoints.lg}) {
     display: none;
   }
 `
 
+const DividerMessage = styled.div`
+  position: sticky;
+  top: 50%;
+  transform: translateY(-50%);
+  background: ${theme.colors.primary};
+  color: white;
+  padding: ${theme.spacing.lg};
+  border-radius: ${theme.borderRadius.lg};
+  text-align: center;
+  font-size: ${theme.fontSize.sm};
+  font-weight: ${theme.fontWeight.bold};
+  box-shadow: ${theme.shadows.glowStrong};
+  z-index: 10;
+  width: 200px;
+  line-height: 1.4;
+
+  @media (max-width: ${theme.breakpoints.lg}) {
+    position: relative;
+    top: 0;
+    transform: none;
+    width: 100%;
+    max-width: 400px;
+  }
+`
+
+const StepCard = styled(motion.div)`
+  background: ${theme.colors.glass};
+  backdrop-filter: blur(10px);
+  border: 1px solid ${theme.colors.glassBorder};
+  border-radius: ${theme.borderRadius.xl};
+  padding: ${theme.spacing.xl};
+  position: relative;
+  transition: ${theme.transitions.normal};
+
+  &:hover {
+    border-color: ${theme.colors.primary}40;
+    transform: translateY(-5px);
+  }
+`
+
+const StepBadge = styled.div`
+  width: 32px;
+  height: 32px;
+  background: linear-gradient(135deg, ${theme.colors.primary}, ${theme.colors.secondary});
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  font-weight: ${theme.fontWeight.bold};
+  font-size: ${theme.fontSize.sm};
+  margin-bottom: ${theme.spacing.md};
+  box-shadow: ${theme.shadows.glow};
+`
+
+const CardTitle = styled.h4`
+  font-size: ${theme.fontSize.lg};
+  font-weight: ${theme.fontWeight.bold};
+  margin-bottom: ${theme.spacing.sm};
+  color: ${theme.colors.text};
+`
+
+const CardDescription = styled.p`
+  font-size: ${theme.fontSize.md};
+  line-height: 1.6;
+  color: ${theme.colors.textSecondary};
+`
+
+const List = styled.ul`
+  list-style: none;
+  padding: 0;
+  margin: ${theme.spacing.md} 0;
+`
+
+const ListItem = styled.li`
+  font-size: ${theme.fontSize.sm};
+  color: ${theme.colors.textSecondary};
+  display: flex;
+  gap: ${theme.spacing.sm};
+  margin-bottom: ${theme.spacing.xs};
+
+  &::before {
+    content: '•';
+    color: ${theme.colors.primary};
+    font-weight: bold;
+  }
+`
+
+const CardFooter = styled.div`
+  font-size: ${theme.fontSize.sm};
+  font-weight: ${theme.fontWeight.semibold};
+  color: ${theme.colors.primary};
+  margin-top: ${theme.spacing.md};
+  padding-top: ${theme.spacing.md};
+  border-top: 1px solid ${theme.colors.glassBorder};
+`
+
+const CardSubtext = styled.p`
+  font-size: ${theme.fontSize.xs};
+  color: ${theme.colors.textMuted};
+  margin-top: ${theme.spacing.xs};
+  font-style: italic;
+`
+
+interface StepData {
+  title: string
+  description: string
+  list?: string[]
+  footer?: string
+  subtext?: string
+}
+
+const Step = ({ num, data, index }: { num: number; data: StepData; index: number }) => (
+  <StepCard
+    initial={{ opacity: 0, y: 20 }}
+    whileInView={{ opacity: 1, y: 0 }}
+    viewport={{ once: true }}
+    transition={{ duration: 0.5, delay: index * 0.1 }}
+  >
+    <StepBadge>{num}</StepBadge>
+    <CardTitle>{data.title}</CardTitle>
+    <CardDescription>{data.description}</CardDescription>
+    
+    {data.list && Array.isArray(data.list) && (
+      <List>
+        {data.list.map((item, i) => (
+          <ListItem key={i}>{item}</ListItem>
+        ))}
+      </List>
+    )}
+
+    {data.footer && <CardFooter>{data.footer}</CardFooter>}
+    {data.subtext && <CardSubtext>{data.subtext}</CardSubtext>}
+  </StepCard>
+)
+
 export const HowItWorks = () => {
   const { t } = useTranslation()
+
+  const systemSteps = [1, 2, 3, 4].map(num => 
+    t(`howItWorks.systemFlow.step${num}`, { returnObjects: true }) as StepData
+  )
   
-  const steps = [
-    {
-      number: 1,
-      icon: (
-        <svg viewBox="0 0 24 24">
-          <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z" />
-          <polyline points="3.27 6.96 12 12.01 20.73 6.96" />
-          <line x1="12" y1="22.08" x2="12" y2="12" />
-        </svg>
-      ),
-      title: t('howItWorks.steps.connect.title'),
-      description: t('howItWorks.steps.connect.description'),
-    },
-    {
-      number: 2,
-      icon: (
-        <svg viewBox="0 0 24 24">
-          <path d="M21 16v-2l-8-5V3.5c0-.83-.67-1.5-1.5-1.5S10 2.67 10 3.5V9l-8 5v2l8-2.5V19l-2 1.5V22l3.5-1 3.5 1v-1.5L13 19v-5.5l8 2.5z" />
-        </svg>
-      ),
-      title: t('howItWorks.steps.flight.title'),
-      description: t('howItWorks.steps.flight.description'),
-    },
-    {
-      number: 3,
-      icon: (
-        <svg viewBox="0 0 24 24">
-          <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
-          <path d="M9 12l2 2 4-4" />
-        </svg>
-      ),
-      title: t('howItWorks.steps.purchase.title'),
-      description: t('howItWorks.steps.purchase.description'),
-    },
-    {
-      number: 4,
-      icon: (
-        <svg viewBox="0 0 24 24">
-          <circle cx="12" cy="12" r="10" />
-          <polyline points="12 6 12 12 16 14" />
-        </svg>
-      ),
-      title: t('howItWorks.steps.monitor.title'),
-      description: t('howItWorks.steps.monitor.description'),
-    },
-    {
-      number: 5,
-      icon: (
-        <svg viewBox="0 0 24 24">
-          <line x1="12" y1="1" x2="12" y2="23" />
-          <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6" />
-        </svg>
-      ),
-      title: t('howItWorks.steps.payout.title'),
-      description: t('howItWorks.steps.payout.description'),
-    },
-  ]
+  const userSteps = [1, 2, 3, 4].map(num => 
+    t(`howItWorks.userFlow.step${num}`, { returnObjects: true }) as StepData
+  )
 
   return (
     <Section>
@@ -245,44 +290,36 @@ export const HowItWorks = () => {
           </SectionDescription>
         </SectionHeader>
 
-        <StepsContainer>
-          {steps.map((step, index) => (
-            <StepRow
-              key={step.number}
-              reverse={index % 2 === 1}
-              initial={{ opacity: 0, y: 30 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true, margin: '-100px' }}
-              transition={{ duration: 0.5, delay: index * 0.1 }}
-            >
-              {index % 2 === 0 ? (
-                <>
-                  <StepContent align="right">
-                    <StepCard>
-                      <StepIcon>{step.icon}</StepIcon>
-                      <StepTitle>{step.title}</StepTitle>
-                      <StepDescription>{step.description}</StepDescription>
-                    </StepCard>
-                  </StepContent>
-                  <StepNumber>{step.number}</StepNumber>
-                  <Spacer />
-                </>
-              ) : (
-                <>
-                  <Spacer />
-                  <StepNumber>{step.number}</StepNumber>
-                  <StepContent align="left">
-                    <StepCard>
-                      <StepIcon>{step.icon}</StepIcon>
-                      <StepTitle>{step.title}</StepTitle>
-                      <StepDescription>{step.description}</StepDescription>
-                    </StepCard>
-                  </StepContent>
-                </>
-              )}
-            </StepRow>
-          ))}
-        </StepsContainer>
+        <FlowsContainer>
+          <FlowColumn>
+            <ColumnHeader>
+              <ColumnTitle>{t('howItWorks.tabs.system')}</ColumnTitle>
+              <ColumnSubtitle>{t('howItWorks.tabSubtitles.system')}</ColumnSubtitle>
+            </ColumnHeader>
+            {systemSteps.map((step, idx) => (
+              <Step key={`system-${idx}`} num={idx + 1} data={step} index={idx} />
+            ))}
+          </FlowColumn>
+
+          <DividerWrapper>
+            <VerticalLine />
+            <DividerMessage>
+              {t('howItWorks.divider.line1')}
+              <br />
+              {t('howItWorks.divider.line2')}
+            </DividerMessage>
+          </DividerWrapper>
+
+          <FlowColumn>
+            <ColumnHeader>
+              <ColumnTitle>{t('howItWorks.tabs.user')}</ColumnTitle>
+              <ColumnSubtitle>{t('howItWorks.tabSubtitles.user')}</ColumnSubtitle>
+            </ColumnHeader>
+            {userSteps.map((step, idx) => (
+              <Step key={`user-${idx}`} num={idx + 1} data={step} index={idx} />
+            ))}
+          </FlowColumn>
+        </FlowsContainer>
       </Container>
     </Section>
   )

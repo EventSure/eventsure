@@ -1,18 +1,20 @@
 {
   "header": {
     "home": "Home",
-    "explorer": "Explorer",
-    "myPage": "My Page",
+    "explorer": "Episode Explorer",
+    "history": "Event History",
+    "myEpisodes": "My Episodes",
     "claims": "Claims",
     "about": "About"
   },
   "hero": {
     "badge": "Powered by Mantle Network",
-    "title1": "Flight Delay",
-    "title2": "Insurance",
-    "title3": "On-Chain Protection",
-    "subtitle": "Get instant compensation for flight delays with our decentralized mutual insurance protocol. Transparent, automated, and trustless coverage for travelers worldwide.",
-    "getCoverage": "Get Coverage",
+    "title1": "EventSure",
+    "title2": "",
+    "title3": "When real events happen, insurance just works.",
+    "subtitle": "An event-based, rule-driven insurance platform that automatically resolves outcomes based on predefined real-world conditions.",
+    "highlights": ["No interpretation.", "No claims.", "No trust required."],
+    "getCoverage": "Explore Events",
     "learnMore": "Learn More"
   },
   "stats": {
@@ -42,14 +44,14 @@
     "subtext": "All conditions are predetermined.",
     "filters": {
       "all": "All",
-      "recruiting": "Recruiting",
-      "active": "Active",
-      "settling": "Settling"
+      "open": "Open",
+      "locked": "Locked",
+      "resolved": "Resolved"
     },
     "status": {
-      "recruiting": "Recruiting",
-      "active": "Active",
-      "settling": "Settling"
+      "open": "Open",
+      "locked": "Locked",
+      "resolved": "Resolved"
     },
     "labels": {
       "coverageCondition": "Coverage Condition",
@@ -58,7 +60,7 @@
       "members": "Members",
       "endDate": "End Date",
       "poolSize": "Pool Size",
-      "join": "Join Now"
+      "comingSoon": "Coming Soon"
     },
     "categories": {
       "flightDelay": "Flight Delay",
@@ -88,51 +90,132 @@
       }
     }
   },
+  "whatIs": {
+    "title": "What is EventSure?",
+    "description1": "EventSure helps reduce uncertainty around everyday events, before they happen.",
+    "description2": "Insurance usually asks you to trust first and understand later.",
+    "description3": "EventSure flips that.",
+    "description4": "Here, insurance is not a promise.",
+    "description5": "It is a fixed agreement around a real-world event.",
+    "process": [
+      "You read the rules.",
+      "You decide to join.",
+      "The outcome is resolved automatically."
+    ]
+  },
   "liveTransactions": {
     "badge": "Live on Mantle",
     "title": "Real-Time",
     "titleHighlight": "Transparency",
     "description": "Every transaction is recorded on-chain. Watch the protocol in action with complete transparency.",
     "feedTitle": "Live Transaction Feed",
+    "mockBadge": "Preview",
     "txTypes": {
-      "purchase": "Policy Purchased",
-      "claim": "Claim Submitted",
-      "payout": "Payout Sent",
-      "stake": "Pool Staked"
+      "join": "Episode Joined",
+      "triggered": "Event Triggered",
+      "payout": "Payout Sent"
     },
     "stats": {
       "volume": "Total Volume (24h)",
-      "activePolicies": "Active Policies",
+      "activeEpisodes": "Active Episodes",
       "networkStatus": "Network Status",
       "acrossAll": "Across all transactions",
-      "protected": "Protected travelers"
+      "participants": "Active participants"
+    }
+  },
+  "eventHistory": {
+    "title": "Event History",
+    "subtitle": "Explore the lifecycle of insurance episodes on Mantle Network.",
+    "noEpisodes": "No episodes yet",
+    "noEpisodesDesc": "When insurance episodes are created, they will appear here.",
+    "noEvents": "No event history found",
+    "events": {
+      "created": "Episode Created",
+      "open": "Opened for Participation",
+      "join": "New Participant Joined",
+      "locked": "Episode Locked",
+      "resolved": "Episode Resolved"
     }
   },
   "howItWorks": {
     "badge": "Simple Process",
     "title": "How It",
     "titleHighlight": "Works",
-    "description": "Get protected in minutes with our streamlined on-chain insurance process.",
-    "steps": {
-      "connect": {
-        "title": "Connect Wallet",
-        "description": "Connect your Web3 wallet to the Mantle network. We support MetaMask, WalletConnect, and other popular wallets."
+    "description": "Get covered in minutes with our streamlined on-chain process.",
+    "tabTitle": "How EventSure Works",
+    "tabs": {
+      "system": "System Flow",
+      "user": "User Flow"
+    },
+    "tabSubtitles": {
+      "system": "What EventSure Does",
+      "user": "What You Do"
+    },
+    "divider": {
+      "line1": "You decide before the event.",
+      "line2": "The system handles everything after."
+    },
+    "systemFlow": {
+      "step1": {
+        "title": "Episode Is Defined",
+        "description": "A real-world event is defined with fixed rules, duration, and a single oracle source.",
+        "footer": "Once created, the rules cannot be changed."
       },
-      "flight": {
-        "title": "Enter Flight Details",
-        "description": "Input your flight number and travel date. Our system automatically verifies flight data through trusted oracles."
+      "step2": {
+        "title": "Risk Pool Is Formed",
+        "description": "Participants facing the same event are grouped into one homogeneous risk pool.",
+        "list": ["one event", "one pool", "one clear end"],
+        "listPrefix": "Each episode has:",
+        "footer": "No mixed risks. No hidden incentives."
       },
-      "purchase": {
-        "title": "Purchase Coverage",
-        "description": "Pay a small premium in MNT tokens to activate your coverage. Smart contracts instantly secure your policy on-chain."
+      "step3": {
+        "title": "Outcome Is Resolved",
+        "description": "When the event ends, oracle data determines whether the trigger condition is met.",
+        "list": [
+          "no manual review",
+          "no interpretation",
+          "no human intervention"
+        ],
+        "listPrefix": "There is:",
+        "footer": "The result is resolved automatically."
       },
-      "monitor": {
-        "title": "Automatic Monitoring",
-        "description": "Our oracle network monitors your flight in real-time. No action needed from you - just travel as planned."
+      "step4": {
+        "title": "Settlement Is Executed",
+        "description": "Based on the resolved outcome, payouts and surplus distribution are executed transparently on-chain.",
+        "subtext": "All settlements happen within the pool's available assets.",
+        "footer": "After settlement, the episode is permanently closed."
+      }
+    },
+    "userFlow": {
+      "step1": {
+        "title": "Explore Events",
+        "description": "Browse real-world events with fixed duration and conditions such as flight delays or travel disruptions."
       },
-      "payout": {
-        "title": "Instant Payout",
-        "description": "If your flight is delayed beyond the threshold, compensation is automatically sent to your wallet. No claims, no waiting."
+      "step2": {
+        "title": "Review the Rules",
+        "description": "Understand exactly:",
+        "list": [
+          "what is covered",
+          "how outcomes are determined",
+          "and what your maximum loss is before you participate"
+        ]
+      },
+      "step3": {
+        "title": "Join the Pool",
+        "description": "You don't buy insurance. You join a risk pool with others facing the same event.",
+        "list": [
+          "Your risk is capped upfront.",
+          "There are no additional contributions later."
+        ]
+      },
+      "step4": {
+        "title": "Automatic Resolution",
+        "description": "When the event ends, oracle data resolves the outcome automatically.",
+        "list": [
+          "No claims.",
+          "No interpretation.",
+          "No additional actions required."
+        ]
       }
     }
   },
@@ -257,10 +340,14 @@
   },
   "activeEvents": {
     "badge": "EPISODE EXPLORER",
-    "title": "Active Events",
-    "subtitle": "Check the rules for each event before participating. All conditions are fixed in advance.",
+    "title": "Active Episodes",
+    "subtitle": "Check the rules for each episode before participating. All conditions are fixed in advance.",
     "status": {
-      "recruiting": "Recruiting",
+      "all": "All",
+      "created": "Created",
+      "open": "Open",
+      "locked": "Locked",
+      "resolved": "Resolved",
       "inForce": "IN FORCE"
     },
     "categories": {
@@ -275,6 +362,7 @@
       "trigger": "Trigger",
       "premium": "Premium",
       "maxPayout": "Max payout",
+      "poolSize": "Pool Size",
       "maxLoss": "Max Loss",
       "event": "Event",
       "eventWindow": "Event window",
@@ -286,7 +374,7 @@
       "poolLogicDesc": "Homogeneous risk pool. Surplus returned pro-rata to members.",
       "none": "None",
       "checkboxLabel": "I understand these rules. I acknowledge that outcomes are determined automatically by the oracle with no negotiation or appeal.",
-      "joinPool": "Join Pool",
+      "joinEpisode": "Join Episode",
       "confirmAndJoin": "Confirm & Join",
       "poolClosesIn": "Pool closes in",
       "eventEndsIn": "Event ends in",
@@ -298,7 +386,7 @@
       "currentDelay": "Current delay",
       "progressToTrigger": "Progress to trigger",
       "referenceOnly": "Real-time data is for reference only. Final outcome is determined solely by oracle resolution at the specified time.",
-      "viewResolution": "View Resolution",
+      "viewMyEpisodes": "View My Episodes",
       "episodeRules": "Episode Rules",
       "readOnly": "Read-only",
       "coveredEvent": "Covered Event",
@@ -307,9 +395,9 @@
       "enRoute": "En route",
       "triggerThreshold": "3h (trigger)",
       "afterArrival": "After arrival",
-        "walletRequired": "Please connect your wallet to join the pool.",
-        "alreadyJoined": "Already Joined",
-        "alreadyJoinedDesc": "You have already joined this pool."
+      "walletRequired": "Please connect your wallet to join the pool.",
+      "alreadyJoined": "Already Joined",
+      "alreadyJoinedDesc": "You have already joined this pool."
     },
     "defaultTrigger": "Flight delay ≥ 3 hours",
     "noEpisodes": "No episodes available",
@@ -383,8 +471,8 @@
     "noEpisodes": "No Episodes Found",
     "noEpisodesDesc": "There are no insurance episodes available at the moment. Check back soon!"
   },
-  "myPage": {
-    "title": "My Page",
+  "myEpisodes": {
+    "title": "My Episodes",
     "subtitle": "Manage episodes for {{address}}",
     "activeEpisodes": "Active Episodes",
     "pastEpisodes": "Past Episodes",
@@ -395,6 +483,9 @@
     "exploreEpisodes": "Explore Episodes",
     "connectWallet": "Connect Your Wallet",
     "connectWalletDesc": "Please connect your wallet to view your episode history.",
-    "loading": "Loading..."
+    "loading": "Loading...",
+    "labels": {
+      "viewRules": "View Rules"
+    }
   }
 }

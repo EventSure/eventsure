@@ -5,7 +5,7 @@ import { EpisodeState } from '@/types/episode';
 export const getStateLabel = (state: number): string => {
   switch (state) {
     case EpisodeState.Created: return 'created';
-    case EpisodeState.Open: return 'recruiting';
+    case EpisodeState.Open: return 'open';
     case EpisodeState.Locked: return 'locked';
     case EpisodeState.Resolved: return 'resolved';
     case EpisodeState.Settled: return 'settled';

@@ -115,6 +115,19 @@ const TxCount = styled.span`
   border-radius: ${theme.borderRadius.full};
 `
 
+const MockBadge = styled.div`
+  display: inline-flex;
+  align-items: center;
+  gap: ${theme.spacing.xs};
+  padding: ${theme.spacing.xs} ${theme.spacing.sm};
+  background: ${theme.colors.warning}15;
+  border: 1px solid ${theme.colors.warning}30;
+  border-radius: ${theme.borderRadius.full};
+  color: ${theme.colors.warning};
+  font-size: ${theme.fontSize.xs};
+  font-weight: ${theme.fontWeight.medium};
+`
+
 const FeedList = styled.div`
   height: 400px;
   overflow: hidden;
@@ -144,14 +157,12 @@ const TxIcon = styled.div<{ type: string }>`
 
   ${({ type }) => {
     switch (type) {
-      case 'purchase':
+      case 'join':
         return `background: ${theme.colors.primary}20; color: ${theme.colors.primary};`
-      case 'claim':
-        return `background: ${theme.colors.success}20; color: ${theme.colors.success};`
+      case 'triggered':
+        return `background: ${theme.colors.warning}20; color: ${theme.colors.warning};`
       case 'payout':
         return `background: ${theme.colors.secondary}20; color: ${theme.colors.secondary};`
-      case 'stake':
-        return `background: ${theme.colors.accent}20; color: ${theme.colors.accent};`
       default:
         return `background: ${theme.colors.surfaceLight}; color: ${theme.colors.textSecondary};`
     }
@@ -292,7 +303,7 @@ const NetworkStats = styled.div`
 // Mock transaction data
 interface Transaction {
   id: string
-  type: 'purchase' | 'claim' | 'payout' | 'stake'
+  type: 'join' | 'triggered' | 'payout'
   hash: string
   address: string
   amount: string
@@ -301,10 +312,9 @@ interface Transaction {
 }
 
 const transactionTypes = [
-  { type: 'purchase' as const, label: 'Policy Purchased', flights: ['KE123', 'OZ456', 'AA789', 'UA234', 'DL567'] },
-  { type: 'claim' as const, label: 'Claim Submitted', flights: ['BA321', 'LH654', 'AF987', 'JL432', 'SQ765'] },
-  { type: 'payout' as const, label: 'Payout Sent', flights: ['EK111', 'QR222', 'TK333', 'CX444', 'NH555'] },
-  { type: 'stake' as const, label: 'Pool Staked', flights: [] },
+  { type: 'join' as const, flights: ['KE123', 'OZ456', 'AA789', 'UA234', 'DL567'] },
+  { type: 'triggered' as const, flights: ['BA321', 'LH654', 'AF987', 'JL432', 'SQ765'] },
+  { type: 'payout' as const, flights: ['EK111', 'QR222', 'TK333', 'CX444', 'NH555'] },
 ]
 
 const generateMockTransaction = (): Transaction => {
@@ -324,19 +334,21 @@ const generateMockTransaction = (): Transaction => {
 
 const getTransactionIcon = (type: string) => {
   switch (type) {
-    case 'purchase':
+    case 'join':
       return (
         <svg viewBox="0 0 24 24">
-          <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
+          <path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" />
+          <circle cx="8.5" cy="7" r="4" />
+          <line x1="20" y1="8" x2="20" y2="14" />
+          <line x1="23" y1="11" x2="17" y2="11" />
         </svg>
       )
-    case 'claim':
+    case 'triggered':
       return (
         <svg viewBox="0 0 24 24">
-          <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
-          <polyline points="14 2 14 8 20 8" />
-          <line x1="16" y1="13" x2="8" y2="13" />
-          <line x1="16" y1="17" x2="8" y2="17" />
+          <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z" />
+          <line x1="12" y1="9" x2="12" y2="13" />
+          <line x1="12" y1="17" x2="12.01" y2="17" />
         </svg>
       )
     case 'payout':
@@ -346,21 +358,13 @@ const getTransactionIcon = (type: string) => {
           <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6" />
         </svg>
       )
-    case 'stake':
-      return (
-        <svg viewBox="0 0 24 24">
-          <circle cx="12" cy="12" r="10" />
-          <path d="M16 8h-6a2 2 0 1 0 0 4h4a2 2 0 1 1 0 4H8" />
-          <path d="M12 18V6" />
-        </svg>
-      )
     default:
       return null
   }
 }
 
-const getTransactionLabel = (type: string) => {
-  return transactionTypes.find((t) => t.type === type)?.label || type
+const getTransactionLabel = (type: string, t: (key: string) => string) => {
+  return t(`liveTransactions.txTypes.${type}`)
 }
 
 const formatTime = (date: Date) => {
@@ -426,6 +430,7 @@ export const LiveTransactions = () => {
                   <path d="M22 12h-4l-3 9L9 3l-3 9H2" />
                 </svg>
                 {t('liveTransactions.feedTitle')}
+                <MockBadge>{t('liveTransactions.mockBadge')}</MockBadge>
               </FeedTitle>
               <TxCount>{txPerSecond.toFixed(1)} tx/s</TxCount>
             </FeedHeader>
@@ -442,7 +447,7 @@ export const LiveTransactions = () => {
                   >
                     <TxIcon type={tx.type}>{getTransactionIcon(tx.type)}</TxIcon>
                     <TxInfo>
-                      <TxType>{getTransactionLabel(tx.type)}</TxType>
+                      <TxType>{getTransactionLabel(tx.type, t)}</TxType>
                       <TxDetails>
                         <TxHash>{tx.hash}</TxHash>
                         {tx.flight && <span>• Flight {tx.flight}</span>}
@@ -479,11 +484,11 @@ export const LiveTransactions = () => {
               transition={{ delay: 0.1 }}
             >
               <StatBoxHeader>
-                <StatBoxTitle>{t('liveTransactions.stats.activePolicies')}</StatBoxTitle>
+                <StatBoxTitle>{t('liveTransactions.stats.activeEpisodes')}</StatBoxTitle>
                 <StatBoxBadge trend="up">+8.3%</StatBoxBadge>
               </StatBoxHeader>
               <StatBoxValue>{activePolicies.toLocaleString()}</StatBoxValue>
-              <StatBoxSubtext>{t('liveTransactions.stats.protected')}</StatBoxSubtext>
+              <StatBoxSubtext>{t('liveTransactions.stats.participants')}</StatBoxSubtext>
             </StatBox>
 
             <StatBox

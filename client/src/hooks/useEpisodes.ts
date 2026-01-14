@@ -1,21 +1,47 @@
 import { useMemo } from 'react';
 import { useReadContracts } from 'wagmi';
-import { EpisodeFactoryABI, EPISODE_FACTORY_ADDRESS, EpisodeABI } from '@/contracts/abis';
+import { useQuery } from '@tanstack/react-query';
+import { EpisodeABI } from '@/contracts/abis';
 import type { EpisodeData } from '@/types/episode';
 
+const API_BASE_URL = 'https://eventsure-production.up.railway.app';
+
+const fetchEpisodeAddresses = async (): Promise<`0x${string}`[]> => {
+  const response = await fetch(`${API_BASE_URL}/api/episodes`);
+  if (!response.ok) {
+    throw new Error('Failed to fetch episodes from API');
+  }
+  const data = await response.json();
+  return (data.episodes as string[]).map(addr => addr.toLowerCase() as `0x${string}`)
+};
+
 export const useEpisodes = () => {
-  const { data: allEpisodesData, isLoading: isLoadingAddresses } = useReadContracts({
-    contracts: [{
-      address: EPISODE_FACTORY_ADDRESS,
-      abi: EpisodeFactoryABI,
-      functionName: 'allEpisodes',
-    }],
+  const { data: episodeAddresses = [], isLoading: isLoadingAddresses } = useQuery({
+    queryKey: ['episodeAddresses'],
+    queryFn: fetchEpisodeAddresses,
+    staleTime: 30000,
+    refetchInterval: 60000,
   });
 
-  const episodeAddresses = useMemo(() => {
-    if (!allEpisodesData?.[0]?.result) return [];
-    return allEpisodesData[0].result as `0x${string}`[];
-  }, [allEpisodesData]);
+  /*
+   * ORIGINAL CONTRACT DIRECT QUERY - Commented out per user request
+   * Can be restored if backend is unavailable
+   *
+   * import { EpisodeFactoryABI, EPISODE_FACTORY_ADDRESS } from '@/contracts/abis';
+   * 
+   * const { data: allEpisodesData, isLoading: isLoadingAddresses } = useReadContracts({
+   *   contracts: [{
+   *     address: EPISODE_FACTORY_ADDRESS,
+   *     abi: EpisodeFactoryABI,
+   *     functionName: 'allEpisodes',
+   *   }],
+   * });
+   *
+   * const episodeAddresses = useMemo(() => {
+   *   if (!allEpisodesData?.[0]?.result) return [];
+   *   return allEpisodesData[0].result as `0x${string}`[];
+   * }, [allEpisodesData]);
+   */
 
   const { data: episodeDetails, isLoading: isLoadingDetails } = useReadContracts({
     contracts: episodeAddresses.flatMap((address) => [
@@ -27,6 +53,9 @@ export const useEpisodes = () => {
       { address, abi: EpisodeABI, functionName: 'DEPARTURE_TIME' },
       { address, abi: EpisodeABI, functionName: 'ESTIMATED_ARRIVAL_TIME' },
     ]),
+    query: {
+      enabled: episodeAddresses.length > 0,
+    },
   });
 
   const episodes: EpisodeData[] = useMemo(() => {

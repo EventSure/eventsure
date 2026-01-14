@@ -2,17 +2,19 @@
   "header": {
     "home": "홈",
     "explorer": "탐색",
-    "myPage": "마이페이지",
+    "history": "이벤트 히스토리",
+    "myEpisodes": "마이 에피소드",
     "claims": "청구",
     "about": "소개"
   },
   "hero": {
     "badge": "Mantle 네트워크 기반",
-    "title1": "항공편 지연",
-    "title2": "보험",
-    "title3": "온체인 보호",
-    "subtitle": "탈중앙화 상호보험 프로토콜로 항공편 지연에 대한 즉각적인 보상을 받으세요. 전 세계 여행자를 위한 투명하고 자동화된 무신뢰 보장.",
-    "getCoverage": "보장 받기",
+    "title1": "EventSure",
+    "title2": "",
+    "title3": "실제 이벤트가 발생하면, 보험이 자동으로 작동합니다.",
+    "subtitle": "사전 정의된 실제 조건에 따라 결과를 자동으로 해결하는 이벤트 기반, 규칙 중심 보험 플랫폼.",
+    "highlights": ["해석 불필요.", "청구 불필요.", "신뢰 불필요."],
+    "getCoverage": "이벤트 탐색",
     "learnMore": "더 알아보기"
   },
   "stats": {
@@ -42,240 +44,21 @@
     "subtext": "모든 조건은 사전에 확정됩니다.",
     "filters": {
       "all": "전체",
-      "recruiting": "모집중",
-      "active": "진행중",
-      "settling": "정산중"
+      "open": "참여 가능",
+      "locked": "진행중",
+      "resolved": "정산 완료"
     },
     "status": {
-      "recruiting": "모집중",
-      "active": "진행중",
-      "settling": "정산중"
+      "open": "참여 가능",
+      "locked": "진행중",
+      "resolved": "정산 완료"
     },
     "labels": {
       "coverageCondition": "보장 조건",
       "premium": "보험료",
       "maxPayout": "최대 보상",
-      "members": "조합원",
-      "endDate": "종료일",
       "poolSize": "풀 규모",
-      "join": "가입하기"
-    },
-    "categories": {
-      "flightDelay": "항공 지연",
-      "weather": "날씨 위험",
-      "tripCancel": "여행 취소"
-    },
-    "pools": {
-      "incheonTokyo": {
-        "title": "인천-도쿄 항공편 지연 보험",
-        "description": "2025년 1월 15일 인천-나리타 구간 출발편 2시간 이상 지연 시 보상",
-        "condition": "출발 지연 2시간 이상 시 자동 지급"
-      },
-      "jejuTyphoon": {
-        "title": "제주도 태풍 취소 보험",
-        "description": "2025년 8월 여름 시즌 제주 여행 태풍으로 인한 항공편 결항 보상",
-        "condition": "태풍 경보로 인한 결항 시 자동 지급"
-      },
-      "gimpoJeju": {
-        "title": "김포-제주 항공편 지연 보험",
-        "description": "2025년 1월 국내선 김포-제주 구간 2시간 이상 지연 시 보상",
-        "condition": "출발 지연 2시간 이상 시 자동 지급"
-      },
-      "tokyoCherry": {
-        "title": "도쿄 벚꽃 시즌 여행 보험",
-        "description": "2024년 4월 도쿄 벚꽃 시즌 여행 취소 보상 정산 진행중",
-        "condition": "항공편 결항 또는 숙소 취소 시 자동 지급"
-      }
-    }
-  },
-  "liveTransactions": {
-    "badge": "Mantle 실시간",
-    "title": "실시간",
-    "titleHighlight": "투명성",
-    "description": "모든 거래가 온체인에 기록됩니다. 완전한 투명성으로 프로토콜 작동을 확인하세요.",
-    "feedTitle": "실시간 거래 피드",
-    "txTypes": {
-      "purchase": "보험 구매",
-      "claim": "보상 청구",
-      "payout": "보상 지급",
-      "stake": "풀 스테이킹"
-    },
-    "stats": {
-      "volume": "총 거래량 (24시간)",
-      "activePolicies": "활성 보험",
-      "networkStatus": "네트워크 상태",
-      "acrossAll": "전체 거래 기준",
-      "protected": "보호받는 여행자"
-    }
-  },
-  "howItWorks": {
-    "badge": "간단한 절차",
-    "title": "이용",
-    "titleHighlight": "방법",
-    "description": "간소화된 온체인 보험 절차로 몇 분 만에 보호받으세요.",
-    "steps": {
-      "connect": {
-        "title": "지갑 연결",
-        "description": "Mantle 네트워크에 Web3 지갑을 연결하세요. MetaMask, WalletConnect 및 기타 인기 지갑을 지원합니다."
-      },
-      "flight": {
-        "title": "항공편 정보 입력",
-        "description": "항공편 번호와 여행 날짜를 입력하세요. 시스템이 신뢰할 수 있는 오라클을 통해 항공편 데이터를 자동으로 검증합니다."
-      },
-      "purchase": {
-        "title": "보장 구매",
-        "description": "MNT 토큰으로 소액의 보험료를 지불하여 보장을 활성화하세요. 스마트 컨트랙트가 즉시 보험을 온체인에 확보합니다."
-      },
-      "monitor": {
-        "title": "자동 모니터링",
-        "description": "오라클 네트워크가 실시간으로 항공편을 모니터링합니다. 별도의 조치 없이 계획대로 여행하시면 됩니다."
-      },
-      "payout": {
-        "title": "즉시 지급",
-        "description": "항공편이 기준 시간을 초과하여 지연되면 보상금이 자동으로 지갑으로 전송됩니다. 청구도, 대기도 필요 없습니다."
-      }
-    }
-  },
-  "coveragePlans": {
-    "badge": "유연한 플랜",
-    "title": "보장",
-    "titleHighlight": "선택",
-    "description": "여행 필요에 맞는 보호 수준을 선택하세요. 모든 플랜에 즉각적인 온체인 지급이 포함됩니다.",
-    "mostPopular": "가장 인기",
-    "perFlight": "항공편당",
-    "getButton": "{{plan}} 선택",
-    "plans": {
-      "basic": {
-        "name": "Basic",
-        "description": "예산 여행자를 위한 필수 보장"
-      },
-      "standard": {
-        "name": "Standard",
-        "description": "자주 여행하는 분들에게 가장 인기 있는 선택"
-      },
-      "premium": {
-        "name": "Premium",
-        "description": "비즈니스 여행자를 위한 최대 보호"
-      }
-    },
-    "features": {
-      "delay3h": "3시간 이상 지연 보장",
-      "delay2h": "2시간 이상 지연 보장",
-      "delay1h": "1시간 이상 지연 보장",
-      "payout01": "최대 0.1 MNT 지급",
-      "payout03": "최대 0.3 MNT 지급",
-      "payout05": "최대 0.5 MNT 지급",
-      "single": "단일 항공편 보장",
-      "multi": "다중 항공편 번들 할인",
-      "unlimited": "30일 무제한 항공편",
-      "standard": "표준 오라클 검증",
-      "priority": "우선 오라클 검증",
-      "instant": "즉시 오라클 검증",
-      "email": "이메일 알림",
-      "push": "실시간 푸시 알림",
-      "support": "우선 고객 지원",
-      "cancel": "취소 보장 포함",
-      "cancelDelay": "취소 + 지연 보장",
-      "rebook": "재예약 비용 보장"
-    },
-    "coverage": {
-      "threshold": "지연 기준",
-      "maxPayout": "최대 지급액",
-      "validity": "유효 기간",
-      "3hours": "3시간 이상",
-      "2hours": "2시간 이상",
-      "1hour": "1시간 이상",
-      "singleFlight": "단일 항공편",
-      "30days": "30일",
-      "30daysUnlimited": "30일 무제한"
-    }
-  },
-  "faq": {
-    "badge": "궁금하신가요?",
-    "title": "자주 묻는",
-    "titleHighlight": "질문",
-    "description": "탈중앙화 항공 보험에 대해 알아야 할 모든 것.",
-    "questions": {
-      "q1": {
-        "question": "항공편 지연 보험은 어떻게 작동하나요?",
-        "answer": "보험을 구매하면 보장 세부 사항이 Mantle 블록체인에 기록됩니다. 오라클 네트워크가 여러 신뢰할 수 있는 소스에서 실시간 항공편 데이터를 모니터링합니다. 항공편이 보장 기준을 초과하여 지연되면 스마트 컨트랙트가 자동으로 지갑에 지급을 트리거합니다 - 청구 절차가 필요 없습니다."
-      },
-      "q2": {
-        "question": "어떤 지연이 보장되나요?",
-        "answer": "보장은 플랜 등급에 따라 다릅니다. Basic 플랜은 3시간 이상 지연, Standard는 2시간 이상, Premium은 1시간 이상 지연을 보장합니다. 지연은 원래 예정된 출발 시간을 기준으로 측정됩니다. 취소는 Standard 및 Premium 플랜에서 보장됩니다."
-      },
-      "q3": {
-        "question": "지급은 얼마나 빨리 받나요?",
-        "answer": "지급은 자동이며 일반적으로 오라클 네트워크에서 지연이 확인된 후 몇 분 내에 처리됩니다. 모든 것이 스마트 컨트랙트로 실행되므로 수동 검토 과정이 없습니다. 평균 지급 시간은 5분 미만입니다."
-      },
-      "q4": {
-        "question": "상호보험 풀이란 무엇인가요?",
-        "answer": "전통적인 보험 회사 대신 EventSure는 탈중앙화 상호 풀로 운영됩니다. 모든 보험료 지불은 모든 사람의 청구를 보장하는 공유 풀로 들어갑니다. 이는 전통적인 보험사의 이익 동기를 제거하여 여행자에게 더 낮은 보험료와 더 높은 지급을 제공합니다."
-      },
-      "q5": {
-        "question": "어떤 항공사와 항공편이 보장되나요?",
-        "answer": "모든 주요 항공사를 포함하여 전 세계 500개 이상의 항공사 항공편을 보장합니다. 오라클 네트워크는 공식 항공 데이터 소스와 통합하여 전 세계 항공편을 추적합니다. 구매 전에 특정 항공편이 시스템에서 추적 가능한지 확인할 수 있습니다."
-      },
-      "q6": {
-        "question": "어떤 토큰으로 결제하고 지급받나요?",
-        "answer": "모든 거래는 MNT(Mantle 네이티브 토큰)로 진행됩니다. 보험료는 MNT로 지불되며, 지급금은 연결된 지갑으로 MNT로 자동 전송됩니다. Mantle 네트워크의 낮은 가스 비용으로 소액 거래가 경제적으로 가능합니다."
-      },
-      "q7": {
-        "question": "항공편을 놓치면 보장이 유효한가요?",
-        "answer": "아니요, 보장은 항공사 측의 지연 및 취소에만 적용됩니다. 항공편을 놓치거나 공항에 늦게 도착하면 보장이 적용되지 않습니다. 보험은 공식 항공편 데이터로 확인된 항공사 측 지연만을 특정하여 보장합니다."
-      },
-      "q8": {
-        "question": "자금이 안전한지 어떻게 알 수 있나요?",
-        "answer": "스마트 컨트랙트는 선도적인 보안 회사에서 감사를 받았습니다. 모든 코드는 오픈소스이며 온체인에서 검증 가능합니다. 상호 풀은 단일 제어 지점 없이 감사된 스마트 컨트랙트로 관리됩니다. 블록체인에서 실시간으로 모든 거래와 풀 잔액을 볼 수 있습니다."
-      }
-    }
-  },
-  "footer": {
-    "description": "Mantle 네트워크의 스마트 컨트랙트로 구동되는 탈중앙화 항공 지연 보험. 전 세계 여행자를 위한 즉각적이고 투명하며 무신뢰 보장.",
-    "product": "제품",
-    "resources": "리소스",
-    "company": "회사",
-    "links": {
-      "howItWorks": "이용 방법",
-      "coveragePlans": "보장 플랜",
-      "pricing": "가격",
-      "faq": "FAQ",
-      "documentation": "문서",
-      "smartContracts": "스마트 컨트랙트",
-      "auditReports": "감사 보고서",
-      "api": "API",
-      "aboutUs": "회사 소개",
-      "blog": "블로그",
-      "careers": "채용",
-      "contact": "연락처"
-    },
-    "copyright": "© 2025 EventSure. All rights reserved.",
-    "builtOn": "Built on Mantle",
-    "privacy": "개인정보 처리방침",
-    "terms": "이용약관",
-    "cookies": "쿠키 정책"
-  },
-  "activeEvents": {
-    "badge": "EPISODE EXPLORER",
-    "title": "진행중인 보험",
-    "subtitle": "각 이벤트의 규칙을 확인한 후 참여하세요. 모든 조건은 사전에 확정됩니다.",
-    "status": {
-      "recruiting": "모집중",
-      "inForce": "IN FORCE"
-    },
-    "categories": {
-      "flightDelay": "항공 지연",
-      "weather": "날씨 위험"
-    },
-    "labels": {
-      "viewRules": "View rules →",
-      "viewRulesShort": "View Rules",
-      "backToEvents": "← Back to events",
-      "backToRules": "← Back to rules",
-      "trigger": "Trigger",
-      "premium": "Premium",
-      "maxPayout": "Max payout",
-      "maxLoss": "Max Loss",
+      "maxLoss": "최대 손실",
       "event": "이벤트",
       "eventWindow": "이벤트 기간",
       "triggerCondition": "트리거 조건",
@@ -286,7 +69,7 @@
       "poolLogicDesc": "동질적 위험 풀. 잉여금은 조합원에게 비례하여 반환됩니다.",
       "none": "없음",
       "checkboxLabel": "본인은 이 규칙을 이해합니다. 결과는 협상이나 이의 제기 없이 오라클에 의해 자동으로 결정됨을 인정합니다.",
-      "joinPool": "Join Pool",
+      "joinEpisode": "Join Episode",
       "confirmAndJoin": "Confirm & Join",
       "poolClosesIn": "Pool closes in",
       "eventEndsIn": "Event ends in",
@@ -298,7 +81,7 @@
       "currentDelay": "현재 지연",
       "progressToTrigger": "트리거까지 진행률",
       "referenceOnly": "실시간 데이터는 참고용일 뿐입니다. 최종 결과는 지정된 시간에 오라클 결의에 의해서만 결정됩니다.",
-      "viewResolution": "View Resolution",
+      "viewMyEpisodes": "내 에피소드 보기",
       "episodeRules": "Episode Rules",
       "readOnly": "Read-only",
       "coveredEvent": "보장 이벤트",
@@ -307,9 +90,9 @@
       "enRoute": "비행 중",
       "triggerThreshold": "3h (trigger)",
       "afterArrival": "도착 직후",
-        "walletRequired": "지갑을 연결하셔야 풀에 참여할 수 있습니다.",
-        "alreadyJoined": "이미 참여함",
-        "alreadyJoinedDesc": "이미 이 풀에 참여하셨습니다."
+      "walletRequired": "지갑을 연결하셔야 풀에 참여할 수 있습니다.",
+      "alreadyJoined": "이미 참여함",
+      "alreadyJoinedDesc": "이미 이 풀에 참여하셨습니다."
     },
     "defaultTrigger": "항공편 지연 3시간 이상",
     "noEpisodes": "이용 가능한 에피소드가 없습니다",
@@ -383,8 +166,8 @@
     "noEpisodes": "에피소드가 없습니다",
     "noEpisodesDesc": "현재 이용 가능한 보험 에피소드가 없습니다. 곧 다시 확인해주세요!"
   },
-  "myPage": {
-    "title": "마이페이지",
+  "myEpisodes": {
+    "title": "마이 에피소드",
     "subtitle": "{{address}}님의 에피소드 관리",
     "activeEpisodes": "진행중인 에피소드",
     "pastEpisodes": "종료된 에피소드",
@@ -395,6 +178,9 @@
     "exploreEpisodes": "에피소드 둘러보기",
     "connectWallet": "지갑을 연결해주세요",
     "connectWalletDesc": "에피소드 내역을 보려면 지갑을 연결해야 합니다.",
-    "loading": "불러오는 중..."
+    "loading": "불러오는 중...",
+    "labels": {
+      "viewRules": "규칙 보기"
+    }
   }
 }

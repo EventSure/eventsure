@@ -6,12 +6,8 @@ import { theme } from "@/styles/theme";
 import { WorldMap } from "@/components/WorldMap";
 import { Header, Footer } from "@/components/layout";
 import { LiveTransactions } from "@/components/dashboard";
-import {
-  HowItWorks,
-  FAQ,
-  ActivePools,
-} from "@/components/sections";
-import { Button, GlassCard, StatCard } from "@/components/common";
+import { HowItWorks, FAQ, ActivePools } from "@/components/sections";
+import { Button, GlassCard } from "@/components/common";
 
 const PageContainer = styled.div`
   min-height: 100vh;
@@ -60,7 +56,7 @@ const Title = styled(motion.h1)`
   line-height: 1.1;
   margin-bottom: ${theme.spacing.lg};
 
-  span {
+  .brand {
     background: linear-gradient(
       135deg,
       ${theme.colors.primary} 0%,
@@ -70,6 +66,7 @@ const Title = styled(motion.h1)`
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     background-clip: text;
+    display: inline-block;
   }
 `;
 
@@ -77,10 +74,46 @@ const Subtitle = styled(motion.p)`
   font-size: ${theme.fontSize.xl};
   color: ${theme.colors.textSecondary};
   line-height: 1.6;
-  margin-bottom: ${theme.spacing.xxl};
-  max-width: 600px;
+  margin-bottom: ${theme.spacing.xl};
+  max-width: 650px;
   margin-left: auto;
   margin-right: auto;
+`;
+
+const Highlights = styled(motion.div)`
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: ${theme.spacing.md};
+  margin-bottom: ${theme.spacing.xxl};
+  flex-wrap: wrap;
+`;
+
+const HighlightItem = styled(motion.div)`
+  display: flex;
+  align-items: center;
+  gap: ${theme.spacing.xs};
+  padding: ${theme.spacing.xs} ${theme.spacing.md};
+  background: ${theme.colors.surface};
+  border: 1px solid ${theme.colors.border};
+  border-radius: ${theme.borderRadius.full};
+  font-size: ${theme.fontSize.sm};
+  color: ${theme.colors.textSecondary};
+  font-weight: ${theme.fontWeight.semibold};
+  box-shadow: ${theme.shadows.sm};
+  transition: all 0.3s ease;
+
+  &:hover {
+    border-color: ${theme.colors.primary}40;
+    background: ${theme.colors.primary}05;
+    transform: translateY(-2px) !important;
+  }
+
+  svg {
+    color: ${theme.colors.primary};
+    width: 16px;
+    height: 16px;
+  }
 `;
 
 const ButtonGroup = styled(motion.div)`
@@ -90,51 +123,67 @@ const ButtonGroup = styled(motion.div)`
   flex-wrap: wrap;
 `;
 
-const StatsSection = styled(motion.section)`
-  padding: ${theme.spacing.xxl} ${theme.spacing.xl};
-  display: flex;
-  justify-content: center;
-`;
-
-const StatsGrid = styled.div`
-  display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  gap: ${theme.spacing.lg};
-  max-width: 1000px;
-  width: 100%;
-
-  @media (max-width: ${theme.breakpoints.lg}) {
-    grid-template-columns: repeat(2, 1fr);
-  }
-
-  @media (max-width: ${theme.breakpoints.sm}) {
-    grid-template-columns: 1fr;
-  }
-`;
-
-const StatValue = styled.div`
-  font-size: ${theme.fontSize.xxxl};
-  font-weight: ${theme.fontWeight.bold};
-  background: linear-gradient(
-    135deg,
-    ${theme.colors.primary},
-    ${theme.colors.secondary}
-  );
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
-  margin-bottom: ${theme.spacing.xs};
-`;
-
-const StatLabel = styled.div`
-  font-size: ${theme.fontSize.sm};
-  color: ${theme.colors.textSecondary};
-`;
-
-const FeaturesSection = styled.section`
+const WhatIsSection = styled(motion.section)`
   padding: ${theme.spacing.xxxl} ${theme.spacing.xl};
   display: flex;
   justify-content: center;
+  background: radial-gradient(
+    circle at 50% 0%,
+    ${theme.colors.primary}05 0%,
+    transparent 70%
+  );
+`;
+
+const WhatIsContent = styled.div`
+  max-width: 1200px;
+  width: 100%;
+`;
+
+const WhatIsTitle = styled.h2`
+  font-size: clamp(32px, 5vw, ${theme.fontSize.xxxl});
+  font-weight: ${theme.fontWeight.bold};
+  margin-bottom: ${theme.spacing.xxl};
+  text-align: center;
+  color: ${theme.colors.text};
+`;
+
+const WhatIsDescription = styled(motion.div)`
+  display: flex;
+  flex-direction: column;
+  gap: ${theme.spacing.xl};
+  margin-bottom: ${theme.spacing.xxxl};
+  padding: ${theme.spacing.xxl};
+  background: ${theme.colors.background}30;
+  border-radius: ${theme.borderRadius.xxl};
+  border: 1px solid ${theme.colors.border};
+  backdrop-filter: blur(10px);
+  position: relative;
+
+  p {
+    font-size: ${theme.fontSize.lg};
+    color: ${theme.colors.textSecondary};
+    line-height: 1.8;
+    text-align: left;
+    max-width: 100%;
+    margin: 0;
+    position: relative;
+  }
+
+  p:first-of-type {
+    font-size: ${theme.fontSize.xl};
+    color: ${theme.colors.text};
+    font-weight: ${theme.fontWeight.semibold};
+    line-height: 1.6;
+    margin-bottom: ${theme.spacing.md};
+    text-align: center;
+    padding-bottom: ${theme.spacing.xl};
+    border-bottom: 1px solid ${theme.colors.border};
+  }
+
+  strong {
+    color: ${theme.colors.primary};
+    font-weight: ${theme.fontWeight.bold};
+  }
 `;
 
 const FeaturesGrid = styled.div`
@@ -268,12 +317,41 @@ export const Home = () => {
             </Badge>
 
             <Title variants={itemVariants}>
-              {t("hero.title1")} <span>{t("hero.title2")}</span>
+              <span className="brand">{t("hero.title1")}</span>{" "}
+              {t("hero.title2")}
               <br />
               {t("hero.title3")}
             </Title>
 
             <Subtitle variants={itemVariants}>{t("hero.subtitle")}</Subtitle>
+
+            <Highlights
+              variants={{
+                hidden: { opacity: 0 },
+                visible: {
+                  opacity: 1,
+                  transition: { staggerChildren: 0.1 },
+                },
+              }}
+            >
+              {(t("hero.highlights", { returnObjects: true }) as string[]).map(
+                (highlight, index) => (
+                  <HighlightItem key={index} variants={itemVariants}>
+                    <svg
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth="3"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                    >
+                      <polyline points="20 6 9 17 4 12" />
+                    </svg>
+                    {highlight}
+                  </HighlightItem>
+                )
+              )}
+            </Highlights>
 
             <ButtonGroup variants={itemVariants}>
               <Button
@@ -305,7 +383,92 @@ export const Home = () => {
           </HeroContent>
         </HeroSection>
 
-        <StatsSection
+        <WhatIsSection
+          initial={{ opacity: 0, y: 50 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.8 }}
+        >
+          <WhatIsContent>
+            <WhatIsTitle>{t("whatIs.title")}</WhatIsTitle>
+            <WhatIsDescription
+              variants={containerVariants}
+              initial="hidden"
+              whileInView="visible"
+              viewport={{ once: true }}
+            >
+              <motion.p variants={itemVariants}>
+                {t("whatIs.description1")}
+              </motion.p>
+              <motion.p variants={itemVariants}>
+                {t("whatIs.description2")}
+              </motion.p>
+              <motion.p variants={itemVariants}>
+                {t("whatIs.description3")}
+              </motion.p>
+              <motion.p variants={itemVariants}>
+                {t("whatIs.description4")}
+              </motion.p>
+              <motion.p variants={itemVariants}>
+                {t("whatIs.description5")}
+              </motion.p>
+            </WhatIsDescription>
+            <FeaturesGrid>
+              <FeatureCard
+                initial={{ opacity: 0, y: 30 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.5, delay: 0.1 }}
+              >
+                <FeatureIcon>
+                  <svg viewBox="0 0 24 24">
+                    <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
+                  </svg>
+                </FeatureIcon>
+                <FeatureTitle>{t("features.security.title")}</FeatureTitle>
+                <FeatureDescription>
+                  {t("features.security.description")}
+                </FeatureDescription>
+              </FeatureCard>
+
+              <FeatureCard
+                initial={{ opacity: 0, y: 30 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.5, delay: 0.2 }}
+              >
+                <FeatureIcon>
+                  <svg viewBox="0 0 24 24">
+                    <path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z" />
+                  </svg>
+                </FeatureIcon>
+                <FeatureTitle>{t("features.claims.title")}</FeatureTitle>
+                <FeatureDescription>
+                  {t("features.claims.description")}
+                </FeatureDescription>
+              </FeatureCard>
+
+              <FeatureCard
+                initial={{ opacity: 0, y: 30 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.5, delay: 0.3 }}
+              >
+                <FeatureIcon>
+                  <svg viewBox="0 0 24 24">
+                    <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2M9 11a4 4 0 1 0 0-8 4 4 0 0 0 0 8zM23 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75" />
+                  </svg>
+                </FeatureIcon>
+                <FeatureTitle>{t("features.mutual.title")}</FeatureTitle>
+                <FeatureDescription>
+                  {t("features.mutual.description")}
+                </FeatureDescription>
+              </FeatureCard>
+            </FeaturesGrid>
+          </WhatIsContent>
+        </WhatIsSection>
+
+        {/* <StatsSection
           initial={{ opacity: 0, y: 50 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
@@ -329,64 +492,9 @@ export const Home = () => {
               <StatLabel>{t("stats.payoutTime")}</StatLabel>
             </StatCard>
           </StatsGrid>
-        </StatsSection>
+        </StatsSection> */}
 
         <HowItWorks />
-
-        <FeaturesSection>
-          <FeaturesGrid>
-            <FeatureCard
-              initial={{ opacity: 0, y: 30 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.5, delay: 0.1 }}
-            >
-              <FeatureIcon>
-                <svg viewBox="0 0 24 24">
-                  <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
-                </svg>
-              </FeatureIcon>
-              <FeatureTitle>{t("features.security.title")}</FeatureTitle>
-              <FeatureDescription>
-                {t("features.security.description")}
-              </FeatureDescription>
-            </FeatureCard>
-
-            <FeatureCard
-              initial={{ opacity: 0, y: 30 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.5, delay: 0.2 }}
-            >
-              <FeatureIcon>
-                <svg viewBox="0 0 24 24">
-                  <path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z" />
-                </svg>
-              </FeatureIcon>
-              <FeatureTitle>{t("features.claims.title")}</FeatureTitle>
-              <FeatureDescription>
-                {t("features.claims.description")}
-              </FeatureDescription>
-            </FeatureCard>
-
-            <FeatureCard
-              initial={{ opacity: 0, y: 30 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.5, delay: 0.3 }}
-            >
-              <FeatureIcon>
-                <svg viewBox="0 0 24 24">
-                  <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2M9 11a4 4 0 1 0 0-8 4 4 0 0 0 0 8zM23 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75" />
-                </svg>
-              </FeatureIcon>
-              <FeatureTitle>{t("features.mutual.title")}</FeatureTitle>
-              <FeatureDescription>
-                {t("features.mutual.description")}
-              </FeatureDescription>
-            </FeatureCard>
-          </FeaturesGrid>
-        </FeaturesSection>
 
         <ActivePools />
         <LiveTransactions />
