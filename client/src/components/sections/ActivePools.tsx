@@ -7,6 +7,10 @@ import { theme } from "@/styles/theme";
 const Section = styled.section`
   padding: ${theme.spacing.xxxl} ${theme.spacing.xl};
   position: relative;
+
+  @media (max-width: ${theme.breakpoints.sm}) {
+    padding: ${theme.spacing.xxl} ${theme.spacing.md};
+  }
 `;
 
 const Container = styled.div`
@@ -38,6 +42,10 @@ const SectionTitle = styled.h2`
   font-weight: ${theme.fontWeight.bold};
   margin-bottom: ${theme.spacing.md};
   color: ${theme.colors.text};
+
+  @media (max-width: ${theme.breakpoints.sm}) {
+    font-size: ${theme.fontSize.xxl};
+  }
 `;
 
 const SectionDescription = styled.p`
@@ -59,6 +67,10 @@ const FilterContainer = styled.div`
   gap: ${theme.spacing.sm};
   margin-bottom: ${theme.spacing.xxl};
   flex-wrap: wrap;
+
+  @media (max-width: ${theme.breakpoints.sm}) {
+    margin-bottom: ${theme.spacing.xl};
+  }
 `;
 
 const FilterChip = styled.button<{ isActive: boolean }>`
@@ -101,6 +113,10 @@ const PoolCard = styled(motion.div)`
   padding: ${theme.spacing.xl};
   display: flex;
   flex-direction: column;
+
+  @media (max-width: ${theme.breakpoints.sm}) {
+    padding: ${theme.spacing.lg};
+  }
 `;
 
 const PoolHeader = styled.div`
@@ -108,6 +124,11 @@ const PoolHeader = styled.div`
   align-items: flex-start;
   justify-content: space-between;
   margin-bottom: ${theme.spacing.md};
+  gap: ${theme.spacing.sm};
+
+  @media (max-width: ${theme.breakpoints.sm}) {
+    flex-direction: column;
+  }
 `;
 
 const PoolHeaderLeft = styled.div`
@@ -151,6 +172,10 @@ const PoolTitle = styled.h3`
   font-weight: ${theme.fontWeight.semibold};
   color: ${theme.colors.text};
   margin: 0;
+
+  @media (max-width: ${theme.breakpoints.sm}) {
+    font-size: ${theme.fontSize.md};
+  }
 `;
 
 const StatusBadge = styled.span<{ status: "open" | "locked" | "resolved" }>`
@@ -213,6 +238,10 @@ const StatsRow = styled.div`
   grid-template-columns: 1fr 1fr;
   gap: ${theme.spacing.lg};
   margin-bottom: ${theme.spacing.lg};
+
+  @media (max-width: ${theme.breakpoints.sm}) {
+    gap: ${theme.spacing.md};
+  }
 `;
 
 const StatItem = styled.div`
@@ -242,6 +271,10 @@ const StatValue = styled.div<{ highlight?: boolean }>`
   font-weight: ${theme.fontWeight.bold};
   color: ${({ highlight }) =>
     highlight ? theme.colors.secondary : theme.colors.text};
+
+  @media (max-width: ${theme.breakpoints.sm}) {
+    font-size: ${theme.fontSize.lg};
+  }
 `;
 
 const PoolSizeContainer = styled.div`

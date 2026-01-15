@@ -49,9 +49,12 @@
       "resolved": "정산 완료"
     },
     "status": {
+      "created": "생성됨",
       "open": "참여 가능",
       "locked": "진행중",
-      "resolved": "정산 완료"
+      "resolved": "결정됨",
+      "settled": "정산 완료",
+      "closed": "종료됨"
     },
     "labels": {
       "coverageCondition": "보장 조건",

@@ -1,5 +1,6 @@
+import { useState } from "react";
 import styled from "@emotion/styled";
-import { motion } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
 import { useAppKit, useAppKitAccount } from "@reown/appkit/react";
 import { useTranslation } from "react-i18next";
 import { Link, useLocation } from "react-router-dom";
@@ -110,6 +111,74 @@ const Actions = styled.div`
   display: flex;
   align-items: center;
   gap: ${theme.spacing.md};
+
+  @media (max-width: ${theme.breakpoints.md}) {
+    display: none;
+  }
+`;
+
+const MobileMenuButton = styled.button`
+  display: none;
+  background: transparent;
+  border: none;
+  padding: ${theme.spacing.sm};
+  cursor: pointer;
+  color: ${theme.colors.text};
+
+  @media (max-width: ${theme.breakpoints.md}) {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  svg {
+    width: 24px;
+    height: 24px;
+    stroke: currentColor;
+    fill: none;
+    stroke-width: 2;
+  }
+`;
+
+const MobileMenu = styled(motion.div)`
+  position: fixed;
+  top: 73px;
+  left: 0;
+  right: 0;
+  background: ${theme.colors.background};
+  border-bottom: 1px solid ${theme.colors.glassBorder};
+  padding: ${theme.spacing.lg};
+  display: flex;
+  flex-direction: column;
+  gap: ${theme.spacing.md};
+  z-index: 99;
+`;
+
+const MobileNavLink = styled(Link, {
+  shouldForwardProp: (prop) => prop !== "$isActive",
+})<{ $isActive?: boolean }>`
+  color: ${({ $isActive }) =>
+    $isActive ? theme.colors.secondary : theme.colors.text};
+  font-weight: ${theme.fontWeight.medium};
+  font-size: ${theme.fontSize.lg};
+  text-decoration: none;
+  padding: ${theme.spacing.md};
+  border-radius: ${theme.borderRadius.md};
+  background: ${({ $isActive }) =>
+    $isActive ? `${theme.colors.secondary}10` : "transparent"};
+
+  &:hover {
+    background: ${theme.colors.surface};
+  }
+`;
+
+const MobileActions = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: ${theme.spacing.sm};
+  margin-top: ${theme.spacing.md};
+  padding-top: ${theme.spacing.md};
+  border-top: 1px solid ${theme.colors.glassBorder};
 `;
 
 const MyPageButton = styled(Link)`
@@ -181,6 +250,7 @@ const WalletButton = () => {
 export const Header = () => {
   const { t } = useTranslation();
   const location = useLocation();
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
   const isActive = (path: string) => {
     if (path === "/") {
@@ -189,65 +259,97 @@ export const Header = () => {
     return location.pathname.startsWith(path);
   };
 
+  const closeMobileMenu = () => setIsMobileMenuOpen(false);
+
   return (
-    <HeaderContainer
-      initial={{ y: -100, opacity: 0 }}
-      animate={{ y: 0, opacity: 1 }}
-      transition={{ duration: 0.6, ease: "easeOut" }}
-    >
-      <HeaderContent>
-        <Logo to="/">
-          <LogoIcon>
-            <svg viewBox="0 0 24 24">
-              <path d="M21 16v-2l-8-5V3.5c0-.83-.67-1.5-1.5-1.5S10 2.67 10 3.5V9l-8 5v2l8-2.5V19l-2 1.5V22l3.5-1 3.5 1v-1.5L13 19v-5.5l8 2.5z" />
-            </svg>
-          </LogoIcon>
-          <LogoText>EventSure</LogoText>
-        </Logo>
+    <>
+      <HeaderContainer
+        initial={{ y: -100, opacity: 0 }}
+        animate={{ y: 0, opacity: 1 }}
+        transition={{ duration: 0.6, ease: "easeOut" }}
+      >
+        <HeaderContent>
+          <Logo to="/" onClick={closeMobileMenu}>
+            <LogoIcon>
+              <svg viewBox="0 0 24 24">
+                <path d="M21 16v-2l-8-5V3.5c0-.83-.67-1.5-1.5-1.5S10 2.67 10 3.5V9l-8 5v2l8-2.5V19l-2 1.5V22l3.5-1 3.5 1v-1.5L13 19v-5.5l8 2.5z" />
+              </svg>
+            </LogoIcon>
+            <LogoText>EventSure</LogoText>
+          </Logo>
 
-        <Nav>
-          <NavLink to="/" $isActive={isActive("/")}>
-            {t("header.home")}
-          </NavLink>
-          <NavLink to="/explorer" $isActive={isActive("/explorer")}>
-            {t("header.explorer")}
-          </NavLink>
-          <NavLink to="/history" $isActive={isActive("/history")}>
-            {t("header.history")}
-          </NavLink>
-          {/* <NavLink to="/claims" $isActive={isActive("/claims")}>
-            {t("header.claims")}
-          </NavLink> */}
-          <NavLink to="/about" $isActive={isActive("/about")}>
-            {t("header.about")}
-          </NavLink>
-        </Nav>
+          <Nav>
+            <NavLink to="/" $isActive={isActive("/")}>
+              {t("header.home")}
+            </NavLink>
+            <NavLink to="/explorer" $isActive={isActive("/explorer")}>
+              {t("header.explorer")}
+            </NavLink>
+            <NavLink to="/history" $isActive={isActive("/history")}>
+              {t("header.history")}
+            </NavLink>
+            <NavLink to="/about" $isActive={isActive("/about")}>
+              {t("header.about")}
+            </NavLink>
+          </Nav>
 
-        <Actions>
-          {/* <LanguageGroup>
-            <LanguageSwitcher 
-              isActive={i18n.language === 'en'} 
-              onClick={() => changeLanguage('en')}
-            >
-              EN
-            </LanguageSwitcher>
-            <LanguageSwitcher 
-              isActive={i18n.language === 'ko'} 
-              onClick={() => changeLanguage('ko')}
-            >
-              KO
-            </LanguageSwitcher>
-          </LanguageGroup> */}
-          <MyPageButton to="/myepisodes">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
-              <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
-              <circle cx="12" cy="7" r="4" />
-            </svg>
-            {t("header.myEpisodes")}
-          </MyPageButton>
-          <WalletButton />
-        </Actions>
-      </HeaderContent>
-    </HeaderContainer>
+          <Actions>
+            <MyPageButton to="/myepisodes">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
+                <circle cx="12" cy="7" r="4" />
+              </svg>
+              {t("header.myEpisodes")}
+            </MyPageButton>
+            <WalletButton />
+          </Actions>
+
+          <MobileMenuButton onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}>
+            {isMobileMenuOpen ? (
+              <svg viewBox="0 0 24 24">
+                <line x1="18" y1="6" x2="6" y2="18" />
+                <line x1="6" y1="6" x2="18" y2="18" />
+              </svg>
+            ) : (
+              <svg viewBox="0 0 24 24">
+                <line x1="3" y1="12" x2="21" y2="12" />
+                <line x1="3" y1="6" x2="21" y2="6" />
+                <line x1="3" y1="18" x2="21" y2="18" />
+              </svg>
+            )}
+          </MobileMenuButton>
+        </HeaderContent>
+      </HeaderContainer>
+
+      <AnimatePresence>
+        {isMobileMenuOpen && (
+          <MobileMenu
+            initial={{ opacity: 0, y: -20 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -20 }}
+            transition={{ duration: 0.2 }}
+          >
+            <MobileNavLink to="/" $isActive={isActive("/")} onClick={closeMobileMenu}>
+              {t("header.home")}
+            </MobileNavLink>
+            <MobileNavLink to="/explorer" $isActive={isActive("/explorer")} onClick={closeMobileMenu}>
+              {t("header.explorer")}
+            </MobileNavLink>
+            <MobileNavLink to="/history" $isActive={isActive("/history")} onClick={closeMobileMenu}>
+              {t("header.history")}
+            </MobileNavLink>
+            <MobileNavLink to="/myepisodes" $isActive={isActive("/myepisodes")} onClick={closeMobileMenu}>
+              {t("header.myEpisodes")}
+            </MobileNavLink>
+            <MobileNavLink to="/about" $isActive={isActive("/about")} onClick={closeMobileMenu}>
+              {t("header.about")}
+            </MobileNavLink>
+            <MobileActions>
+              <WalletButton />
+            </MobileActions>
+          </MobileMenu>
+        )}
+      </AnimatePresence>
+    </>
   );
 };
