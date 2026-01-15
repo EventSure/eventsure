@@ -9,15 +9,12 @@ import {
   useReadContract,
 } from "wagmi";
 import { useQueryClient } from "@tanstack/react-query";
-import { parseEther, stringToHex, pad, encodeAbiParameters } from "viem";
+import { parseEther, stringToHex, pad } from "viem";
 import { theme } from "@/styles/theme";
 import { Header, Footer } from "@/components/layout";
-import { useEpisodes } from "@/hooks/useEpisodes";
 import { EpisodeFactoryABI } from "@/contracts/abis";
 import { EpisodeFactoryBytecode } from "@/contracts/bytecode";
 import { useFactoryStore, DEFAULT_FACTORY } from "@/stores/factoryStore";
-import { EpisodeState } from "@/types/episode";
-import * as episodeUtils from "@/utils/episode";
 
 const PageContainer = styled.div`
   min-height: 100vh;
@@ -208,171 +205,10 @@ const FormGrid = styled.div`
   }
 `;
 
-const EpisodeInfo = styled.div`
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
-`;
-
 const AddressText = styled.span`
   font-family: "JetBrains Mono", monospace;
   font-size: ${theme.fontSize.xs};
   color: ${theme.colors.textMuted};
-`;
-
-const FlightName = styled.span`
-  font-weight: ${theme.fontWeight.semibold};
-  font-size: ${theme.fontSize.md};
-  color: ${theme.colors.text};
-`;
-
-const ActionButtons = styled.div`
-  display: flex;
-  gap: ${theme.spacing.sm};
-`;
-
-const LoadingSpinner = styled(motion.div)`
-  width: 16px;
-  height: 16px;
-  border: 2px solid ${theme.colors.glassBorder};
-  border-top-color: currentColor;
-  border-radius: 50%;
-`;
-
-const EpisodeRowLoading = styled.div`
-  position: absolute;
-  inset: 0;
-  background: ${theme.colors.background}80;
-  backdrop-filter: blur(2px);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  border-radius: ${theme.borderRadius.md};
-  z-index: 10;
-`;
-
-const EpisodeRowWrapper = styled.div`
-  position: relative;
-`;
-
-const EpisodeItemContainer = styled.div`
-  border-bottom: 1px solid ${theme.colors.glassBorder};
-
-  &:last-child {
-    border-bottom: none;
-  }
-`;
-
-const EpisodeHeader = styled.div<{ $isExpanded: boolean }>`
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: ${theme.spacing.md};
-  cursor: pointer;
-  transition: background ${theme.transitions.fast};
-  border-radius: ${({ $isExpanded }) =>
-    $isExpanded
-      ? `${theme.borderRadius.md} ${theme.borderRadius.md} 0 0`
-      : theme.borderRadius.md};
-
-  &:hover {
-    background: ${theme.colors.surface}50;
-  }
-
-  @media (max-width: ${theme.breakpoints.sm}) {
-    flex-direction: column;
-    align-items: flex-start;
-    gap: ${theme.spacing.md};
-  }
-`;
-
-const ExpandIcon = styled(motion.div)`
-  width: 20px;
-  height: 20px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: ${theme.colors.textMuted};
-  margin-right: ${theme.spacing.sm};
-`;
-
-const EpisodeHeaderLeft = styled.div`
-  display: flex;
-  align-items: center;
-`;
-
-const EpisodeDetails = styled(motion.div)`
-  overflow: hidden;
-  background: ${theme.colors.surface}30;
-  border-radius: 0 0 ${theme.borderRadius.lg} ${theme.borderRadius.lg};
-`;
-
-const DetailsContent = styled.div`
-  padding: ${theme.spacing.lg} ${theme.spacing.xl};
-`;
-
-const DetailsGrid = styled.div`
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: ${theme.spacing.lg};
-
-  @media (max-width: ${theme.breakpoints.md}) {
-    grid-template-columns: repeat(2, 1fr);
-  }
-
-  @media (max-width: ${theme.breakpoints.sm}) {
-    grid-template-columns: 1fr;
-  }
-`;
-
-const DetailSection = styled.div`
-  background: ${theme.colors.surface};
-  padding: ${theme.spacing.lg};
-  border-radius: ${theme.borderRadius.lg};
-  border: 1px solid ${theme.colors.glassBorder};
-`;
-
-const DetailSectionTitle = styled.h4`
-  font-size: ${theme.fontSize.xs};
-  font-weight: ${theme.fontWeight.bold};
-  color: ${theme.colors.secondary};
-  text-transform: uppercase;
-  letter-spacing: 0.1em;
-  margin-bottom: ${theme.spacing.md};
-  display: flex;
-  align-items: center;
-  gap: ${theme.spacing.sm};
-`;
-
-const DetailRow = styled.div`
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: ${theme.spacing.sm} 0;
-  border-bottom: 1px solid ${theme.colors.glassBorder}50;
-
-  &:last-child {
-    border-bottom: none;
-    padding-bottom: 0;
-  }
-
-  &:first-of-type {
-    padding-top: 0;
-  }
-`;
-
-const DetailLabel = styled.span`
-  font-size: ${theme.fontSize.sm};
-  color: ${theme.colors.textMuted};
-`;
-
-const DetailValue = styled.span<{ $highlight?: boolean; $mono?: boolean }>`
-  font-size: ${theme.fontSize.sm};
-  font-weight: ${theme.fontWeight.semibold};
-  color: ${({ $highlight }) =>
-    $highlight ? theme.colors.secondary : theme.colors.text};
-  font-family: ${({ $mono }) =>
-    $mono ? "'JetBrains Mono', monospace" : "inherit"};
 `;
 
 const FullAddressBox = styled.div`
@@ -386,92 +222,14 @@ const FullAddressBox = styled.div`
   gap: ${theme.spacing.sm};
 `;
 
-const CopyButton = styled.button`
-  background: ${theme.colors.secondary}20;
-  border: 1px solid ${theme.colors.secondary}40;
-  color: ${theme.colors.secondary};
-  padding: ${theme.spacing.xs} ${theme.spacing.sm};
-  border-radius: ${theme.borderRadius.sm};
-  font-size: ${theme.fontSize.xs};
-  cursor: pointer;
-  transition: all ${theme.transitions.fast};
-
-  &:hover {
-    background: ${theme.colors.secondary}30;
-  }
-`;
-
-const ChevronIcon = ({ isExpanded }: { isExpanded: boolean }) => (
-  <svg
-    width="16"
-    height="16"
-    viewBox="0 0 24 24"
-    fill="none"
-    stroke="currentColor"
-    strokeWidth="2"
-    style={{
-      transform: isExpanded ? "rotate(180deg)" : "rotate(0deg)",
-      transition: "transform 0.2s",
-    }}
-  >
-    <polyline points="6 9 12 15 18 9" />
-  </svg>
-);
-
-const DollarIcon = () => (
-  <svg
-    width="14"
-    height="14"
-    viewBox="0 0 24 24"
-    fill="none"
-    stroke="currentColor"
-    strokeWidth="2"
-  >
-    <line x1="12" y1="1" x2="12" y2="23" />
-    <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6" />
-  </svg>
-);
-
-const ClockIcon = () => (
-  <svg
-    width="14"
-    height="14"
-    viewBox="0 0 24 24"
-    fill="none"
-    stroke="currentColor"
-    strokeWidth="2"
-  >
-    <circle cx="12" cy="12" r="10" />
-    <polyline points="12 6 12 12 16 14" />
-  </svg>
-);
-
-const InfoIcon = () => (
-  <svg
-    width="14"
-    height="14"
-    viewBox="0 0 24 24"
-    fill="none"
-    stroke="currentColor"
-    strokeWidth="2"
-  >
-    <circle cx="12" cy="12" r="10" />
-    <line x1="12" y1="16" x2="12" y2="12" />
-    <line x1="12" y1="8" x2="12.01" y2="8" />
-  </svg>
-);
-
 const Admin = () => {
   const { address: connectedAddress } = useAccount();
-  const { factoryAddress, setFactoryAddress, resetToDefault } = useFactoryStore();
-  const { episodes, isLoading: isLoadingEpisodes } = useEpisodes(true);
+  const { factoryAddress, setFactoryAddress, resetToDefault } =
+    useFactoryStore();
   const queryClient = useQueryClient();
   const [password, setPassword] = useState("");
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [authError, setAuthError] = useState(false);
-  const [pendingEpisode, setPendingEpisode] = useState<string | null>(null);
-  const [pendingAction, setPendingAction] = useState<string | null>(null);
-  const [expandedEpisode, setExpandedEpisode] = useState<string | null>(null);
   const [newFactoryAddress, setNewFactoryAddress] = useState("");
   const [oracleAddress, setOracleAddress] = useState("");
 
@@ -489,13 +247,13 @@ const Admin = () => {
   const { data: factoryOwner } = useReadContract({
     address: factoryAddress,
     abi: EpisodeFactoryABI,
-    functionName: 'owner',
+    functionName: "owner",
   });
 
   const { data: factoryOracle } = useReadContract({
     address: factoryAddress,
     abi: EpisodeFactoryABI,
-    functionName: 'oracle',
+    functionName: "oracle",
   });
 
   const {
@@ -515,7 +273,11 @@ const Admin = () => {
     isPending: isDeploying,
     error: deployError,
   } = useDeployContract();
-  const { isLoading: isDeployConfirming, isSuccess: isDeploySuccess, data: deployReceipt } = useWaitForTransactionReceipt({
+  const {
+    isLoading: isDeployConfirming,
+    isSuccess: isDeploySuccess,
+    data: deployReceipt,
+  } = useWaitForTransactionReceipt({
     hash: deployHash,
   });
 
@@ -523,8 +285,6 @@ const Admin = () => {
     if (isSuccess) {
       queryClient.invalidateQueries({ queryKey: ["episodeAddresses"] });
       setTimeout(() => {
-        setPendingEpisode(null);
-        setPendingAction(null);
         reset();
       }, 1000);
     }
@@ -588,31 +348,9 @@ const Admin = () => {
     }
   };
 
-  const handleAction = (
-    epAddress: `0x${string}`,
-    action: "open" | "lock" | "close"
-  ) => {
-    setPendingEpisode(epAddress);
-    setPendingAction(action);
-
-    const functionName =
-      action === "open"
-        ? "openEpisode"
-        : action === "lock"
-        ? "lockEpisode"
-        : "closeEpisode";
-
-    writeContract({
-      address: factoryAddress,
-      abi: EpisodeFactoryABI,
-      functionName: functionName as any,
-      args: [epAddress],
-    });
-  };
-
   const handleDeployFactory = () => {
     if (!oracleAddress) return;
-    
+
     deployContract({
       abi: EpisodeFactoryABI,
       bytecode: EpisodeFactoryBytecode,
@@ -622,38 +360,10 @@ const Admin = () => {
 
   const handleUpdateFactoryAddress = (e: React.FormEvent) => {
     e.preventDefault();
-    if (newFactoryAddress.startsWith('0x') && newFactoryAddress.length === 42) {
+    if (newFactoryAddress.startsWith("0x") && newFactoryAddress.length === 42) {
       setFactoryAddress(newFactoryAddress as `0x${string}`);
       setNewFactoryAddress("");
     }
-  };
-
-  const getNextStateLabel = (action: "open" | "lock" | "close") => {
-    switch (action) {
-      case "open":
-        return "OPEN";
-      case "lock":
-        return "LOCKED";
-      case "close":
-        return "RESOLVED";
-    }
-  };
-
-  const isEpisodeLoading = (epAddress: string) => {
-    return pendingEpisode === epAddress && (isPending || isConfirming);
-  };
-
-  const toggleEpisodeExpand = (address: string) => {
-    setExpandedEpisode(expandedEpisode === address ? null : address);
-  };
-
-  const copyToClipboard = (text: string) => {
-    navigator.clipboard.writeText(text);
-  };
-
-  const formatTimestamp = (timestamp: bigint) => {
-    if (!timestamp || timestamp === 0n) return "N/A";
-    return new Date(Number(timestamp) * 1000).toLocaleString();
   };
 
   const renderAuthGate = () => (
@@ -819,10 +529,28 @@ const Admin = () => {
 
         <GlassCard>
           <Subtitle>Factory Status</Subtitle>
-          <div style={{ display: "flex", flexDirection: "column", gap: theme.spacing.md }}>
-            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+          <div
+            style={{
+              display: "flex",
+              flexDirection: "column",
+              gap: theme.spacing.md,
+            }}
+          >
+            <div
+              style={{
+                display: "flex",
+                justifyContent: "space-between",
+                alignItems: "center",
+              }}
+            >
               <Label>Active Factory</Label>
-              <div style={{ display: "flex", alignItems: "center", gap: theme.spacing.sm }}>
+              <div
+                style={{
+                  display: "flex",
+                  alignItems: "center",
+                  gap: theme.spacing.sm,
+                }}
+              >
                 <AddressText style={{ fontSize: theme.fontSize.md }}>
                   {factoryAddress}
                 </AddressText>
@@ -831,15 +559,27 @@ const Admin = () => {
                 )}
               </div>
             </div>
-            
-            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+
+            <div
+              style={{
+                display: "flex",
+                justifyContent: "space-between",
+                alignItems: "center",
+              }}
+            >
               <Label>Factory Owner</Label>
               <AddressText style={{ fontSize: theme.fontSize.sm }}>
                 {factoryOwner || "Loading..."}
               </AddressText>
             </div>
 
-            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+            <div
+              style={{
+                display: "flex",
+                justifyContent: "space-between",
+                alignItems: "center",
+              }}
+            >
               <Label>Factory Oracle</Label>
               <AddressText style={{ fontSize: theme.fontSize.sm }}>
                 {factoryOracle || "Loading..."}
@@ -849,14 +589,25 @@ const Admin = () => {
             <FullAddressBox style={{ marginTop: 0 }}>
               <div style={{ flex: 1 }}>
                 <Label>Switch Factory Address</Label>
-                <form onSubmit={handleUpdateFactoryAddress} style={{ display: 'flex', gap: theme.spacing.sm, marginTop: 4 }}>
-                  <Input 
-                    placeholder="0x..." 
-                    value={newFactoryAddress} 
+                <form
+                  onSubmit={handleUpdateFactoryAddress}
+                  style={{
+                    display: "flex",
+                    gap: theme.spacing.sm,
+                    marginTop: 4,
+                  }}
+                >
+                  <Input
+                    placeholder="0x..."
+                    value={newFactoryAddress}
                     onChange={(e) => setNewFactoryAddress(e.target.value)}
-                    style={{ padding: '8px 12px' }}
+                    style={{ padding: "8px 12px" }}
                   />
-                  <Button type="submit" variant="outline" style={{ padding: '8px 16px', whiteSpace: 'nowrap' }}>
+                  <Button
+                    type="submit"
+                    variant="outline"
+                    style={{ padding: "8px 16px", whiteSpace: "nowrap" }}
+                  >
                     Update
                   </Button>
                 </form>
@@ -864,7 +615,11 @@ const Admin = () => {
             </FullAddressBox>
 
             {factoryAddress !== DEFAULT_FACTORY && (
-              <Button onClick={resetToDefault} variant="danger" style={{ width: '100%' }}>
+              <Button
+                onClick={resetToDefault}
+                variant="danger"
+                style={{ width: "100%" }}
+              >
                 Reset to Default Factory
               </Button>
             )}
@@ -873,40 +628,60 @@ const Admin = () => {
 
         <GlassCard>
           <Subtitle>Deploy New Factory</Subtitle>
-          <div style={{ display: "flex", flexDirection: "column", gap: theme.spacing.lg }}>
+          <div
+            style={{
+              display: "flex",
+              flexDirection: "column",
+              gap: theme.spacing.lg,
+            }}
+          >
             <InputGroup style={{ marginBottom: 0 }}>
               <Label>Oracle Address</Label>
-              <Input 
-                placeholder="0x..." 
-                value={oracleAddress} 
-                onChange={(e) => setOracleAddress(e.target.value)} 
+              <Input
+                placeholder="0x..."
+                value={oracleAddress}
+                onChange={(e) => setOracleAddress(e.target.value)}
               />
             </InputGroup>
-            
+
             {deployError && (
               <ErrorBox>
-                {deployError.message.includes("User rejected") 
-                  ? "Deployment rejected by user" 
-                  : `Error: ${deployError.message.split('\n')[0]}`}
+                {deployError.message.includes("User rejected")
+                  ? "Deployment rejected by user"
+                  : `Error: ${deployError.message.split("\n")[0]}`}
               </ErrorBox>
             )}
 
-            {isDeploySuccess && <SuccessBox>New Factory deployed at: {deployReceipt?.contractAddress}</SuccessBox>}
+            {isDeploySuccess && (
+              <SuccessBox>
+                New Factory deployed at: {deployReceipt?.contractAddress}
+              </SuccessBox>
+            )}
 
-            <Button 
-              variant="gradient" 
+            <Button
+              variant="gradient"
               onClick={handleDeployFactory}
               disabled={isDeploying || isDeployConfirming || !oracleAddress}
               style={{ width: "100%" }}
             >
-              {isDeploying ? "Confirm in Wallet..." : isDeployConfirming ? "Deploying..." : "Deploy EpisodeFactory"}
+              {isDeploying
+                ? "Confirm in Wallet..."
+                : isDeployConfirming
+                ? "Deploying..."
+                : "Deploy EpisodeFactory"}
             </Button>
           </div>
         </GlassCard>
 
         <GlassCard>
           <Subtitle>Connected Wallet</Subtitle>
-          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+          <div
+            style={{
+              display: "flex",
+              justifyContent: "space-between",
+              alignItems: "center",
+            }}
+          >
             <AddressText style={{ fontSize: theme.fontSize.md }}>
               {connectedAddress || "Not connected"}
             </AddressText>
@@ -914,11 +689,16 @@ const Admin = () => {
               {connectedAddress ? "Connected" : "Disconnected"}
             </Badge>
           </div>
-          {connectedAddress && factoryOwner && connectedAddress.toLowerCase() !== factoryOwner.toLowerCase() && (
-            <ErrorBox style={{ marginTop: theme.spacing.md, marginBottom: 0 }}>
-              Warning: You are not the owner of the active Factory. You won't be able to manage episodes.
-            </ErrorBox>
-          )}
+          {connectedAddress &&
+            factoryOwner &&
+            connectedAddress.toLowerCase() !== factoryOwner.toLowerCase() && (
+              <ErrorBox
+                style={{ marginTop: theme.spacing.md, marginBottom: 0 }}
+              >
+                Warning: You are not the owner of the active Factory. You won't
+                be able to manage episodes.
+              </ErrorBox>
+            )}
         </GlassCard>
       </motion.div>
     </AnimatePresence>
