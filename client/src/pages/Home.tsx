@@ -2,6 +2,7 @@ import styled from "@emotion/styled";
 import { motion } from "framer-motion";
 import { useAccount } from "wagmi";
 import { useTranslation } from "react-i18next";
+import { useNavigate } from "react-router-dom";
 import { theme } from "@/styles/theme";
 import { WorldMap } from "@/components/WorldMap";
 import { Header, Footer } from "@/components/layout";
@@ -291,6 +292,14 @@ const itemVariants = {
 export const Home = () => {
   const { address, isConnected } = useAccount();
   const { t } = useTranslation();
+  const navigate = useNavigate();
+
+  const handleScrollTo = (id: string) => {
+    const element = document.getElementById(id);
+    if (element) {
+      element.scrollIntoView({ behavior: "smooth" });
+    }
+  };
 
   return (
     <PageContainer>
@@ -358,6 +367,7 @@ export const Home = () => {
                 size="lg"
                 whileHover={{ scale: 1.02 }}
                 whileTap={{ scale: 0.98 }}
+                onClick={() => navigate("/explorer")}
               >
                 {t("hero.getCoverage")}
               </Button>
@@ -366,6 +376,7 @@ export const Home = () => {
                 size="lg"
                 whileHover={{ scale: 1.02 }}
                 whileTap={{ scale: 0.98 }}
+                onClick={() => handleScrollTo("what-is")}
               >
                 {t("hero.learnMore")}
               </Button>
@@ -384,6 +395,7 @@ export const Home = () => {
         </HeroSection>
 
         <WhatIsSection
+          id="what-is"
           initial={{ opacity: 0, y: 50 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
@@ -427,6 +439,7 @@ export const Home = () => {
                 </FeatureIcon>
                 <FeatureTitle>{t("features.security.title")}</FeatureTitle>
                 <FeatureDescription>
+.
                   {t("features.security.description")}
                 </FeatureDescription>
               </FeatureCard>
