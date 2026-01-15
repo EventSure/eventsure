@@ -1,4 +1,4 @@
-import{cy as x,cB as d,dd as u,cC as b,cD as v,cF as F,cW as D,cU as w,cP as j,dF as l,cE as c,cH as z,cN as h,cK as H,cI as E,du as L,cO as y,c_ as J,cZ as Q,da as M,cz as q,cA as K,dc as G,dM as Z,dN as X,cQ as ee,cR as te}from"./index-BeULVfBl.js";import"./index-TGLFvCVy.js";import"./index-COgO_jv0.js";import{S as Y}from"./SwapController-CD0c_SW6.js";const ie=x`
+import{cx as x,cA as d,dc as u,cB as b,cC as v,cE as z,cV as D,cT as w,cO as j,dE as l,cD as c,cG as F,cM as h,cJ as H,cH as E,dt as L,cN as y,cZ as J,cY as G,d9 as M,cy as q,cz as K,db as Q,dL as Z,dM as X,cP as ee,cQ as te}from"./index-Bk2PoBLB.js";import"./index-DS4qaT8P.js";import"./index-Cl3PP-Ma.js";import{S as Y}from"./SwapController-DPSlPaIy.js";const ie=x`
   :host {
     width: 100%;
     height: 100px;
@@ -58,7 +58,7 @@ import{cy as x,cB as d,dd as u,cC as b,cD as v,cF as F,cW as D,cU as w,cP as j,d
     resize: none;
     overflow: hidden;
   }
-`;var P=function(e,t,n,r){var o=arguments.length,i=o<3?t:r===null?r=Object.getOwnPropertyDescriptor(t,n):r,s;if(typeof Reflect=="object"&&typeof Reflect.decorate=="function")i=Reflect.decorate(e,t,n,r);else for(var a=e.length-1;a>=0;a--)(s=e[a])&&(i=(o<3?s(i):o>3?s(t,n,i):s(t,n))||i);return o>3&&i&&Object.defineProperty(t,n,i),i};let $=class extends v{constructor(){super(...arguments),this.inputElementRef=F(),this.instructionElementRef=F(),this.readOnly=!1,this.instructionHidden=!!this.value,this.pasting=!1,this.onDebouncedSearch=D.debounce(async t=>{if(!t.length){this.setReceiverAddress("");return}const n=w.state.activeChain;if(D.isAddress(t,n)){this.setReceiverAddress(t);return}try{const o=await j.getEnsAddress(t);if(o){l.setReceiverProfileName(t),l.setReceiverAddress(o);const i=await j.getEnsAvatar(t);l.setReceiverProfileImageUrl(i||void 0)}}catch{this.setReceiverAddress(t)}finally{l.setLoading(!1)}})}firstUpdated(){this.value&&(this.instructionHidden=!0),this.checkHidden()}render(){return this.readOnly?c` <wui-flex
+`;var P=function(e,t,n,r){var o=arguments.length,i=o<3?t:r===null?r=Object.getOwnPropertyDescriptor(t,n):r,s;if(typeof Reflect=="object"&&typeof Reflect.decorate=="function")i=Reflect.decorate(e,t,n,r);else for(var a=e.length-1;a>=0;a--)(s=e[a])&&(i=(o<3?s(i):o>3?s(t,n,i):s(t,n))||i);return o>3&&i&&Object.defineProperty(t,n,i),i};let $=class extends v{constructor(){super(...arguments),this.inputElementRef=z(),this.instructionElementRef=z(),this.readOnly=!1,this.instructionHidden=!!this.value,this.pasting=!1,this.onDebouncedSearch=D.debounce(async t=>{if(!t.length){this.setReceiverAddress("");return}const n=w.state.activeChain;if(D.isAddress(t,n)){this.setReceiverAddress(t);return}try{const o=await j.getEnsAddress(t);if(o){l.setReceiverProfileName(t),l.setReceiverAddress(o);const i=await j.getEnsAvatar(t);l.setReceiverProfileImageUrl(i||void 0)}}catch{this.setReceiverAddress(t)}finally{l.setLoading(!1)}})}firstUpdated(){this.value&&(this.instructionHidden=!0),this.checkHidden()}render(){return this.readOnly?c` <wui-flex
         flexDirection="column"
         justifyContent="center"
         gap="01"
@@ -80,7 +80,7 @@ import{cy as x,cB as d,dd as u,cC as b,cD as v,cF as F,cW as D,cU as w,cP as j,d
       .padding=${["8","4","5","4"]}
     >
       <wui-text
-        ${z(this.instructionElementRef)}
+        ${F(this.instructionElementRef)}
         class="instruction"
         color="secondary"
         variant="md-medium"
@@ -101,7 +101,7 @@ import{cy as x,cB as d,dd as u,cC as b,cD as v,cF as F,cW as D,cU as w,cP as j,d
       <textarea
         spellcheck="false"
         ?disabled=${!this.instructionHidden}
-        ${z(this.inputElementRef)}
+        ${F(this.inputElementRef)}
         @input=${this.onInputChange.bind(this)}
         @blur=${this.onBlur.bind(this)}
         .value=${this.value??""}
@@ -265,7 +265,7 @@ ${this.value??""}</textarea
       >
         ${this.message}
       </wui-button>
-    </wui-flex>`}async handleSendParameters(){if(this.loading=!0,!this.params){this.loading=!1;return}const t=Number(this.params.amount);if(isNaN(t)){y.showError("Invalid amount"),this.loading=!1;return}const{namespace:n,chainId:r,assetAddress:o}=this.params;if(!J.SEND_PARAMS_SUPPORTED_CHAINS.includes(n)){y.showError(`Chain "${n}" is not supported for send parameters`),this.loading=!1;return}const i=w.getCaipNetworkById(r,n);if(!i){y.showError(`Network with id "${r}" not found`),this.loading=!1;return}try{const{balance:s,name:a,symbol:W,decimals:V}=await Q.fetchERC20Balance({caipAddress:this.caipAddress,assetAddress:o,caipNetwork:i});if(!a||!W||!V||!s){y.showError("Token not found");return}l.setToken({name:a,symbol:W,chainId:i.id.toString(),address:`${i.chainNamespace}:${i.id}:${o}`,value:0,price:0,quantity:{decimals:V.toString(),numeric:s.toString()},iconUrl:M.getTokenImage(W)??""}),l.setTokenAmount(t),l.setReceiverAddress(this.params.to)}catch(s){console.error("Failed to load token information:",s),y.showError("Failed to load token information")}finally{this.loading=!1}}};f.styles=re;g([u()],f.prototype,"token",void 0);g([u()],f.prototype,"sendTokenAmount",void 0);g([u()],f.prototype,"receiverAddress",void 0);g([u()],f.prototype,"receiverProfileName",void 0);g([u()],f.prototype,"loading",void 0);g([u()],f.prototype,"params",void 0);g([u()],f.prototype,"caipAddress",void 0);g([u()],f.prototype,"message",void 0);g([u()],f.prototype,"disconnecting",void 0);f=g([b("w3m-wallet-send-view")],f);const oe=x`
+    </wui-flex>`}async handleSendParameters(){if(this.loading=!0,!this.params){this.loading=!1;return}const t=Number(this.params.amount);if(isNaN(t)){y.showError("Invalid amount"),this.loading=!1;return}const{namespace:n,chainId:r,assetAddress:o}=this.params;if(!J.SEND_PARAMS_SUPPORTED_CHAINS.includes(n)){y.showError(`Chain "${n}" is not supported for send parameters`),this.loading=!1;return}const i=w.getCaipNetworkById(r,n);if(!i){y.showError(`Network with id "${r}" not found`),this.loading=!1;return}try{const{balance:s,name:a,symbol:W,decimals:V}=await G.fetchERC20Balance({caipAddress:this.caipAddress,assetAddress:o,caipNetwork:i});if(!a||!W||!V||!s){y.showError("Token not found");return}l.setToken({name:a,symbol:W,chainId:i.id.toString(),address:`${i.chainNamespace}:${i.id}:${o}`,value:0,price:0,quantity:{decimals:V.toString(),numeric:s.toString()},iconUrl:M.getTokenImage(W)??""}),l.setTokenAmount(t),l.setReceiverAddress(this.params.to)}catch(s){console.error("Failed to load token information:",s),y.showError("Failed to load token information")}finally{this.loading=!1}}};f.styles=re;g([u()],f.prototype,"token",void 0);g([u()],f.prototype,"sendTokenAmount",void 0);g([u()],f.prototype,"receiverAddress",void 0);g([u()],f.prototype,"receiverProfileName",void 0);g([u()],f.prototype,"loading",void 0);g([u()],f.prototype,"params",void 0);g([u()],f.prototype,"caipAddress",void 0);g([u()],f.prototype,"message",void 0);g([u()],f.prototype,"disconnecting",void 0);f=g([b("w3m-wallet-send-view")],f);const oe=x`
   .contentContainer {
     height: 440px;
     overflow: scroll;
@@ -443,7 +443,7 @@ ${this.value??""}</textarea
         @click=${()=>this.onNetworkClick(this.caipNetwork)}
         class="network"
         textTitle="Network"
-        imageSrc=${G(M.getNetworkImage(this.caipNetwork))}
+        imageSrc=${Q(M.getNetworkImage(this.caipNetwork))}
       ></wui-list-content>`:null}onNetworkClick(t){t&&!this.params&&h.push("Networks",{network:t})}};N.styles=le;O([d()],N.prototype,"receiverAddress",void 0);O([d({type:Object})],N.prototype,"caipNetwork",void 0);O([u()],N.prototype,"params",void 0);N=O([b("w3m-wallet-send-details")],N);const ce=x`
   wui-avatar,
   wui-image {
