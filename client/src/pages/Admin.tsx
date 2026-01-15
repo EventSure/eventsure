@@ -5,13 +5,17 @@ import {
   useAccount,
   useWriteContract,
   useWaitForTransactionReceipt,
+  useDeployContract,
+  useReadContract,
 } from "wagmi";
 import { useQueryClient } from "@tanstack/react-query";
-import { parseEther, stringToHex, pad } from "viem";
+import { parseEther, stringToHex, pad, encodeAbiParameters } from "viem";
 import { theme } from "@/styles/theme";
 import { Header, Footer } from "@/components/layout";
 import { useEpisodes } from "@/hooks/useEpisodes";
-import { EpisodeFactoryABI, EPISODE_FACTORY_ADDRESS } from "@/contracts/abis";
+import { EpisodeFactoryABI } from "@/contracts/abis";
+import { EpisodeFactoryBytecode } from "@/contracts/bytecode";
+import { useFactoryStore, DEFAULT_FACTORY } from "@/stores/factoryStore";
 import { EpisodeState } from "@/types/episode";
 import * as episodeUtils from "@/utils/episode";
 
@@ -459,7 +463,8 @@ const InfoIcon = () => (
 
 const Admin = () => {
   const { address: connectedAddress } = useAccount();
-  const { episodes, isLoading: isLoadingEpisodes } = useEpisodes();
+  const { factoryAddress, setFactoryAddress, resetToDefault } = useFactoryStore();
+  const { episodes, isLoading: isLoadingEpisodes } = useEpisodes(true);
   const queryClient = useQueryClient();
   const [password, setPassword] = useState("");
   const [isAuthenticated, setIsAuthenticated] = useState(false);
@@ -467,6 +472,8 @@ const Admin = () => {
   const [pendingEpisode, setPendingEpisode] = useState<string | null>(null);
   const [pendingAction, setPendingAction] = useState<string | null>(null);
   const [expandedEpisode, setExpandedEpisode] = useState<string | null>(null);
+  const [newFactoryAddress, setNewFactoryAddress] = useState("");
+  const [oracleAddress, setOracleAddress] = useState("");
 
   const [formData, setFormData] = useState({
     productId: "FLIGHT-001",
@@ -477,6 +484,18 @@ const Admin = () => {
     signupEnd: "",
     departureTime: "",
     estimatedArrivalTime: "",
+  });
+
+  const { data: factoryOwner } = useReadContract({
+    address: factoryAddress,
+    abi: EpisodeFactoryABI,
+    functionName: 'owner',
+  });
+
+  const { data: factoryOracle } = useReadContract({
+    address: factoryAddress,
+    abi: EpisodeFactoryABI,
+    functionName: 'oracle',
   });
 
   const {
@@ -490,6 +509,16 @@ const Admin = () => {
     hash,
   });
 
+  const {
+    deployContract,
+    data: deployHash,
+    isPending: isDeploying,
+    error: deployError,
+  } = useDeployContract();
+  const { isLoading: isDeployConfirming, isSuccess: isDeploySuccess, data: deployReceipt } = useWaitForTransactionReceipt({
+    hash: deployHash,
+  });
+
   useEffect(() => {
     if (isSuccess) {
       queryClient.invalidateQueries({ queryKey: ["episodeAddresses"] });
@@ -500,6 +529,13 @@ const Admin = () => {
       }, 1000);
     }
   }, [isSuccess, queryClient, reset]);
+
+  useEffect(() => {
+    if (isDeploySuccess && deployReceipt?.contractAddress) {
+      setFactoryAddress(deployReceipt.contractAddress);
+      queryClient.invalidateQueries({ queryKey: ["episodeAddresses"] });
+    }
+  }, [isDeploySuccess, deployReceipt, setFactoryAddress, queryClient]);
 
   const handleLogin = (e: React.FormEvent) => {
     e.preventDefault();
@@ -533,7 +569,7 @@ const Admin = () => {
       );
 
       writeContract({
-        address: EPISODE_FACTORY_ADDRESS,
+        address: factoryAddress,
         abi: EpisodeFactoryABI,
         functionName: "createEpisode",
         args: [
@@ -567,11 +603,29 @@ const Admin = () => {
         : "closeEpisode";
 
     writeContract({
-      address: EPISODE_FACTORY_ADDRESS,
+      address: factoryAddress,
       abi: EpisodeFactoryABI,
       functionName: functionName as any,
       args: [epAddress],
     });
+  };
+
+  const handleDeployFactory = () => {
+    if (!oracleAddress) return;
+    
+    deployContract({
+      abi: EpisodeFactoryABI,
+      bytecode: EpisodeFactoryBytecode,
+      args: [oracleAddress],
+    });
+  };
+
+  const handleUpdateFactoryAddress = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (newFactoryAddress.startsWith('0x') && newFactoryAddress.length === 42) {
+      setFactoryAddress(newFactoryAddress as `0x${string}`);
+      setNewFactoryAddress("");
+    }
   };
 
   const getNextStateLabel = (action: "open" | "lock" | "close") => {
@@ -764,247 +818,106 @@ const Admin = () => {
         </GlassCard>
 
         <GlassCard>
-          <Subtitle>Manage Episodes</Subtitle>
-          {isLoadingEpisodes ? (
-            <div style={{ textAlign: "center", padding: theme.spacing.xl }}>
-              Loading episodes...
+          <Subtitle>Factory Status</Subtitle>
+          <div style={{ display: "flex", flexDirection: "column", gap: theme.spacing.md }}>
+            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+              <Label>Active Factory</Label>
+              <div style={{ display: "flex", alignItems: "center", gap: theme.spacing.sm }}>
+                <AddressText style={{ fontSize: theme.fontSize.md }}>
+                  {factoryAddress}
+                </AddressText>
+                {factoryAddress === DEFAULT_FACTORY && (
+                  <Badge variant="secondary">DEFAULT</Badge>
+                )}
+              </div>
             </div>
-          ) : episodes.length === 0 ? (
-            <div style={{ textAlign: "center", padding: theme.spacing.xl }}>
-              No episodes found.
+            
+            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+              <Label>Factory Owner</Label>
+              <AddressText style={{ fontSize: theme.fontSize.sm }}>
+                {factoryOwner || "Loading..."}
+              </AddressText>
             </div>
-          ) : (
-            <div>
-              {episodes.map((ep) => {
-                const isExpanded = expandedEpisode === ep.address;
-                return (
-                  <EpisodeItemContainer key={ep.address}>
-                    <EpisodeRowWrapper>
-                      {isEpisodeLoading(ep.address) && (
-                        <EpisodeRowLoading>
-                          <div
-                            style={{
-                              display: "flex",
-                              alignItems: "center",
-                              gap: theme.spacing.sm,
-                              color: theme.colors.secondary,
-                            }}
-                          >
-                            <LoadingSpinner
-                              animate={{ rotate: 360 }}
-                              transition={{
-                                duration: 1,
-                                repeat: Infinity,
-                                ease: "linear",
-                              }}
-                            />
-                            <span
-                              style={{
-                                fontSize: theme.fontSize.sm,
-                                fontWeight: theme.fontWeight.medium,
-                              }}
-                            >
-                              {isPending
-                                ? "Confirm in wallet..."
-                                : `Changing to ${getNextStateLabel(
-                                    pendingAction as "open" | "lock" | "close"
-                                  )}...`}
-                            </span>
-                          </div>
-                        </EpisodeRowLoading>
-                      )}
-                      <EpisodeHeader
-                        $isExpanded={isExpanded}
-                        onClick={() => toggleEpisodeExpand(ep.address)}
-                      >
-                        <EpisodeHeaderLeft>
-                          <ExpandIcon>
-                            <ChevronIcon isExpanded={isExpanded} />
-                          </ExpandIcon>
-                          <EpisodeInfo>
-                            <FlightName>{ep.flightName}</FlightName>
-                            <AddressText>
-                              {ep.address.slice(0, 6)}...{ep.address.slice(-4)}
-                            </AddressText>
-                          </EpisodeInfo>
-                        </EpisodeHeaderLeft>
 
-                        <div
-                          style={{
-                            display: "flex",
-                            alignItems: "center",
-                            gap: theme.spacing.lg,
-                          }}
-                        >
-                          <Badge
-                            variant={episodeUtils.getStateBadgeVariant(
-                              ep.state
-                            )}
-                          >
-                            {episodeUtils.getStateLabel(ep.state).toUpperCase()}
-                          </Badge>
-
-                          <ActionButtons onClick={(e) => e.stopPropagation()}>
-                            {ep.state === EpisodeState.Created && (
-                              <Button
-                                variant="gradient"
-                                onClick={() => handleAction(ep.address, "open")}
-                                disabled={isPending || isConfirming}
-                              >
-                                → OPEN
-                              </Button>
-                            )}
-                            {ep.state === EpisodeState.Open && (
-                              <Button
-                                variant="outline"
-                                onClick={() => handleAction(ep.address, "lock")}
-                                disabled={isPending || isConfirming}
-                              >
-                                → LOCKED
-                              </Button>
-                            )}
-                            {ep.state === EpisodeState.Locked && (
-                              <Button
-                                variant="success"
-                                onClick={() =>
-                                  handleAction(ep.address, "close")
-                                }
-                                disabled={isPending || isConfirming}
-                              >
-                                → RESOLVED
-                              </Button>
-                            )}
-                          </ActionButtons>
-                        </div>
-                      </EpisodeHeader>
-                    </EpisodeRowWrapper>
-
-                    <AnimatePresence>
-                      {isExpanded && (
-                        <EpisodeDetails
-                          initial={{ height: 0, opacity: 0 }}
-                          animate={{ height: "auto", opacity: 1 }}
-                          exit={{ height: 0, opacity: 0 }}
-                          transition={{ duration: 0.2 }}
-                        >
-                          <DetailsContent>
-                            <DetailsGrid>
-                              <DetailSection>
-                                <DetailSectionTitle>
-                                  <DollarIcon />
-                                  Financial Terms
-                                </DetailSectionTitle>
-                                <DetailRow>
-                                  <DetailLabel>Premium</DetailLabel>
-                                  <DetailValue $highlight>
-                                    {episodeUtils.formatMNT(ep.premiumAmount)}
-                                  </DetailValue>
-                                </DetailRow>
-                                <DetailRow>
-                                  <DetailLabel>Max Payout</DetailLabel>
-                                  <DetailValue $highlight>
-                                    {episodeUtils.formatMNT(ep.payoutAmount)}
-                                  </DetailValue>
-                                </DetailRow>
-                                <DetailRow>
-                                  <DetailLabel>Pool Size</DetailLabel>
-                                  <DetailValue>
-                                    {episodeUtils.formatMNT(ep.totalPremium)}
-                                  </DetailValue>
-                                </DetailRow>
-                                <DetailRow>
-                                  <DetailLabel>Payout Ratio</DetailLabel>
-                                  <DetailValue>
-                                    {ep.premiumAmount > 0n
-                                      ? `${(
-                                          Number(ep.payoutAmount) /
-                                          Number(ep.premiumAmount)
-                                        ).toFixed(1)}x`
-                                      : "N/A"}
-                                  </DetailValue>
-                                </DetailRow>
-                              </DetailSection>
-
-                              <DetailSection>
-                                <DetailSectionTitle>
-                                  <ClockIcon />
-                                  Schedule
-                                </DetailSectionTitle>
-                                <DetailRow>
-                                  <DetailLabel>Departure</DetailLabel>
-                                  <DetailValue>
-                                    {formatTimestamp(ep.departureTime)}
-                                  </DetailValue>
-                                </DetailRow>
-                                <DetailRow>
-                                  <DetailLabel>Est. Arrival</DetailLabel>
-                                  <DetailValue>
-                                    {formatTimestamp(ep.estimatedArrivalTime)}
-                                  </DetailValue>
-                                </DetailRow>
-                                <DetailRow>
-                                  <DetailLabel>Duration</DetailLabel>
-                                  <DetailValue>
-                                    {ep.departureTime && ep.estimatedArrivalTime
-                                      ? `${Math.round(
-                                          (Number(ep.estimatedArrivalTime) -
-                                            Number(ep.departureTime)) /
-                                            3600
-                                        )}h`
-                                      : "N/A"}
-                                  </DetailValue>
-                                </DetailRow>
-                              </DetailSection>
-
-                              <DetailSection>
-                                <DetailSectionTitle>
-                                  <InfoIcon />
-                                  Episode Info
-                                </DetailSectionTitle>
-                                <DetailRow>
-                                  <DetailLabel>State</DetailLabel>
-                                  <DetailValue>
-                                    {episodeUtils
-                                      .getStateLabel(ep.state)
-                                      .toUpperCase()}
-                                  </DetailValue>
-                                </DetailRow>
-                                <DetailRow>
-                                  <DetailLabel>Participants</DetailLabel>
-                                  <DetailValue>
-                                    {ep.premiumAmount > 0n
-                                      ? Math.floor(
-                                          Number(ep.totalPremium) /
-                                            Number(ep.premiumAmount)
-                                        )
-                                      : 0}
-                                  </DetailValue>
-                                </DetailRow>
-                                <FullAddressBox>
-                                  <AddressText
-                                    style={{
-                                      fontSize: theme.fontSize.xs,
-                                      wordBreak: "break-all",
-                                    }}
-                                  >
-                                    {ep.address}
-                                  </AddressText>
-                                  <CopyButton
-                                    onClick={() => copyToClipboard(ep.address)}
-                                  >
-                                    Copy
-                                  </CopyButton>
-                                </FullAddressBox>
-                              </DetailSection>
-                            </DetailsGrid>
-                          </DetailsContent>
-                        </EpisodeDetails>
-                      )}
-                    </AnimatePresence>
-                  </EpisodeItemContainer>
-                );
-              })}
+            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+              <Label>Factory Oracle</Label>
+              <AddressText style={{ fontSize: theme.fontSize.sm }}>
+                {factoryOracle || "Loading..."}
+              </AddressText>
             </div>
+
+            <FullAddressBox style={{ marginTop: 0 }}>
+              <div style={{ flex: 1 }}>
+                <Label>Switch Factory Address</Label>
+                <form onSubmit={handleUpdateFactoryAddress} style={{ display: 'flex', gap: theme.spacing.sm, marginTop: 4 }}>
+                  <Input 
+                    placeholder="0x..." 
+                    value={newFactoryAddress} 
+                    onChange={(e) => setNewFactoryAddress(e.target.value)}
+                    style={{ padding: '8px 12px' }}
+                  />
+                  <Button type="submit" variant="outline" style={{ padding: '8px 16px', whiteSpace: 'nowrap' }}>
+                    Update
+                  </Button>
+                </form>
+              </div>
+            </FullAddressBox>
+
+            {factoryAddress !== DEFAULT_FACTORY && (
+              <Button onClick={resetToDefault} variant="danger" style={{ width: '100%' }}>
+                Reset to Default Factory
+              </Button>
+            )}
+          </div>
+        </GlassCard>
+
+        <GlassCard>
+          <Subtitle>Deploy New Factory</Subtitle>
+          <div style={{ display: "flex", flexDirection: "column", gap: theme.spacing.lg }}>
+            <InputGroup style={{ marginBottom: 0 }}>
+              <Label>Oracle Address</Label>
+              <Input 
+                placeholder="0x..." 
+                value={oracleAddress} 
+                onChange={(e) => setOracleAddress(e.target.value)} 
+              />
+            </InputGroup>
+            
+            {deployError && (
+              <ErrorBox>
+                {deployError.message.includes("User rejected") 
+                  ? "Deployment rejected by user" 
+                  : `Error: ${deployError.message.split('\n')[0]}`}
+              </ErrorBox>
+            )}
+
+            {isDeploySuccess && <SuccessBox>New Factory deployed at: {deployReceipt?.contractAddress}</SuccessBox>}
+
+            <Button 
+              variant="gradient" 
+              onClick={handleDeployFactory}
+              disabled={isDeploying || isDeployConfirming || !oracleAddress}
+              style={{ width: "100%" }}
+            >
+              {isDeploying ? "Confirm in Wallet..." : isDeployConfirming ? "Deploying..." : "Deploy EpisodeFactory"}
+            </Button>
+          </div>
+        </GlassCard>
+
+        <GlassCard>
+          <Subtitle>Connected Wallet</Subtitle>
+          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+            <AddressText style={{ fontSize: theme.fontSize.md }}>
+              {connectedAddress || "Not connected"}
+            </AddressText>
+            <Badge variant={connectedAddress ? "success" : "error"}>
+              {connectedAddress ? "Connected" : "Disconnected"}
+            </Badge>
+          </div>
+          {connectedAddress && factoryOwner && connectedAddress.toLowerCase() !== factoryOwner.toLowerCase() && (
+            <ErrorBox style={{ marginTop: theme.spacing.md, marginBottom: 0 }}>
+              Warning: You are not the owner of the active Factory. You won't be able to manage episodes.
+            </ErrorBox>
           )}
         </GlassCard>
       </motion.div>

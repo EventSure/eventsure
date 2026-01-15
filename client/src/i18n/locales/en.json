@@ -14,7 +14,7 @@
     "title3": "When real events happen, insurance just works.",
     "subtitle": "An event-based, rule-driven insurance platform that automatically resolves outcomes based on predefined real-world conditions.",
     "highlights": ["No interpretation.", "No claims.", "No trust required."],
-    "getCoverage": "Explore Events",
+    "getCoverage": "Explore Episodes",
     "learnMore": "Learn More"
   },
   "stats": {
@@ -188,7 +188,7 @@
     },
     "userFlow": {
       "step1": {
-        "title": "Explore Events",
+        "title": "Explore Episodes",
         "description": "Browse real-world events with fixed duration and conditions such as flight delays or travel disruptions."
       },
       "step2": {
@@ -201,10 +201,10 @@
         ]
       },
       "step3": {
-        "title": "Join the Pool",
-        "description": "You don't buy insurance. You join a risk pool with others facing the same event.",
+        "title": "Join the Episode",
+        "description": "You don't buy insurance. You join an episode with others exposed to the same event.",
         "list": [
-          "Your risk is capped upfront.",
+          "Your risk is capped upfront by predefined rules.",
           "There are no additional contributions later."
         ]
       },
@@ -348,6 +348,8 @@
       "open": "Open",
       "locked": "Locked",
       "resolved": "Resolved",
+      "settled": "Settled",
+      "closed": "Closed",
       "inForce": "IN FORCE"
     },
     "categories": {

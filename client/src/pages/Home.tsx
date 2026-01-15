@@ -2,6 +2,7 @@ import styled from "@emotion/styled";
 import { motion } from "framer-motion";
 import { useAccount } from "wagmi";
 import { useTranslation } from "react-i18next";
+import { useNavigate } from "react-router-dom";
 import { theme } from "@/styles/theme";
 import { WorldMap } from "@/components/WorldMap";
 import { Header, Footer } from "@/components/layout";
@@ -291,6 +292,7 @@ const itemVariants = {
 export const Home = () => {
   const { address, isConnected } = useAccount();
   const { t } = useTranslation();
+  const navigate = useNavigate();
 
   return (
     <PageContainer>
@@ -358,6 +360,7 @@ export const Home = () => {
                 size="lg"
                 whileHover={{ scale: 1.02 }}
                 whileTap={{ scale: 0.98 }}
+                onClick={() => navigate("/explorer")}
               >
                 {t("hero.getCoverage")}
               </Button>

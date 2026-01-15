@@ -1,7 +1,8 @@
 import { useMemo } from 'react';
 import { useReadContracts } from 'wagmi';
 import { useQuery } from '@tanstack/react-query';
-import { EpisodeABI } from '@/contracts/abis';
+import { EpisodeABI, EpisodeFactoryABI } from '@/contracts/abis';
+import { useFactoryStore } from '@/stores/factoryStore';
 import type { EpisodeData } from '@/types/episode';
 
 const API_BASE_URL = 'https://eventsure-production.up.railway.app';
@@ -15,13 +16,38 @@ const fetchEpisodeAddresses = async (): Promise<`0x${string}`[]> => {
   return (data.episodes as string[]).map(addr => addr.toLowerCase() as `0x${string}`)
 };
 
-export const useEpisodes = () => {
-  const { data: episodeAddresses = [], isLoading: isLoadingAddresses } = useQuery({
+export const useEpisodes = (useContractDirectly = false) => {
+  const factoryAddress = useFactoryStore((state) => state.factoryAddress);
+
+  const { data: contractEpisodes, isLoading: isLoadingFromContract } = useReadContracts({
+    contracts: [{
+      address: factoryAddress,
+      abi: EpisodeFactoryABI,
+      functionName: 'allEpisodes',
+    }],
+    query: {
+      enabled: useContractDirectly,
+    },
+  });
+
+  const { data: apiEpisodes = [], isLoading: isLoadingFromApi } = useQuery({
     queryKey: ['episodeAddresses'],
     queryFn: fetchEpisodeAddresses,
     staleTime: 30000,
     refetchInterval: 60000,
+    enabled: !useContractDirectly,
   });
+
+  const episodeAddresses = useMemo(() => {
+    if (useContractDirectly && contractEpisodes?.[0]?.result) {
+      return (contractEpisodes[0].result as `0x${string}`[]).map(
+        addr => addr.toLowerCase() as `0x${string}`
+      );
+    }
+    return apiEpisodes;
+  }, [useContractDirectly, contractEpisodes, apiEpisodes]);
+
+  const isLoadingAddresses = useContractDirectly ? isLoadingFromContract : isLoadingFromApi;
 
   /*
    * ORIGINAL CONTRACT DIRECT QUERY - Commented out per user request
