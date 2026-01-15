@@ -294,6 +294,13 @@ export const Home = () => {
   const { t } = useTranslation();
   const navigate = useNavigate();
 
+  const handleScrollTo = (id: string) => {
+    const element = document.getElementById(id);
+    if (element) {
+      element.scrollIntoView({ behavior: "smooth" });
+    }
+  };
+
   return (
     <PageContainer>
       <WorldMap />
@@ -369,6 +376,7 @@ export const Home = () => {
                 size="lg"
                 whileHover={{ scale: 1.02 }}
                 whileTap={{ scale: 0.98 }}
+                onClick={() => handleScrollTo("what-is")}
               >
                 {t("hero.learnMore")}
               </Button>
@@ -387,6 +395,7 @@ export const Home = () => {
         </HeroSection>
 
         <WhatIsSection
+          id="what-is"
           initial={{ opacity: 0, y: 50 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
@@ -430,6 +439,7 @@ export const Home = () => {
                 </FeatureIcon>
                 <FeatureTitle>{t("features.security.title")}</FeatureTitle>
                 <FeatureDescription>
+.
                   {t("features.security.description")}
                 </FeatureDescription>
               </FeatureCard>

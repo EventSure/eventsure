@@ -1,6 +1,8 @@
 package http
 
 import (
+	"net/http"
+
 	"eventsure-server/interface/http/controller"
 	"eventsure-server/interface/http/middleware"
 
@@ -9,42 +11,35 @@ import (
 
 // Router sets up HTTP routes
 type Router struct {
-	episodeController     *controller.EpisodeController
-	poolController        *controller.PoolController
-	transactionController *controller.TransactionController
-	statsController       *controller.StatsController
+	episodeController *controller.EpisodeController
 }
 
 // NewRouter creates a new Router
-func NewRouter(
-	episodeController *controller.EpisodeController,
-	poolController *controller.PoolController,
-	transactionController *controller.TransactionController,
-	statsController *controller.StatsController,
-) *Router {
+func NewRouter(episodeController *controller.EpisodeController) *Router {
 	return &Router{
-		episodeController:     episodeController,
-		poolController:        poolController,
-		transactionController: transactionController,
-		statsController:       statsController,
+		episodeController: episodeController,
 	}
 }
 
 // SetupRoutes sets up all routes
 func (r *Router) SetupRoutes(mux *mux.Router) {
+	// Health check endpoint (for Railway/deployment health checks)
+	mux.HandleFunc("/health", func(w http.ResponseWriter, r *http.Request) {
+		w.WriteHeader(http.StatusOK)
+		w.Write([]byte("OK"))
+	}).Methods("GET")
+
 	api := mux.PathPrefix("/api").Subrouter()
 
 	// Apply logging middleware to all API routes
 	api.Use(middleware.LoggingMiddleware)
 
-	// Phase 1: 필수 엔드포인트
+	// Episode endpoints
 	api.HandleFunc("/episodes", r.episodeController.GetEpisodes).Methods("GET")
-	api.HandleFunc("/episodes/{episodeId}", r.episodeController.GetEpisodeDetail).Methods("GET")
-	api.HandleFunc("/pools", r.poolController.GetPools).Methods("GET")
-	api.HandleFunc("/stats/home", r.statsController.GetHomeStats).Methods("GET")
+	api.HandleFunc("/episodes/{episode}/events", r.episodeController.GetEpisodeEvents).Methods("GET")
 
-	// Phase 2: 중요 엔드포인트
-	api.HandleFunc("/transactions", r.transactionController.GetTransactions).Methods("GET")
-	api.HandleFunc("/transactions/stats", r.transactionController.GetTransactionStats).Methods("GET")
+	// User Episode endpoints
+	api.HandleFunc("/user-episodes", r.episodeController.CreateUserEpisode).Methods("POST")
+	api.HandleFunc("/user-episodes", r.episodeController.GetUserEpisodes).Methods("GET")
 	// TODO: User endpoints will be added later
 }
